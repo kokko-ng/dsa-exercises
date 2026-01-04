@@ -1,0 +1,400 @@
+# Hints for Bit Manipulation problems
+
+single_number:
+  level_1:
+    title: "XOR Properties"
+    content: |
+      Key XOR properties:
+      - `a ^ a = 0` (same number XORed cancels out)
+      - `a ^ 0 = a` (XOR with 0 leaves number unchanged)
+      - XOR is commutative and associative
+
+      If every number appears twice except one, what happens when you XOR all?
+
+  level_2:
+    title: "XOR All Numbers"
+    content: |
+      XOR all numbers together:
+
+      ```python
+      result = 0
+      for num in nums:
+          result ^= num
+      return result
+      ```
+
+      Pairs cancel out: `(2 ^ 2) ^ (1) ^ (4 ^ 4) = 0 ^ 1 ^ 0 = 1`
+
+  level_3:
+    title: "One-liner with reduce"
+    content: |
+      ```python
+      from functools import reduce
+      from operator import xor
+
+      def single_number(nums):
+          return reduce(xor, nums)
+      ```
+
+      Time: O(n), Space: O(1)
+
+single_number_ii:
+  level_1:
+    title: "Count Bits"
+    content: |
+      XOR doesn't work here (3 times doesn't cancel out).
+
+      Idea: Count the number of 1s at each bit position.
+      If count % 3 != 0, the single number has a 1 at that position.
+
+  level_2:
+    title: "Bit Counting Solution"
+    content: |
+      ```python
+      result = 0
+      for i in range(32):
+          bit_sum = 0
+          for num in nums:
+              bit_sum += (num >> i) & 1
+          if bit_sum % 3:
+              result |= (1 << i)
+
+      # Handle negative numbers in Python
+      if result >= 2**31:
+          result -= 2**32
+
+      return result
+      ```
+
+  level_3:
+    title: "State Machine Approach"
+    content: |
+      Track bit counts mod 3 using two variables:
+
+      ```python
+      ones, twos = 0, 0
+      for num in nums:
+          ones = (ones ^ num) & ~twos
+          twos = (twos ^ num) & ~ones
+      return ones
+      ```
+
+      - `ones`: bits that appeared 1 mod 3 times
+      - `twos`: bits that appeared 2 mod 3 times
+      - When count reaches 3, both reset to 0
+
+single_number_iii:
+  level_1:
+    title: "Separate the Two Numbers"
+    content: |
+      XOR of all numbers = a ^ b (where a, b are the two unique numbers).
+
+      The result has 1s where a and b differ.
+
+      Use any set bit to divide numbers into two groups!
+
+  level_2:
+    title: "Two-Pass Solution"
+    content: |
+      ```python
+      # Step 1: XOR all to get a ^ b
+      xor_all = 0
+      for num in nums:
+          xor_all ^= num
+
+      # Step 2: Find a bit where a and b differ
+      diff_bit = xor_all & (-xor_all)  # Lowest set bit
+
+      # Step 3: Divide and XOR each group
+      a, b = 0, 0
+      for num in nums:
+          if num & diff_bit:
+              a ^= num
+          else:
+              b ^= num
+
+      return [a, b]
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - `xor_all & (-xor_all)` isolates the rightmost set bit
+      - This bit is 1 in exactly one of a or b
+      - When we partition by this bit:
+        - a goes to one group, b goes to the other
+        - Pairs go to the same group (both have same bit value)
+        - XOR of each group gives us a and b separately
+
+counting_bits:
+  level_1:
+    title: "Dynamic Programming"
+    content: |
+      Use previously computed results!
+
+      Observation: The number of 1s in `i` relates to `i >> 1` (right shift).
+
+      `bits[i] = bits[i >> 1] + (i & 1)`
+
+  level_2:
+    title: "DP Solution"
+    content: |
+      ```python
+      result = [0] * (n + 1)
+      for i in range(1, n + 1):
+          result[i] = result[i >> 1] + (i & 1)
+      return result
+      ```
+
+      - `i >> 1` removes the last bit
+      - `i & 1` checks if last bit is 1
+
+  level_3:
+    title: "Alternative Recurrences"
+    content: |
+      Another approach using `i & (i-1)`:
+
+      ```python
+      result = [0] * (n + 1)
+      for i in range(1, n + 1):
+          result[i] = result[i & (i-1)] + 1
+      return result
+      ```
+
+      `i & (i-1)` removes the lowest set bit, so we add 1 to that count.
+
+number_of_1_bits:
+  level_1:
+    title: "Check Each Bit"
+    content: |
+      Two approaches:
+      1. Check all 32 bits
+      2. Only visit set bits using `n & (n-1)`
+
+  level_2:
+    title: "Brian Kernighan's Algorithm"
+    content: |
+      `n & (n-1)` clears the lowest set bit:
+
+      ```python
+      count = 0
+      while n:
+          n &= (n - 1)
+          count += 1
+      return count
+      ```
+
+      Example: 12 (1100) -> 8 (1000) -> 0
+
+  level_3:
+    title: "Why n & (n-1) Works"
+    content: |
+      - `n-1` flips all bits from the rightmost 1 to the end
+      - Example: 1100 - 1 = 1011
+      - AND with original: 1100 & 1011 = 1000 (rightmost 1 cleared)
+
+      Alternative using built-in:
+      ```python
+      return bin(n).count('1')
+      ```
+
+reverse_bits:
+  level_1:
+    title: "Bit by Bit"
+    content: |
+      Extract bits from the right, build result from the left.
+
+      For each of 32 bits:
+      1. Get the rightmost bit of n
+      2. Add it to result (shift result left first)
+      3. Shift n right
+
+  level_2:
+    title: "Iterative Solution"
+    content: |
+      ```python
+      result = 0
+      for i in range(32):
+          result = (result << 1) | (n & 1)
+          n >>= 1
+      return result
+      ```
+
+      We build result by shifting left and adding the next bit from n.
+
+  level_3:
+    title: "Divide and Conquer"
+    content: |
+      Swap halves, then quarters, etc.:
+
+      ```python
+      n = (n >> 16) | (n << 16)
+      n = ((n & 0xff00ff00) >> 8) | ((n & 0x00ff00ff) << 8)
+      n = ((n & 0xf0f0f0f0) >> 4) | ((n & 0x0f0f0f0f) << 4)
+      n = ((n & 0xcccccccc) >> 2) | ((n & 0x33333333) << 2)
+      n = ((n & 0xaaaaaaaa) >> 1) | ((n & 0x55555555) << 1)
+      return n
+      ```
+
+      This is O(log 32) = O(1) with constant operations.
+
+power_of_two:
+  level_1:
+    title: "Binary Representation"
+    content: |
+      Powers of two in binary have exactly one 1:
+      - 1 = 0001
+      - 2 = 0010
+      - 4 = 0100
+      - 8 = 1000
+
+      How can you check if there's exactly one 1 bit?
+
+  level_2:
+    title: "n & (n-1) Trick"
+    content: |
+      `n & (n-1)` clears the lowest set bit.
+
+      If n is a power of 2, it has exactly one set bit.
+      After clearing it, we get 0!
+
+      ```python
+      return n > 0 and (n & (n - 1)) == 0
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - `n <= 0`: Not a power of 2 (including 0 and negatives)
+      - `n = 1`: 2^0 = 1, so True
+
+      Alternative: `n > 0 and n & (-n) == n`
+      (Only one bit set means isolating lowest bit gives n itself)
+
+bitwise_and_range:
+  level_1:
+    title: "Common Prefix"
+    content: |
+      ANDing a range of consecutive numbers:
+      - Bits that change across the range become 0
+      - Only the **common prefix** of left and right survives
+
+  level_2:
+    title: "Shift Until Equal"
+    content: |
+      Find common prefix by right-shifting both until equal:
+
+      ```python
+      shift = 0
+      while left < right:
+          left >>= 1
+          right >>= 1
+          shift += 1
+      return left << shift
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      Example: left=5 (101), right=7 (111)
+      - 5 >> 1 = 2 (10), 7 >> 1 = 3 (11), shift=1
+      - 2 >> 1 = 1 (1), 3 >> 1 = 1 (1), shift=2
+      - Equal! Result = 1 << 2 = 4
+
+      All numbers from 5 to 7 share prefix 1xx, but
+      the last two bits vary, so they AND to 0.
+
+      Alternative using Brian Kernighan:
+      ```python
+      while right > left:
+          right &= (right - 1)
+      return right
+      ```
+
+missing_number:
+  level_1:
+    title: "XOR Approach"
+    content: |
+      XOR all numbers with all indices!
+
+      If we XOR [0,1,2,...,n] with nums, pairs cancel out.
+      The remaining value is the missing number.
+
+  level_2:
+    title: "XOR Solution"
+    content: |
+      ```python
+      result = len(nums)  # Start with n
+      for i, num in enumerate(nums):
+          result ^= i ^ num
+      return result
+      ```
+
+      Example: nums = [3,0,1], n=3
+      - result = 3
+      - i=0: result ^= 0 ^ 3 = 3 ^ 0 ^ 3 = 0
+      - i=1: result ^= 1 ^ 0 = 0 ^ 1 ^ 0 = 1
+      - i=2: result ^= 2 ^ 1 = 1 ^ 2 ^ 1 = 2
+
+  level_3:
+    title: "Math Approach"
+    content: |
+      Alternative using sum:
+
+      ```python
+      n = len(nums)
+      expected_sum = n * (n + 1) // 2
+      return expected_sum - sum(nums)
+      ```
+
+      Both are O(n) time, O(1) space.
+
+sum_of_two_integers:
+  level_1:
+    title: "Think About Binary Addition"
+    content: |
+      Binary addition without carry: XOR
+      Carry bits: AND, shifted left
+
+      Example: 5 + 3
+      - 101 XOR 011 = 110 (sum without carry)
+      - 101 AND 011 = 001 -> 010 (carry shifted)
+
+      Repeat until no carry!
+
+  level_2:
+    title: "Iterative Solution"
+    content: |
+      ```python
+      # Handle Python's arbitrary precision with 32-bit mask
+      MASK = 0xFFFFFFFF
+      MAX_INT = 0x7FFFFFFF
+
+      while b != 0:
+          carry = (a & b) << 1
+          a = (a ^ b) & MASK
+          b = carry & MASK
+
+      # Handle negative numbers
+      return a if a <= MAX_INT else ~(a ^ MASK)
+      ```
+
+  level_3:
+    title: "Why Masking is Needed"
+    content: |
+      Python integers have arbitrary precision, so we need to simulate
+      32-bit behavior.
+
+      - `& MASK` keeps only lower 32 bits
+      - `MAX_INT = 0x7FFFFFFF` is the largest positive 32-bit int
+      - If result > MAX_INT, it's negative in 32-bit representation
+
+      Recursive version:
+      ```python
+      def getSum(a, b):
+          if b == 0:
+              return a
+          return getSum((a ^ b) & MASK, ((a & b) << 1) & MASK)
+      ```
+
+      Need to handle final negative conversion.

@@ -1,0 +1,660 @@
+# Hints for Two Pointers & Sliding Window problems
+
+remove_element:
+  level_1:
+    title: "Two Pointer Approach"
+    content: |
+      Use two pointers:
+      - One (slow) for placing non-val elements
+      - One (fast) for scanning through array
+
+      When you find a non-val element, place it at the slow pointer position.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      slow = 0
+      for fast in range(len(nums)):
+          if nums[fast] != val:
+              nums[slow] = nums[fast]
+              slow += 1
+      return slow
+      ```
+
+      The first `slow` elements will be the non-val elements.
+
+  level_3:
+    title: "Alternative: Swap with End"
+    content: |
+      When order doesn't matter, swap with the end:
+
+      ```python
+      left, right = 0, len(nums) - 1
+      while left <= right:
+          if nums[left] == val:
+              nums[left] = nums[right]
+              right -= 1
+          else:
+              left += 1
+      return left
+      ```
+
+      This does fewer writes when val is rare.
+
+squares_of_sorted_array:
+  level_1:
+    title: "Two Pointers from Ends"
+    content: |
+      The input is sorted, but after squaring:
+      - Negative numbers' squares go in reverse
+      - Positive numbers' squares stay in order
+
+      The largest squares are at the **ends** of the array!
+
+  level_2:
+    title: "Fill Result from End"
+    content: |
+      ```python
+      n = len(nums)
+      result = [0] * n
+      left, right = 0, n - 1
+      pos = n - 1  # Fill from end
+
+      while left <= right:
+          left_sq = nums[left] ** 2
+          right_sq = nums[right] ** 2
+
+          if left_sq > right_sq:
+              result[pos] = left_sq
+              left += 1
+          else:
+              result[pos] = right_sq
+              right -= 1
+          pos -= 1
+
+      return result
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Largest values are at ends (most negative or most positive)
+      - Compare squares of both ends, pick larger
+      - Place in result from right to left
+      - O(n) time, O(n) space for result
+
+three_sum:
+  level_1:
+    title: "Reduce to Two Sum"
+    content: |
+      For each element nums[i]:
+      - Find two other elements that sum to -nums[i]
+      - This is a two-sum problem!
+
+      Sort the array first to help with duplicates and two-pointer approach.
+
+  level_2:
+    title: "Sort + Two Pointers"
+    content: |
+      ```python
+      nums.sort()
+      result = []
+
+      for i in range(len(nums) - 2):
+          # Skip duplicates for first element
+          if i > 0 and nums[i] == nums[i - 1]:
+              continue
+
+          left, right = i + 1, len(nums) - 1
+          target = -nums[i]
+
+          while left < right:
+              current_sum = nums[left] + nums[right]
+              if current_sum == target:
+                  result.append([nums[i], nums[left], nums[right]])
+                  # Skip duplicates
+                  while left < right and nums[left] == nums[left + 1]:
+                      left += 1
+                  while left < right and nums[right] == nums[right - 1]:
+                      right -= 1
+                  left += 1
+                  right -= 1
+              elif current_sum < target:
+                  left += 1
+              else:
+                  right -= 1
+
+      return result
+      ```
+
+  level_3:
+    title: "Handling Duplicates"
+    content: |
+      Three places to skip duplicates:
+      1. Skip duplicate first elements (i)
+      2. Skip duplicate second elements (left) after finding a triplet
+      3. Skip duplicate third elements (right) after finding a triplet
+
+      Time: O(n^2), Space: O(1) excluding output
+
+three_sum_closest:
+  level_1:
+    title: "Similar to 3Sum"
+    content: |
+      Use the same sort + two pointers approach.
+
+      Instead of finding exact sum = 0, track the closest sum seen so far.
+
+  level_2:
+    title: "Track Closest"
+    content: |
+      ```python
+      nums.sort()
+      closest = float('inf')
+
+      for i in range(len(nums) - 2):
+          left, right = i + 1, len(nums) - 1
+
+          while left < right:
+              current_sum = nums[i] + nums[left] + nums[right]
+
+              if abs(current_sum - target) < abs(closest - target):
+                  closest = current_sum
+
+              if current_sum == target:
+                  return target
+              elif current_sum < target:
+                  left += 1
+              else:
+                  right -= 1
+
+      return closest
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      - Early exit if exact match found
+      - Can skip duplicates like in 3Sum for slight speedup
+      - No need to track indices, just the sum
+
+sort_colors:
+  level_1:
+    title: "Dutch National Flag"
+    content: |
+      Use three pointers:
+      - low: boundary for 0s (everything before is 0)
+      - mid: current element being examined
+      - high: boundary for 2s (everything after is 2)
+
+  level_2:
+    title: "Three Pointer Implementation"
+    content: |
+      ```python
+      low, mid, high = 0, 0, len(nums) - 1
+
+      while mid <= high:
+          if nums[mid] == 0:
+              nums[low], nums[mid] = nums[mid], nums[low]
+              low += 1
+              mid += 1
+          elif nums[mid] == 1:
+              mid += 1
+          else:  # nums[mid] == 2
+              nums[mid], nums[high] = nums[high], nums[mid]
+              high -= 1
+              # Don't increment mid - need to check swapped element
+      ```
+
+  level_3:
+    title: "Why mid Doesn't Increment for 2"
+    content: |
+      When swapping with high:
+      - We don't know what value came from high
+      - It could be 0, 1, or 2
+      - Need to process it again
+
+      When swapping with low:
+      - We know it's either 0 or 1 (already processed)
+      - Safe to increment mid
+
+backspace_string_compare:
+  level_1:
+    title: "Stack or Two Pointers"
+    content: |
+      Approach 1: Build final strings using a stack, then compare.
+
+      Approach 2: Compare from the end using two pointers (O(1) space).
+
+  level_2:
+    title: "Stack Approach"
+    content: |
+      ```python
+      def build(s):
+          stack = []
+          for c in s:
+              if c == '#':
+                  if stack:
+                      stack.pop()
+              else:
+                  stack.append(c)
+          return ''.join(stack)
+
+      return build(s) == build(t)
+      ```
+
+  level_3:
+    title: "Two Pointer O(1) Space"
+    content: |
+      Compare from the end:
+
+      ```python
+      def get_next_char(s, i):
+          skip = 0
+          while i >= 0:
+              if s[i] == '#':
+                  skip += 1
+                  i -= 1
+              elif skip > 0:
+                  skip -= 1
+                  i -= 1
+              else:
+                  break
+          return i
+
+      i, j = len(s) - 1, len(t) - 1
+      while i >= 0 or j >= 0:
+          i = get_next_char(s, i)
+          j = get_next_char(t, j)
+          if i >= 0 and j >= 0 and s[i] != t[j]:
+              return False
+          if (i >= 0) != (j >= 0):
+              return False
+          i -= 1
+          j -= 1
+      return True
+      ```
+
+maximum_average_subarray:
+  level_1:
+    title: "Fixed-Size Sliding Window"
+    content: |
+      Calculate sum of first k elements, then slide the window:
+      - Add the new element entering the window
+      - Subtract the element leaving the window
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      # Calculate initial window sum
+      window_sum = sum(nums[:k])
+      max_sum = window_sum
+
+      # Slide the window
+      for i in range(k, len(nums)):
+          window_sum += nums[i] - nums[i - k]
+          max_sum = max(max_sum, window_sum)
+
+      return max_sum / k
+      ```
+
+  level_3:
+    title: "Complexity"
+    content: |
+      - Time: O(n) - single pass after initial window
+      - Space: O(1)
+
+      Track sum instead of average to avoid floating point issues during comparison.
+
+minimum_size_subarray_sum:
+  level_1:
+    title: "Variable-Size Sliding Window"
+    content: |
+      Use a window that expands to include more elements (increasing sum)
+      and contracts when sum >= target (to find smaller valid windows).
+
+  level_2:
+    title: "Expand and Contract"
+    content: |
+      ```python
+      left = 0
+      current_sum = 0
+      min_length = float('inf')
+
+      for right in range(len(nums)):
+          current_sum += nums[right]
+
+          while current_sum >= target:
+              min_length = min(min_length, right - left + 1)
+              current_sum -= nums[left]
+              left += 1
+
+      return min_length if min_length != float('inf') else 0
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Expand right to include more elements until sum >= target
+      - Contract left to find minimal valid window
+      - All positive numbers guarantee sum increases with window size
+
+      Time: O(n), Space: O(1)
+
+longest_repeating_character_replacement:
+  level_1:
+    title: "Window Validity Condition"
+    content: |
+      A window is valid if:
+      `window_size - max_count <= k`
+
+      Where max_count is the count of the most frequent character in window.
+
+  level_2:
+    title: "Sliding Window Implementation"
+    content: |
+      ```python
+      from collections import defaultdict
+
+      count = defaultdict(int)
+      max_count = 0
+      left = 0
+      result = 0
+
+      for right in range(len(s)):
+          count[s[right]] += 1
+          max_count = max(max_count, count[s[right]])
+
+          # Shrink window if invalid
+          while (right - left + 1) - max_count > k:
+              count[s[left]] -= 1
+              left += 1
+
+          result = max(result, right - left + 1)
+
+      return result
+      ```
+
+  level_3:
+    title: "Optimization Note"
+    content: |
+      We don't need to update max_count when shrinking because:
+      - We only care about longer valid windows
+      - A window longer than current best needs higher max_count
+      - The current max_count represents best case for window length
+
+permutation_in_string:
+  level_1:
+    title: "Fixed-Size Sliding Window"
+    content: |
+      A permutation of s1 has the same length as s1.
+
+      Use a window of size len(s1) and check if character counts match.
+
+  level_2:
+    title: "Character Count Matching"
+    content: |
+      ```python
+      from collections import Counter
+
+      if len(s1) > len(s2):
+          return False
+
+      s1_count = Counter(s1)
+      window_count = Counter(s2[:len(s1)])
+
+      if window_count == s1_count:
+          return True
+
+      for i in range(len(s1), len(s2)):
+          # Add new char
+          window_count[s2[i]] += 1
+          # Remove old char
+          old_char = s2[i - len(s1)]
+          window_count[old_char] -= 1
+          if window_count[old_char] == 0:
+              del window_count[old_char]
+
+          if window_count == s1_count:
+              return True
+
+      return False
+      ```
+
+  level_3:
+    title: "Optimization: Track Matches"
+    content: |
+      Instead of comparing full counters, track number of matching characters:
+
+      ```python
+      matches = 0
+      for c in s1_count:
+          if s1_count[c] == window_count.get(c, 0):
+              matches += 1
+
+      # Update matches when adding/removing chars
+      # If matches == len(s1_count), found permutation
+      ```
+
+find_all_anagrams:
+  level_1:
+    title: "Similar to Permutation in String"
+    content: |
+      Same sliding window approach, but collect all starting indices
+      instead of returning on first match.
+
+  level_2:
+    title: "Collect All Matches"
+    content: |
+      ```python
+      from collections import Counter
+
+      if len(p) > len(s):
+          return []
+
+      p_count = Counter(p)
+      window_count = Counter()
+      result = []
+
+      for i in range(len(s)):
+          window_count[s[i]] += 1
+
+          # Remove element outside window
+          if i >= len(p):
+              left_char = s[i - len(p)]
+              window_count[left_char] -= 1
+              if window_count[left_char] == 0:
+                  del window_count[left_char]
+
+          if window_count == p_count:
+              result.append(i - len(p) + 1)
+
+      return result
+      ```
+
+  level_3:
+    title: "Time Complexity"
+    content: |
+      - O(n) for the main loop
+      - Counter comparison is O(26) = O(1) for lowercase letters
+      - Total: O(n)
+
+max_consecutive_ones_iii:
+  level_1:
+    title: "Reframe the Problem"
+    content: |
+      Find the longest subarray with **at most k zeros**.
+
+      This is a classic variable-size sliding window!
+
+  level_2:
+    title: "Sliding Window Implementation"
+    content: |
+      ```python
+      left = 0
+      zeros = 0
+      max_length = 0
+
+      for right in range(len(nums)):
+          if nums[right] == 0:
+              zeros += 1
+
+          while zeros > k:
+              if nums[left] == 0:
+                  zeros -= 1
+              left += 1
+
+          max_length = max(max_length, right - left + 1)
+
+      return max_length
+      ```
+
+  level_3:
+    title: "Alternative: No Shrinking"
+    content: |
+      Since we only want the longest window, never shrink:
+
+      ```python
+      left = 0
+      for right in range(len(nums)):
+          if nums[right] == 0:
+              k -= 1
+          if k < 0:
+              if nums[left] == 0:
+                  k += 1
+              left += 1
+      return right - left + 1
+      ```
+
+fruit_into_baskets:
+  level_1:
+    title: "Longest Subarray with 2 Distinct"
+    content: |
+      This is equivalent to finding the longest subarray
+      with at most 2 distinct elements.
+
+  level_2:
+    title: "Sliding Window with Hash Map"
+    content: |
+      ```python
+      from collections import defaultdict
+
+      basket = defaultdict(int)
+      left = 0
+      max_fruits = 0
+
+      for right in range(len(fruits)):
+          basket[fruits[right]] += 1
+
+          while len(basket) > 2:
+              basket[fruits[left]] -= 1
+              if basket[fruits[left]] == 0:
+                  del basket[fruits[left]]
+              left += 1
+
+          max_fruits = max(max_fruits, right - left + 1)
+
+      return max_fruits
+      ```
+
+  level_3:
+    title: "Generalization"
+    content: |
+      This pattern works for "at most K distinct elements":
+      - Just change the condition from `> 2` to `> k`
+      - Same as longest_substring_k_distinct problem
+
+longest_substring_k_distinct:
+  level_1:
+    title: "Variable-Size Sliding Window"
+    content: |
+      Maintain a window with at most k distinct characters.
+
+      Track character counts in a hash map.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      from collections import defaultdict
+
+      if k == 0:
+          return 0
+
+      char_count = defaultdict(int)
+      left = 0
+      max_length = 0
+
+      for right in range(len(s)):
+          char_count[s[right]] += 1
+
+          while len(char_count) > k:
+              char_count[s[left]] -= 1
+              if char_count[s[left]] == 0:
+                  del char_count[s[left]]
+              left += 1
+
+          max_length = max(max_length, right - left + 1)
+
+      return max_length
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - k = 0: return 0 (can't have any characters)
+      - k >= 26: return len(s) for lowercase only
+      - Empty string: return 0
+
+sliding_window_maximum:
+  level_1:
+    title: "Need O(1) Max Lookup"
+    content: |
+      Brute force: O(nk) - find max in each window.
+
+      Use a data structure that maintains max efficiently:
+      - Monotonic decreasing deque!
+
+  level_2:
+    title: "Monotonic Deque"
+    content: |
+      ```python
+      from collections import deque
+
+      dq = deque()  # Store indices
+      result = []
+
+      for i in range(len(nums)):
+          # Remove indices outside window
+          while dq and dq[0] < i - k + 1:
+              dq.popleft()
+
+          # Remove smaller elements (they can't be max)
+          while dq and nums[dq[-1]] < nums[i]:
+              dq.pop()
+
+          dq.append(i)
+
+          # Add to result once window is full
+          if i >= k - 1:
+              result.append(nums[dq[0]])
+
+      return result
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      The deque maintains:
+      - Indices in increasing order (front = oldest)
+      - Values in decreasing order (front = largest)
+
+      When adding element:
+      - Remove older indices outside window (front)
+      - Remove smaller elements that can't be max (back)
+
+      Front of deque is always the maximum of current window.
+
+      Time: O(n), Space: O(k)

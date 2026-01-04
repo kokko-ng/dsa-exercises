@@ -1,0 +1,449 @@
+# Hints for Two Heaps problems
+
+find_median_from_stream:
+  level_1:
+    title: "Two Heaps for Median"
+    content: |
+      The key insight is to keep track of two halves:
+      - **Smaller half**: Numbers less than or equal to median
+      - **Larger half**: Numbers greater than median
+
+      What data structures let you quickly access the maximum of the smaller half
+      and minimum of the larger half?
+
+  level_2:
+    title: "Max-Heap and Min-Heap"
+    content: |
+      Use two heaps:
+      - **Max-heap** for smaller half (access largest of smaller numbers)
+      - **Min-heap** for larger half (access smallest of larger numbers)
+
+      Balance rule: Keep sizes equal or max-heap has one extra.
+
+      ```python
+      import heapq
+
+      class MedianFinder:
+          def __init__(self):
+              self.small = []  # max-heap (negate values)
+              self.large = []  # min-heap
+
+          def add_num(self, num):
+              # Add to max-heap first
+              heapq.heappush(self.small, -num)
+
+              # Balance: largest of small should be <= smallest of large
+              if self.large and -self.small[0] > self.large[0]:
+                  heapq.heappush(self.large, -heapq.heappop(self.small))
+
+              # Balance sizes
+              if len(self.small) > len(self.large) + 1:
+                  heapq.heappush(self.large, -heapq.heappop(self.small))
+              elif len(self.large) > len(self.small):
+                  heapq.heappush(self.small, -heapq.heappop(self.large))
+      ```
+
+  level_3:
+    title: "Finding the Median"
+    content: |
+      ```python
+      def find_median(self):
+          if len(self.small) > len(self.large):
+              return -self.small[0]
+          else:
+              return (-self.small[0] + self.large[0]) / 2
+      ```
+
+      **Time Complexity**:
+      - `add_num`: O(log n)
+      - `find_median`: O(1)
+
+sliding_window_median:
+  level_1:
+    title: "Two Heaps with Removal"
+    content: |
+      This is like "Find Median from Stream" but we also need to remove elements
+      as the window slides.
+
+      Challenge: Heaps don't support efficient arbitrary removal.
+
+      Solution: Use **lazy deletion** - mark elements as removed, clean up when they surface.
+
+  level_2:
+    title: "Lazy Deletion Approach"
+    content: |
+      ```python
+      import heapq
+      from collections import defaultdict
+
+      def sliding_window_median(nums, k):
+          small = []  # max-heap (negated)
+          large = []  # min-heap
+          to_remove = defaultdict(int)  # count of elements to remove
+
+          def add(num):
+              if not small or num <= -small[0]:
+                  heapq.heappush(small, -num)
+              else:
+                  heapq.heappush(large, num)
+
+          def remove(num):
+              to_remove[num] += 1  # Mark for lazy deletion
+
+          def balance():
+              # Clean up heap tops if they should be removed
+              while small and to_remove[-small[0]]:
+                  to_remove[-small[0]] -= 1
+                  heapq.heappop(small)
+              while large and to_remove[large[0]]:
+                  to_remove[large[0]] -= 1
+                  heapq.heappop(large)
+
+              # Balance sizes
+              while len(small) > len(large) + 1:
+                  heapq.heappush(large, -heapq.heappop(small))
+                  balance()  # Clean up after transfer
+              while len(large) > len(small):
+                  heapq.heappush(small, -heapq.heappop(large))
+                  balance()
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      def sliding_window_median(nums, k):
+          # ... (initialization and helper functions above)
+
+          result = []
+
+          # Initialize first window
+          for i in range(k):
+              add(nums[i])
+              balance()
+
+          for i in range(k, len(nums) + 1):
+              # Get median
+              if k % 2:
+                  result.append(float(-small[0]))
+              else:
+                  result.append((-small[0] + large[0]) / 2.0)
+
+              if i == len(nums):
+                  break
+
+              # Remove outgoing element, add incoming
+              remove(nums[i - k])
+              add(nums[i])
+              balance()
+
+          return result
+      ```
+
+maximize_capital:
+  level_1:
+    title: "Greedy with Priority Queue"
+    content: |
+      Strategy: Always pick the project with maximum profit among affordable projects.
+
+      Two heaps can help:
+      1. One to track projects sorted by capital requirement
+      2. One to track available projects sorted by profit
+
+  level_2:
+    title: "Min-Heap for Capital, Max-Heap for Profit"
+    content: |
+      ```python
+      import heapq
+
+      def maximize_capital(k, w, profits, capital):
+          # Min-heap: (capital_required, profit, index)
+          min_capital_heap = [(c, p) for c, p in zip(capital, profits)]
+          heapq.heapify(min_capital_heap)
+
+          # Max-heap: available profits (negated)
+          max_profit_heap = []
+
+          for _ in range(k):
+              # Move all affordable projects to profit heap
+              while min_capital_heap and min_capital_heap[0][0] <= w:
+                  cap, profit = heapq.heappop(min_capital_heap)
+                  heapq.heappush(max_profit_heap, -profit)
+
+              # Pick the most profitable affordable project
+              if max_profit_heap:
+                  w += -heapq.heappop(max_profit_heap)
+              else:
+                  break  # No affordable projects left
+
+          return w
+      ```
+
+  level_3:
+    title: "Time Complexity"
+    content: |
+      - **Time**: O(n log n) for heap operations, where n is number of projects
+      - **Space**: O(n) for the heaps
+
+      Key insight: We only need to consider each project once, moving it from
+      "unaffordable" to "available" as our capital grows.
+
+next_interval:
+  level_1:
+    title: "Sort by Start Time"
+    content: |
+      For each interval, we need to find the interval with the smallest start
+      time that is >= the current interval's end time.
+
+      Can we process intervals in a smart order to make this efficient?
+
+  level_2:
+    title: "Two Heaps Approach"
+    content: |
+      Use two max-heaps:
+      1. **Max-heap by end time**: Process intervals in order of decreasing end time
+      2. **Max-heap by start time**: Find intervals that can serve as "next"
+
+      ```python
+      import heapq
+
+      def next_interval(intervals):
+          n = len(intervals)
+          result = [-1] * n
+
+          # Max-heaps (negate for max behavior)
+          # (end_time, index)
+          end_heap = [(-intervals[i][1], i) for i in range(n)]
+          # (start_time, index)
+          start_heap = [(-intervals[i][0], i) for i in range(n)]
+
+          heapq.heapify(end_heap)
+          heapq.heapify(start_heap)
+
+          while end_heap:
+              end_time, idx = heapq.heappop(end_heap)
+              end_time = -end_time
+
+              # Pop all starts that are too small
+              while start_heap and -start_heap[0][0] < end_time:
+                  heapq.heappop(start_heap)
+
+              if start_heap:
+                  result[idx] = start_heap[0][1]
+
+          return result
+      ```
+
+  level_3:
+    title: "Alternative: Binary Search"
+    content: |
+      Alternative approach using sorting and binary search:
+
+      1. Sort intervals by start time (keep original indices)
+      2. For each interval's end time, binary search for smallest start >= end
+
+      This is often simpler to implement correctly.
+
+kth_smallest_in_sorted_matrix:
+  level_1:
+    title: "Min-Heap with K Elements"
+    content: |
+      Each row and column is sorted. This is like merging k sorted lists.
+
+      Start with the first element of each row in a min-heap.
+      Pop the smallest, add the next element from that row.
+      Repeat k times.
+
+  level_2:
+    title: "Min-Heap Approach"
+    content: |
+      ```python
+      import heapq
+
+      def kth_smallest_in_sorted_matrix(matrix, k):
+          n = len(matrix)
+          # Min-heap: (value, row, col)
+          min_heap = [(matrix[0][0], 0, 0)]
+          visited = {(0, 0)}
+
+          for _ in range(k):
+              val, row, col = heapq.heappop(min_heap)
+
+              # Add right neighbor
+              if col + 1 < n and (row, col + 1) not in visited:
+                  visited.add((row, col + 1))
+                  heapq.heappush(min_heap, (matrix[row][col + 1], row, col + 1))
+
+              # Add bottom neighbor
+              if row + 1 < n and (row + 1, col) not in visited:
+                  visited.add((row + 1, col))
+                  heapq.heappush(min_heap, (matrix[row + 1][col], row + 1, col))
+
+          return val
+      ```
+
+  level_3:
+    title: "Binary Search Alternative"
+    content: |
+      Alternative O(n log(max-min)) approach using binary search:
+
+      1. Binary search on the answer value
+      2. Count how many elements are <= mid value
+      3. Adjust search range based on count vs k
+
+      This can be faster for large k values.
+
+merge_k_sorted_arrays:
+  level_1:
+    title: "K-Way Merge with Heap"
+    content: |
+      This is the classic k-way merge problem.
+
+      Use a min-heap to always get the next smallest element across all arrays.
+
+      Track: (value, array_index, element_index)
+
+  level_2:
+    title: "Min-Heap Solution"
+    content: |
+      ```python
+      import heapq
+
+      def merge_k_sorted_arrays(arrays):
+          result = []
+          min_heap = []
+
+          # Initialize with first element from each non-empty array
+          for i, arr in enumerate(arrays):
+              if arr:
+                  heapq.heappush(min_heap, (arr[0], i, 0))
+
+          while min_heap:
+              val, arr_idx, elem_idx = heapq.heappop(min_heap)
+              result.append(val)
+
+              # Add next element from same array if exists
+              if elem_idx + 1 < len(arrays[arr_idx]):
+                  next_val = arrays[arr_idx][elem_idx + 1]
+                  heapq.heappush(min_heap, (next_val, arr_idx, elem_idx + 1))
+
+          return result
+      ```
+
+  level_3:
+    title: "Time and Space Complexity"
+    content: |
+      - **Time**: O(N log k) where N is total elements, k is number of arrays
+      - **Space**: O(k) for the heap
+
+      The heap always contains at most k elements (one from each array).
+
+smallest_range_k_lists:
+  level_1:
+    title: "Track Range While Merging"
+    content: |
+      Imagine pointers at the start of each list. The current range is
+      [min_pointer, max_pointer].
+
+      To minimize the range, we should advance the pointer at the minimum
+      value (can't make max smaller, but might make min larger).
+
+  level_2:
+    title: "Min-Heap with Max Tracking"
+    content: |
+      ```python
+      import heapq
+
+      def smallest_range_k_lists(nums):
+          min_heap = []  # (value, list_idx, elem_idx)
+          current_max = float('-inf')
+
+          # Initialize with first element from each list
+          for i, lst in enumerate(nums):
+              heapq.heappush(min_heap, (lst[0], i, 0))
+              current_max = max(current_max, lst[0])
+
+          result = [min_heap[0][0], current_max]
+
+          while True:
+              val, list_idx, elem_idx = heapq.heappop(min_heap)
+
+              # Try to advance this list's pointer
+              if elem_idx + 1 < len(nums[list_idx]):
+                  next_val = nums[list_idx][elem_idx + 1]
+                  heapq.heappush(min_heap, (next_val, list_idx, elem_idx + 1))
+                  current_max = max(current_max, next_val)
+
+                  # Check if new range is smaller
+                  if current_max - min_heap[0][0] < result[1] - result[0]:
+                      result = [min_heap[0][0], current_max]
+              else:
+                  break  # One list exhausted
+
+          return result
+      ```
+
+  level_3:
+    title: "Why Advance Minimum?"
+    content: |
+      We can't make the maximum smaller without potentially losing a list.
+      We can try to make the minimum larger by advancing its pointer.
+
+      When any list is exhausted, we must stop (can't include all lists anymore).
+
+      **Time**: O(N log k), **Space**: O(k)
+
+reorganize_string:
+  level_1:
+    title: "Greedy with Most Frequent"
+    content: |
+      To avoid adjacent duplicates, always pick a different character than the previous one.
+
+      Strategy: Greedily pick the most frequent character that isn't the previous character.
+
+      What data structure efficiently gives you the most frequent element?
+
+  level_2:
+    title: "Max-Heap Approach"
+    content: |
+      ```python
+      import heapq
+      from collections import Counter
+
+      def reorganize_string(s):
+          count = Counter(s)
+
+          # Check if possible: no char should appear more than (n+1)/2 times
+          max_freq = max(count.values())
+          if max_freq > (len(s) + 1) // 2:
+              return ""
+
+          # Max-heap: (-count, char)
+          max_heap = [(-cnt, char) for char, cnt in count.items()]
+          heapq.heapify(max_heap)
+
+          result = []
+          prev_cnt, prev_char = 0, ''
+
+          while max_heap:
+              cnt, char = heapq.heappop(max_heap)
+
+              # Add previous char back if it still has count
+              if prev_cnt < 0:
+                  heapq.heappush(max_heap, (prev_cnt, prev_char))
+
+              result.append(char)
+              prev_cnt, prev_char = cnt + 1, char  # cnt is negative
+
+          return ''.join(result)
+      ```
+
+  level_3:
+    title: "Impossibility Check"
+    content: |
+      If any character appears more than `(n + 1) // 2` times, it's impossible.
+
+      Example: "aaab" (length 4, 'a' appears 3 times, max allowed is 2)
+      - Positions: _ a _ a (only 2 spots for 'a')
+
+      This check can be done upfront for early exit.

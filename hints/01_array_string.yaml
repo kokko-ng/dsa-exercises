@@ -1,0 +1,584 @@
+# Hints for Array & String Manipulation problems
+
+two_sum:
+  level_1:
+    title: "Think About Lookup Speed"
+    content: |
+      The brute force approach checks every pair - O(n²).
+
+      For each number, you need to find if its **complement** (target - num) exists.
+
+      What data structure gives you O(1) lookup time?
+
+  level_2:
+    title: "Hash Map Approach"
+    content: |
+      Use a dictionary to store numbers you've seen:
+      - **Key**: the number
+      - **Value**: its index
+
+      For each number:
+      1. Calculate `complement = target - num`
+      2. Check if complement is in the dictionary
+      3. If yes, you found your answer!
+      4. If no, add current number to dictionary
+
+      ```python
+      seen = {}
+      for i, num in enumerate(nums):
+          complement = target - num
+          if complement in seen:
+              return [seen[complement], i]
+          seen[num] = i
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      Watch out for:
+      - **Same element twice**: `[3, 3]` with target 6
+        - Add to dict AFTER checking, not before
+      - **Negative numbers**: Work the same way
+      - **Return order**: Some problems want smaller index first
+
+valid_anagram:
+  level_1:
+    title: "What Makes an Anagram?"
+    content: |
+      Two strings are anagrams if they have the **same characters**
+      with the **same frequencies**.
+
+      Two approaches:
+      1. Sort both strings and compare
+      2. Count character frequencies
+
+  level_2:
+    title: "Counting Approach"
+    content: |
+      Use a frequency counter:
+
+      ```python
+      from collections import Counter
+      return Counter(s) == Counter(t)
+      ```
+
+      Or manually with a dict:
+      ```python
+      if len(s) != len(t):
+          return False
+      count = {}
+      for c in s:
+          count[c] = count.get(c, 0) + 1
+      for c in t:
+          if c not in count or count[c] == 0:
+              return False
+          count[c] -= 1
+      return True
+      ```
+
+  level_3:
+    title: "Optimizations"
+    content: |
+      - **Early exit**: If lengths differ, return False immediately
+      - **Space optimization**: Use a single counter, increment for s, decrement for t
+      - **For fixed alphabet**: Use array of size 26 instead of dict
+
+valid_palindrome:
+  level_1:
+    title: "Two Pointer Approach"
+    content: |
+      A palindrome reads the same forwards and backwards.
+
+      Use two pointers:
+      - One starting from the left
+      - One starting from the right
+      - Move them toward each other, comparing characters
+
+  level_2:
+    title: "Handling Non-Alphanumeric"
+    content: |
+      Skip non-alphanumeric characters:
+
+      ```python
+      left, right = 0, len(s) - 1
+      while left < right:
+          # Skip non-alphanumeric from left
+          while left < right and not s[left].isalnum():
+              left += 1
+          # Skip non-alphanumeric from right
+          while left < right and not s[right].isalnum():
+              right -= 1
+          # Compare (case-insensitive)
+          if s[left].lower() != s[right].lower():
+              return False
+          left += 1
+          right -= 1
+      return True
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Empty string after filtering → True (empty is palindrome)
+      - String with only non-alphanumeric chars → True
+      - Case sensitivity: "Aa" should be palindrome
+
+reverse_string:
+  level_1:
+    title: "In-Place Swap"
+    content: |
+      To reverse in-place with O(1) space:
+      - Swap first with last
+      - Swap second with second-to-last
+      - Continue until pointers meet
+
+  level_2:
+    title: "Two Pointer Implementation"
+    content: |
+      ```python
+      left, right = 0, len(s) - 1
+      while left < right:
+          s[left], s[right] = s[right], s[left]
+          left += 1
+          right -= 1
+      ```
+
+      Python tuple swap makes this clean!
+
+  level_3:
+    title: "Common Mistakes"
+    content: |
+      - Don't return a new list - modify in-place
+      - The function should return None
+      - Don't use `s = s[::-1]` - that creates a new list
+
+longest_common_prefix:
+  level_1:
+    title: "Character by Character"
+    content: |
+      Compare characters at each position across all strings.
+
+      Stop when:
+      - You reach the end of any string
+      - Characters don't match
+
+  level_2:
+    title: "Vertical Scanning"
+    content: |
+      ```python
+      if not strs:
+          return ""
+
+      for i in range(len(strs[0])):
+          char = strs[0][i]
+          for s in strs[1:]:
+              if i >= len(s) or s[i] != char:
+                  return strs[0][:i]
+
+      return strs[0]
+      ```
+
+      Alternative: Use first string as prefix, shrink it until it matches all.
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Empty array → ""
+      - Array with empty string → ""
+      - Single string → return that string
+      - All strings identical → return any string
+
+remove_duplicates:
+  level_1:
+    title: "Slow and Fast Pointers"
+    content: |
+      Since array is sorted, duplicates are adjacent.
+
+      Use two pointers:
+      - **Slow**: Position to place next unique element
+      - **Fast**: Scans through the array
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      if not nums:
+          return 0
+
+      slow = 0
+      for fast in range(1, len(nums)):
+          if nums[fast] != nums[slow]:
+              slow += 1
+              nums[slow] = nums[fast]
+
+      return slow + 1
+      ```
+
+      Only copy when we find a new unique element.
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - `slow` always points to last unique element
+      - Elements before `slow` are all unique
+      - We only overwrite already-processed positions
+
+rotate_array:
+  level_1:
+    title: "Multiple Approaches"
+    content: |
+      Three main approaches:
+      1. Use extra array
+      2. Cyclic replacements
+      3. **Reverse trick** (most elegant)
+
+      Note: `k` might be larger than array length!
+
+  level_2:
+    title: "Reverse Approach"
+    content: |
+      Key insight: Rotation = three reversals!
+
+      For `[1,2,3,4,5,6,7]` with k=3:
+      1. Reverse all: `[7,6,5,4,3,2,1]`
+      2. Reverse first k: `[5,6,7,4,3,2,1]`
+      3. Reverse rest: `[5,6,7,1,2,3,4]`
+
+      ```python
+      def reverse(l, r):
+          while l < r:
+              nums[l], nums[r] = nums[r], nums[l]
+              l, r = l + 1, r - 1
+
+      k = k % len(nums)  # Handle k > len
+      reverse(0, len(nums) - 1)
+      reverse(0, k - 1)
+      reverse(k, len(nums) - 1)
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - `k = 0` → no change
+      - `k >= len(nums)` → use `k % len(nums)`
+      - Empty or single element → no change needed
+
+move_zeroes:
+  level_1:
+    title: "Two Pointer Technique"
+    content: |
+      Similar to remove duplicates:
+      - One pointer for where to place non-zero
+      - One pointer to scan through array
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      slow = 0  # Position for next non-zero
+      for fast in range(len(nums)):
+          if nums[fast] != 0:
+              nums[slow], nums[fast] = nums[fast], nums[slow]
+              slow += 1
+      ```
+
+      Swapping maintains relative order of non-zeros.
+
+  level_3:
+    title: "Optimization"
+    content: |
+      - If `slow == fast`, skip the swap (no benefit)
+      - Alternative: Move all non-zeros first, then fill zeros
+        ```python
+        pos = 0
+        for num in nums:
+            if num != 0:
+                nums[pos] = num
+                pos += 1
+        for i in range(pos, len(nums)):
+            nums[i] = 0
+        ```
+
+plus_one:
+  level_1:
+    title: "Handle the Carry"
+    content: |
+      Start from the rightmost digit and add one.
+
+      The tricky part: handling carry when digit becomes 10.
+
+  level_2:
+    title: "Right to Left"
+    content: |
+      ```python
+      for i in range(len(digits) - 1, -1, -1):
+          if digits[i] < 9:
+              digits[i] += 1
+              return digits
+          digits[i] = 0
+
+      # All 9s case: need new digit
+      return [1] + digits
+      ```
+
+      If digit < 9, just increment and return.
+      If digit = 9, set to 0 and continue (carry).
+
+  level_3:
+    title: "Edge Case: All 9s"
+    content: |
+      `[9, 9, 9]` becomes `[1, 0, 0, 0]`
+
+      After the loop, if we haven't returned, all digits were 9.
+      Prepend 1 to the array.
+
+merge_sorted_arrays:
+  level_1:
+    title: "Merge from the End"
+    content: |
+      Key insight: `nums1` has space at the end.
+
+      If you merge from the start, you'd overwrite elements.
+      Merge from the end to avoid this!
+
+  level_2:
+    title: "Three Pointers"
+    content: |
+      ```python
+      p1, p2 = m - 1, n - 1  # End of actual elements
+      p = m + n - 1           # End of nums1
+
+      while p1 >= 0 and p2 >= 0:
+          if nums1[p1] > nums2[p2]:
+              nums1[p] = nums1[p1]
+              p1 -= 1
+          else:
+              nums1[p] = nums2[p2]
+              p2 -= 1
+          p -= 1
+
+      # Copy remaining nums2 elements
+      nums1[:p2 + 1] = nums2[:p2 + 1]
+      ```
+
+  level_3:
+    title: "Why No nums1 Cleanup?"
+    content: |
+      If `p1` elements remain, they're already in place!
+
+      Only need to copy remaining `nums2` elements.
+
+product_except_self:
+  level_1:
+    title: "Prefix and Suffix Products"
+    content: |
+      For each position, the answer is:
+      - Product of all elements to the LEFT × Product of all elements to the RIGHT
+
+      Can we precompute these?
+
+  level_2:
+    title: "Two Pass Solution"
+    content: |
+      ```python
+      n = len(nums)
+      result = [1] * n
+
+      # Left pass: result[i] = product of nums[0..i-1]
+      left_product = 1
+      for i in range(n):
+          result[i] = left_product
+          left_product *= nums[i]
+
+      # Right pass: multiply by product of nums[i+1..n-1]
+      right_product = 1
+      for i in range(n - 1, -1, -1):
+          result[i] *= right_product
+          right_product *= nums[i]
+
+      return result
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      - Using the output array for left products: O(1) extra space
+      - Single variable for running right product
+      - **Don't use division** (what if there's a zero?)
+
+container_with_most_water:
+  level_1:
+    title: "Two Pointer Greedy"
+    content: |
+      Area = width × min(height[left], height[right])
+
+      Start with maximum width (leftmost and rightmost).
+      Which pointer should you move to potentially find larger area?
+
+  level_2:
+    title: "Move the Shorter Line"
+    content: |
+      ```python
+      left, right = 0, len(height) - 1
+      max_area = 0
+
+      while left < right:
+          area = (right - left) * min(height[left], height[right])
+          max_area = max(max_area, area)
+
+          if height[left] < height[right]:
+              left += 1
+          else:
+              right -= 1
+
+      return max_area
+      ```
+
+      Moving the taller line can only decrease area (width shrinks, height limited by shorter).
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Width always decreases
+      - Moving shorter line might find a taller one → increase height
+      - Moving taller line can never help (still limited by shorter)
+
+trapping_rain_water:
+  level_1:
+    title: "Water at Each Position"
+    content: |
+      Water at position i = min(max_left, max_right) - height[i]
+
+      Where:
+      - `max_left` = maximum height to the left of i
+      - `max_right` = maximum height to the right of i
+
+  level_2:
+    title: "Two Pointer Approach"
+    content: |
+      ```python
+      if not height:
+          return 0
+
+      left, right = 0, len(height) - 1
+      left_max, right_max = height[left], height[right]
+      water = 0
+
+      while left < right:
+          if left_max < right_max:
+              left += 1
+              left_max = max(left_max, height[left])
+              water += left_max - height[left]
+          else:
+              right -= 1
+              right_max = max(right_max, height[right])
+              water += right_max - height[right]
+
+      return water
+      ```
+
+  level_3:
+    title: "Why Two Pointers Work"
+    content: |
+      - When `left_max < right_max`, we know water at left is bounded by left_max
+      - We don't need to know the exact right_max, just that it's higher
+      - Same logic applies when processing from right
+
+longest_substring_without_repeating:
+  level_1:
+    title: "Sliding Window"
+    content: |
+      Maintain a window with no repeating characters.
+
+      Expand right when possible, shrink left when you hit a duplicate.
+
+  level_2:
+    title: "Hash Set for Window"
+    content: |
+      ```python
+      seen = set()
+      left = 0
+      max_len = 0
+
+      for right in range(len(s)):
+          while s[right] in seen:
+              seen.remove(s[left])
+              left += 1
+          seen.add(s[right])
+          max_len = max(max_len, right - left + 1)
+
+      return max_len
+      ```
+
+  level_3:
+    title: "Optimization with Hash Map"
+    content: |
+      Store character positions to jump `left` directly:
+
+      ```python
+      char_index = {}
+      left = 0
+      max_len = 0
+
+      for right, char in enumerate(s):
+          if char in char_index and char_index[char] >= left:
+              left = char_index[char] + 1
+          char_index[char] = right
+          max_len = max(max_len, right - left + 1)
+
+      return max_len
+      ```
+
+minimum_window_substring:
+  level_1:
+    title: "Sliding Window with Counts"
+    content: |
+      Track character counts needed from `t`.
+
+      Expand window to include all required characters.
+      Shrink window to find minimum.
+
+  level_2:
+    title: "Two Pointers with Counter"
+    content: |
+      ```python
+      from collections import Counter
+
+      if not s or not t:
+          return ""
+
+      need = Counter(t)
+      have = {}
+      required = len(need)
+      formed = 0
+
+      left = 0
+      min_len = float('inf')
+      result = ""
+
+      for right, char in enumerate(s):
+          have[char] = have.get(char, 0) + 1
+
+          if char in need and have[char] == need[char]:
+              formed += 1
+
+          while formed == required:
+              if right - left + 1 < min_len:
+                  min_len = right - left + 1
+                  result = s[left:right + 1]
+
+              have[s[left]] -= 1
+              if s[left] in need and have[s[left]] < need[s[left]]:
+                  formed -= 1
+              left += 1
+
+      return result
+      ```
+
+  level_3:
+    title: "Optimization Tips"
+    content: |
+      - `formed` tracks how many unique chars have required count
+      - Only process characters in `t` when updating `formed`
+      - Contract window only when all requirements met
+      - For very long `s` with short `t`: filter to only relevant positions

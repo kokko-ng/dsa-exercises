@@ -1,0 +1,468 @@
+# Hints for Monotonic Stack/Queue problems
+
+next_greater_element:
+  level_1:
+    title: "Monotonic Stack Concept"
+    content: |
+      The brute force checks every pair - O(n^2).
+
+      Key insight: Use a **monotonic decreasing stack** that stores elements
+      waiting for their next greater element.
+
+      When you see a larger element, it's the answer for all smaller elements
+      in the stack!
+
+  level_2:
+    title: "Stack Approach"
+    content: |
+      Process right to left (or left to right with stack of indices):
+
+      ```python
+      result = [-1] * len(nums)
+      stack = []  # Store indices
+
+      for i in range(len(nums) - 1, -1, -1):
+          # Pop elements smaller than current
+          while stack and nums[stack[-1]] <= nums[i]:
+              stack.pop()
+
+          if stack:
+              result[i] = nums[stack[-1]]
+
+          stack.append(i)
+
+      return result
+      ```
+
+  level_3:
+    title: "Alternative: Left to Right"
+    content: |
+      Process left to right, resolve when you find answer:
+
+      ```python
+      result = [-1] * len(nums)
+      stack = []  # Store indices of elements waiting for answer
+
+      for i, num in enumerate(nums):
+          while stack and nums[stack[-1]] < num:
+              idx = stack.pop()
+              result[idx] = num
+          stack.append(i)
+
+      return result
+      ```
+
+next_greater_element_ii:
+  level_1:
+    title: "Handling Circular Array"
+    content: |
+      For circular arrays, elements can wrap around.
+
+      Trick: Process the array **twice** (virtually extend it).
+
+      Use `i % n` to handle the circular indexing.
+
+  level_2:
+    title: "Double Pass Solution"
+    content: |
+      ```python
+      n = len(nums)
+      result = [-1] * n
+      stack = []
+
+      # Process 2n elements to handle circular nature
+      for i in range(2 * n - 1, -1, -1):
+          idx = i % n
+
+          while stack and stack[-1] <= nums[idx]:
+              stack.pop()
+
+          if stack and i < n:
+              result[idx] = stack[-1]
+
+          stack.append(nums[idx])
+
+      return result
+      ```
+
+  level_3:
+    title: "Why 2n Works"
+    content: |
+      - First pass (indices n to 2n-1): Builds the stack
+      - Second pass (indices 0 to n-1): Each element can see elements that come after it circularly
+
+      The stack contains elements from "the right" which includes wrapped elements.
+
+daily_temperatures:
+  level_1:
+    title: "Similar to Next Greater"
+    content: |
+      This is essentially "next greater element" but you need:
+      - The **distance** to the next greater, not the value
+      - Store indices in the stack, not values
+
+  level_2:
+    title: "Stack of Indices"
+    content: |
+      ```python
+      result = [0] * len(temperatures)
+      stack = []  # Store indices
+
+      for i, temp in enumerate(temperatures):
+          while stack and temperatures[stack[-1]] < temp:
+              prev_idx = stack.pop()
+              result[prev_idx] = i - prev_idx
+          stack.append(i)
+
+      return result
+      ```
+
+      Days without warmer temperature remain 0 (never popped).
+
+  level_3:
+    title: "Time Complexity"
+    content: |
+      - Each index is pushed once and popped at most once
+      - O(n) time, O(n) space
+
+      The stack holds indices of days waiting for a warmer day,
+      in decreasing order of temperature.
+
+stock_span:
+  level_1:
+    title: "Previous Greater Element"
+    content: |
+      The span equals: current index - index of previous greater price + 1
+
+      Or equivalently: count of consecutive days with price <= current.
+
+      This is the "previous greater element" pattern!
+
+  level_2:
+    title: "Stack with Indices"
+    content: |
+      ```python
+      result = []
+      stack = []  # (price, index)
+
+      for i, price in enumerate(prices):
+          while stack and stack[-1][0] <= price:
+              stack.pop()
+
+          if stack:
+              span = i - stack[-1][1]
+          else:
+              span = i + 1  # No previous greater, span from start
+
+          result.append(span)
+          stack.append((price, i))
+
+      return result
+      ```
+
+  level_3:
+    title: "Optimization with Span"
+    content: |
+      Instead of storing indices, store cumulative spans:
+
+      ```python
+      result = []
+      stack = []  # (price, span)
+
+      for price in prices:
+          span = 1
+          while stack and stack[-1][0] <= price:
+              span += stack.pop()[1]
+          result.append(span)
+          stack.append((price, span))
+
+      return result
+      ```
+
+largest_rectangle_histogram:
+  level_1:
+    title: "Key Insight"
+    content: |
+      For each bar, find:
+      - How far left can it extend? (until a shorter bar)
+      - How far right can it extend? (until a shorter bar)
+
+      Area = height * (right_boundary - left_boundary - 1)
+
+      Use monotonic stack to find these boundaries!
+
+  level_2:
+    title: "Single Pass Solution"
+    content: |
+      Maintain increasing stack of indices:
+
+      ```python
+      stack = []
+      max_area = 0
+      heights = heights + [0]  # Sentinel to flush stack
+
+      for i, h in enumerate(heights):
+          while stack and heights[stack[-1]] > h:
+              height = heights[stack.pop()]
+              width = i if not stack else i - stack[-1] - 1
+              max_area = max(max_area, height * width)
+          stack.append(i)
+
+      return max_area
+      ```
+
+  level_3:
+    title: "Understanding the Width"
+    content: |
+      When we pop index `j`:
+      - Current index `i` is the right boundary (first smaller)
+      - `stack[-1]` after pop is left boundary (previous smaller)
+      - Width = `i - stack[-1] - 1`
+
+      If stack is empty, bar extends to the left edge: width = `i`.
+
+      The sentinel `[0]` ensures all bars get processed.
+
+maximal_rectangle:
+  level_1:
+    title: "Reduce to Histogram"
+    content: |
+      Build histograms row by row!
+
+      For each row, treat it as the base of a histogram:
+      - Height at column j = consecutive 1s above (including current row)
+      - Apply largest rectangle in histogram
+
+  level_2:
+    title: "Row by Row Solution"
+    content: |
+      ```python
+      if not matrix or not matrix[0]:
+          return 0
+
+      cols = len(matrix[0])
+      heights = [0] * cols
+      max_area = 0
+
+      for row in matrix:
+          # Update heights
+          for j in range(cols):
+              if row[j] == '1':
+                  heights[j] += 1
+              else:
+                  heights[j] = 0
+
+          # Apply histogram algorithm
+          max_area = max(max_area, largest_rectangle_histogram(heights))
+
+      return max_area
+      ```
+
+  level_3:
+    title: "Example Walkthrough"
+    content: |
+      Matrix:
+      ```
+      1 0 1 0 0
+      1 0 1 1 1
+      1 1 1 1 1
+      1 0 0 1 0
+      ```
+
+      Heights per row:
+      - Row 0: [1,0,1,0,0]
+      - Row 1: [2,0,2,1,1]
+      - Row 2: [3,1,3,2,2]
+      - Row 3: [4,0,0,3,0]
+
+      Largest histogram area is 6 (from row 2).
+
+remove_k_digits:
+  level_1:
+    title: "Greedy with Stack"
+    content: |
+      To get smallest number, prefer smaller digits on the left.
+
+      When you see a smaller digit, remove larger digits before it
+      (as long as you have removals left).
+
+      This creates a monotonic increasing stack!
+
+  level_2:
+    title: "Stack Solution"
+    content: |
+      ```python
+      stack = []
+
+      for digit in num:
+          while k > 0 and stack and stack[-1] > digit:
+              stack.pop()
+              k -= 1
+          stack.append(digit)
+
+      # Remove remaining from end if k > 0
+      if k > 0:
+          stack = stack[:-k]
+
+      # Remove leading zeros and handle empty result
+      result = ''.join(stack).lstrip('0')
+      return result if result else '0'
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - All same digits: "1111" with k=2 -> remove from end
+      - Leading zeros: "10200" with k=1 -> "200" (strip leading zeros)
+      - Remove all: "10" with k=2 -> "0"
+      - Increasing sequence: "12345" with k=2 -> remove last 2
+
+sum_of_subarray_minimums:
+  level_1:
+    title: "Count Contribution"
+    content: |
+      Instead of enumerating all subarrays, count how many times
+      each element is the minimum.
+
+      For element at index i:
+      - Find how many subarrays have it as the minimum
+      - Contribution = arr[i] * count
+
+  level_2:
+    title: "Using Previous/Next Smaller"
+    content: |
+      For element at index i:
+      - `left[i]` = distance to previous smaller element
+      - `right[i]` = distance to next smaller element
+
+      Count of subarrays where arr[i] is minimum = left[i] * right[i]
+
+      ```python
+      MOD = 10**9 + 7
+      n = len(arr)
+
+      # Previous smaller element distances
+      left = [0] * n
+      stack = []
+      for i in range(n):
+          while stack and arr[stack[-1]] > arr[i]:
+              stack.pop()
+          left[i] = i - stack[-1] if stack else i + 1
+          stack.append(i)
+
+      # Next smaller element distances
+      right = [0] * n
+      stack = []
+      for i in range(n - 1, -1, -1):
+          while stack and arr[stack[-1]] >= arr[i]:
+              stack.pop()
+          right[i] = stack[-1] - i if stack else n - i
+          stack.append(i)
+
+      return sum(arr[i] * left[i] * right[i] for i in range(n)) % MOD
+      ```
+
+  level_3:
+    title: "Handling Duplicates"
+    content: |
+      Use strict inequality on one side (>=) and non-strict on other (>)
+      to avoid double counting when elements are equal.
+
+      - Previous smaller: use `>`
+      - Next smaller: use `>=`
+
+      This ensures each subarray is counted exactly once.
+
+shortest_unsorted_subarray:
+  level_1:
+    title: "Find Boundaries"
+    content: |
+      Find the leftmost and rightmost positions that are "out of order."
+
+      An element is out of order if:
+      - It's smaller than some element to its left, OR
+      - It's larger than some element to its right
+
+  level_2:
+    title: "Stack Approach"
+    content: |
+      ```python
+      n = len(nums)
+      left = n  # Leftmost boundary
+      right = 0  # Rightmost boundary
+      stack = []
+
+      # Find left boundary using increasing stack
+      for i in range(n):
+          while stack and nums[stack[-1]] > nums[i]:
+              left = min(left, stack.pop())
+          stack.append(i)
+
+      stack = []
+
+      # Find right boundary using decreasing stack
+      for i in range(n - 1, -1, -1):
+          while stack and nums[stack[-1]] < nums[i]:
+              right = max(right, stack.pop())
+          stack.append(i)
+
+      return right - left + 1 if right > left else 0
+      ```
+
+  level_3:
+    title: "O(1) Space Solution"
+    content: |
+      ```python
+      n = len(nums)
+      min_val, max_val = float('inf'), float('-inf')
+      left, right = -1, -1
+
+      # Find rightmost boundary
+      for i in range(n):
+          if nums[i] < max_val:
+              right = i
+          max_val = max(max_val, nums[i])
+
+      # Find leftmost boundary
+      for i in range(n - 1, -1, -1):
+          if nums[i] > min_val:
+              left = i
+          min_val = min(min_val, nums[i])
+
+      return right - left + 1 if right > left else 0
+      ```
+
+online_stock_span:
+  level_1:
+    title: "Similar to Stock Span"
+    content: |
+      This is the same as problem 4, but implemented as a class
+      that processes prices one at a time (online).
+
+      Use a monotonic decreasing stack to track prices and their spans.
+
+  level_2:
+    title: "Stack Implementation"
+    content: |
+      ```python
+      class StockSpanner:
+          def __init__(self):
+              self.stack = []  # (price, span)
+
+          def next(self, price: int) -> int:
+              span = 1
+              while self.stack and self.stack[-1][0] <= price:
+                  span += self.stack.pop()[1]
+              self.stack.append((price, span))
+              return span
+      ```
+
+  level_3:
+    title: "Why Store Spans"
+    content: |
+      Storing cumulative spans instead of indices allows O(1) span calculation:
+
+      - When we pop a price, we absorb its entire span
+      - No need to track original positions
+      - Each price is pushed once, popped at most once
+      - Amortized O(1) per call

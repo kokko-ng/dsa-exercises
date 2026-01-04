@@ -1,0 +1,678 @@
+# Hints for Backtracking problems
+
+combination_sum:
+  level_1:
+    title: "Backtracking with Unlimited Use"
+    content: |
+      Each number can be used unlimited times.
+
+      For each position in recursion:
+      - Try including current candidate (can include again)
+      - Try moving to next candidate
+
+      Track running sum and stop when sum exceeds target.
+
+  level_2:
+    title: "Backtracking Implementation"
+    content: |
+      ```python
+      def combination_sum(candidates, target):
+          result = []
+
+          def backtrack(start, path, remaining):
+              if remaining == 0:
+                  result.append(path[:])
+                  return
+              if remaining < 0:
+                  return
+
+              for i in range(start, len(candidates)):
+                  path.append(candidates[i])
+                  # Can reuse same element, so pass i not i+1
+                  backtrack(i, path, remaining - candidates[i])
+                  path.pop()
+
+          backtrack(0, [], target)
+          return result
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      Sort candidates first to enable early termination:
+
+      ```python
+      candidates.sort()
+      for i in range(start, len(candidates)):
+          if candidates[i] > remaining:
+              break  # No point trying larger numbers
+          # ... rest of backtracking
+      ```
+
+combination_sum_ii:
+  level_1:
+    title: "Handle Duplicates"
+    content: |
+      Unlike Combination Sum I:
+      - Each number used at most once
+      - Input may contain duplicates
+      - Result must not contain duplicate combinations
+
+      Sort to group duplicates, then skip consecutive same values.
+
+  level_2:
+    title: "Skip Duplicates Pattern"
+    content: |
+      ```python
+      def combination_sum_ii(candidates, target):
+          candidates.sort()
+          result = []
+
+          def backtrack(start, path, remaining):
+              if remaining == 0:
+                  result.append(path[:])
+                  return
+
+              for i in range(start, len(candidates)):
+                  # Skip duplicates at same level
+                  if i > start and candidates[i] == candidates[i-1]:
+                      continue
+                  if candidates[i] > remaining:
+                      break
+
+                  path.append(candidates[i])
+                  backtrack(i + 1, path, remaining - candidates[i])
+                  path.pop()
+
+          backtrack(0, [], target)
+          return result
+      ```
+
+  level_3:
+    title: "Why Skip Works"
+    content: |
+      When `i > start` and `candidates[i] == candidates[i-1]`:
+      - The previous duplicate was already tried at this level
+      - Including current duplicate would create duplicate combination
+      - Safe to skip because previous iteration covered all cases
+
+combination_sum_iii:
+  level_1:
+    title: "Fixed Size Combination"
+    content: |
+      Must use exactly k numbers from 1-9.
+
+      Similar to Combination Sum I but:
+      - Numbers 1-9 only
+      - Each number used at most once
+      - Must have exactly k numbers
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def combination_sum_iii(k, n):
+          result = []
+
+          def backtrack(start, path, remaining):
+              if len(path) == k:
+                  if remaining == 0:
+                      result.append(path[:])
+                  return
+
+              for i in range(start, 10):
+                  if i > remaining:
+                      break
+                  path.append(i)
+                  backtrack(i + 1, path, remaining - i)
+                  path.pop()
+
+          backtrack(1, [], n)
+          return result
+      ```
+
+  level_3:
+    title: "Pruning"
+    content: |
+      Additional pruning:
+      - If remaining numbers can't reach target, stop
+      - If sum of smallest remaining exceeds target, stop
+
+      ```python
+      # At most (9 - start + 1) more numbers available
+      if k - len(path) > 9 - start + 1:
+          return
+      ```
+
+letter_combinations_phone:
+  level_1:
+    title: "Cartesian Product"
+    content: |
+      Each digit maps to several letters.
+
+      Generate all combinations by:
+      - For each digit, try each of its letters
+      - Combine with results from remaining digits
+
+  level_2:
+    title: "Backtracking Implementation"
+    content: |
+      ```python
+      def letter_combinations_phone(digits):
+          if not digits:
+              return []
+
+          mapping = {
+              '2': 'abc', '3': 'def', '4': 'ghi', '5': 'jkl',
+              '6': 'mno', '7': 'pqrs', '8': 'tuv', '9': 'wxyz'
+          }
+          result = []
+
+          def backtrack(index, path):
+              if index == len(digits):
+                  result.append(''.join(path))
+                  return
+
+              for letter in mapping[digits[index]]:
+                  path.append(letter)
+                  backtrack(index + 1, path)
+                  path.pop()
+
+          backtrack(0, [])
+          return result
+      ```
+
+  level_3:
+    title: "Iterative Alternative"
+    content: |
+      ```python
+      def letter_combinations_phone(digits):
+          if not digits:
+              return []
+
+          mapping = {'2': 'abc', '3': 'def', ...}
+          result = ['']
+
+          for digit in digits:
+              new_result = []
+              for combo in result:
+                  for letter in mapping[digit]:
+                      new_result.append(combo + letter)
+              result = new_result
+
+          return result
+      ```
+
+palindrome_partitioning:
+  level_1:
+    title: "Partition String"
+    content: |
+      At each position, try all possible palindrome prefixes.
+
+      For each valid palindrome prefix:
+      - Add to current partition
+      - Recursively partition remaining string
+      - Backtrack
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def palindrome_partitioning(s):
+          result = []
+
+          def is_palindrome(sub):
+              return sub == sub[::-1]
+
+          def backtrack(start, path):
+              if start == len(s):
+                  result.append(path[:])
+                  return
+
+              for end in range(start + 1, len(s) + 1):
+                  prefix = s[start:end]
+                  if is_palindrome(prefix):
+                      path.append(prefix)
+                      backtrack(end, path)
+                      path.pop()
+
+          backtrack(0, [])
+          return result
+      ```
+
+  level_3:
+    title: "Optimization with DP"
+    content: |
+      Precompute palindrome status:
+
+      ```python
+      n = len(s)
+      dp = [[False] * n for _ in range(n)]
+
+      for i in range(n):
+          dp[i][i] = True
+      for length in range(2, n + 1):
+          for i in range(n - length + 1):
+              j = i + length - 1
+              if s[i] == s[j]:
+                  dp[i][j] = (length == 2) or dp[i+1][j-1]
+
+      # Use dp[i][j] instead of is_palindrome
+      ```
+
+n_queens:
+  level_1:
+    title: "Row by Row Placement"
+    content: |
+      Place one queen per row.
+
+      For each row, try placing queen in each column.
+      Check if placement is valid (no attacks).
+
+      Track:
+      - Columns used
+      - Diagonals used (row - col)
+      - Anti-diagonals used (row + col)
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def n_queens(n):
+          result = []
+          cols = set()
+          diag1 = set()  # row - col
+          diag2 = set()  # row + col
+
+          def backtrack(row, board):
+              if row == n:
+                  result.append([''.join(r) for r in board])
+                  return
+
+              for col in range(n):
+                  if col in cols or (row - col) in diag1 or (row + col) in diag2:
+                      continue
+
+                  cols.add(col)
+                  diag1.add(row - col)
+                  diag2.add(row + col)
+                  board[row][col] = 'Q'
+
+                  backtrack(row + 1, board)
+
+                  cols.remove(col)
+                  diag1.remove(row - col)
+                  diag2.remove(row + col)
+                  board[row][col] = '.'
+
+          board = [['.' for _ in range(n)] for _ in range(n)]
+          backtrack(0, board)
+          return result
+      ```
+
+  level_3:
+    title: "Diagonal Insight"
+    content: |
+      Cells on same diagonal have same (row - col).
+      Cells on same anti-diagonal have same (row + col).
+
+      This allows O(1) attack checking instead of O(n).
+
+sudoku_solver:
+  level_1:
+    title: "Constraint Satisfaction"
+    content: |
+      For each empty cell:
+      - Try digits 1-9
+      - Check if valid (row, column, 3x3 box)
+      - If valid, recurse to next empty cell
+      - If stuck, backtrack
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def sudoku_solver(board):
+          def is_valid(row, col, num):
+              # Check row
+              if num in board[row]:
+                  return False
+              # Check column
+              if num in [board[r][col] for r in range(9)]:
+                  return False
+              # Check 3x3 box
+              box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+              for r in range(box_row, box_row + 3):
+                  for c in range(box_col, box_col + 3):
+                      if board[r][c] == num:
+                          return False
+              return True
+
+          def solve():
+              for r in range(9):
+                  for c in range(9):
+                      if board[r][c] == '.':
+                          for num in '123456789':
+                              if is_valid(r, c, num):
+                                  board[r][c] = num
+                                  if solve():
+                                      return True
+                                  board[r][c] = '.'
+                          return False
+              return True
+
+          solve()
+      ```
+
+  level_3:
+    title: "Optimization with Sets"
+    content: |
+      Use sets for O(1) lookup:
+
+      ```python
+      rows = [set() for _ in range(9)]
+      cols = [set() for _ in range(9)]
+      boxes = [set() for _ in range(9)]
+
+      # Initialize from board
+      for r in range(9):
+          for c in range(9):
+              if board[r][c] != '.':
+                  num = board[r][c]
+                  rows[r].add(num)
+                  cols[c].add(num)
+                  boxes[(r // 3) * 3 + c // 3].add(num)
+      ```
+
+word_search:
+  level_1:
+    title: "Grid DFS"
+    content: |
+      For each cell matching first letter:
+      - Start DFS from that cell
+      - Mark cells as visited
+      - Explore all 4 directions
+      - Backtrack (unmark) when returning
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def word_search(board, word):
+          m, n = len(board), len(board[0])
+
+          def dfs(r, c, index):
+              if index == len(word):
+                  return True
+              if r < 0 or r >= m or c < 0 or c >= n:
+                  return False
+              if board[r][c] != word[index]:
+                  return False
+
+              # Mark as visited
+              temp = board[r][c]
+              board[r][c] = '#'
+
+              # Explore neighbors
+              found = (dfs(r + 1, c, index + 1) or
+                       dfs(r - 1, c, index + 1) or
+                       dfs(r, c + 1, index + 1) or
+                       dfs(r, c - 1, index + 1))
+
+              # Backtrack
+              board[r][c] = temp
+              return found
+
+          for r in range(m):
+              for c in range(n):
+                  if dfs(r, c, 0):
+                      return True
+          return False
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      Early termination:
+      - Check if word characters exist in board
+      - If last char is rarer than first, search reversed word
+
+      ```python
+      from collections import Counter
+      board_count = Counter(c for row in board for c in row)
+      word_count = Counter(word)
+      if any(word_count[c] > board_count[c] for c in word_count):
+          return False
+      ```
+
+word_search_ii:
+  level_1:
+    title: "Trie + Backtracking"
+    content: |
+      Instead of searching each word separately:
+      - Build a Trie from all words
+      - DFS on board while traversing Trie
+      - Find all words in one pass
+
+  level_2:
+    title: "Trie Implementation"
+    content: |
+      ```python
+      def word_search_ii(board, words):
+          # Build Trie
+          trie = {}
+          for word in words:
+              node = trie
+              for c in word:
+                  if c not in node:
+                      node[c] = {}
+                  node = node[c]
+              node['$'] = word  # Mark end with the word itself
+
+          m, n = len(board), len(board[0])
+          result = []
+
+          def dfs(r, c, node):
+              if r < 0 or r >= m or c < 0 or c >= n:
+                  return
+              char = board[r][c]
+              if char not in node:
+                  return
+
+              next_node = node[char]
+              if '$' in next_node:
+                  result.append(next_node['$'])
+                  del next_node['$']  # Avoid duplicates
+
+              board[r][c] = '#'
+              for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                  dfs(r + dr, c + dc, next_node)
+              board[r][c] = char
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      for r in range(m):
+          for c in range(n):
+              dfs(r, c, trie)
+
+      return result
+      ```
+
+      Optimization: Prune Trie nodes with no children after finding word.
+
+generate_parentheses:
+  level_1:
+    title: "Track Open and Close Counts"
+    content: |
+      At each step:
+      - Can add '(' if open_count < n
+      - Can add ')' if close_count < open_count
+
+      This ensures valid parentheses.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def generate_parentheses(n):
+          result = []
+
+          def backtrack(path, open_count, close_count):
+              if len(path) == 2 * n:
+                  result.append(''.join(path))
+                  return
+
+              if open_count < n:
+                  path.append('(')
+                  backtrack(path, open_count + 1, close_count)
+                  path.pop()
+
+              if close_count < open_count:
+                  path.append(')')
+                  backtrack(path, open_count, close_count + 1)
+                  path.pop()
+
+          backtrack([], 0, 0)
+          return result
+      ```
+
+  level_3:
+    title: "String Concatenation Alternative"
+    content: |
+      ```python
+      def generate_parentheses(n):
+          result = []
+
+          def backtrack(s, open_count, close_count):
+              if len(s) == 2 * n:
+                  result.append(s)
+                  return
+              if open_count < n:
+                  backtrack(s + '(', open_count + 1, close_count)
+              if close_count < open_count:
+                  backtrack(s + ')', open_count, close_count + 1)
+
+          backtrack('', 0, 0)
+          return result
+      ```
+
+restore_ip_addresses:
+  level_1:
+    title: "Four Segments"
+    content: |
+      IP address has exactly 4 segments.
+
+      Each segment:
+      - Is 0-255
+      - Has no leading zeros (except "0" itself)
+
+      Try all valid segment lengths at each position.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def restore_ip_addresses(s):
+          result = []
+
+          def is_valid(segment):
+              if len(segment) > 1 and segment[0] == '0':
+                  return False
+              return 0 <= int(segment) <= 255
+
+          def backtrack(start, path):
+              if len(path) == 4:
+                  if start == len(s):
+                      result.append('.'.join(path))
+                  return
+
+              for length in range(1, 4):
+                  if start + length > len(s):
+                      break
+                  segment = s[start:start + length]
+                  if is_valid(segment):
+                      path.append(segment)
+                      backtrack(start + length, path)
+                      path.pop()
+
+          backtrack(0, [])
+          return result
+      ```
+
+  level_3:
+    title: "Pruning"
+    content: |
+      Add pruning based on remaining length:
+
+      ```python
+      remaining = len(s) - start
+      remaining_segments = 4 - len(path)
+
+      # Each segment needs 1-3 chars
+      if remaining < remaining_segments or remaining > remaining_segments * 3:
+          return
+      ```
+
+expression_add_operators:
+  level_1:
+    title: "Track Previous Operand"
+    content: |
+      Tricky because of operator precedence.
+
+      For multiplication, need to "undo" previous addition/subtraction.
+
+      Track:
+      - Current value
+      - Previous operand (for multiplication)
+      - Current expression string
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def expression_add_operators(num, target):
+          result = []
+
+          def backtrack(index, path, value, prev):
+              if index == len(num):
+                  if value == target:
+                      result.append(path)
+                  return
+
+              for i in range(index, len(num)):
+                  # Skip numbers with leading zeros
+                  if i > index and num[index] == '0':
+                      break
+
+                  curr_str = num[index:i+1]
+                  curr = int(curr_str)
+
+                  if index == 0:
+                      # First number, no operator
+                      backtrack(i + 1, curr_str, curr, curr)
+                  else:
+                      # Try +, -, *
+                      backtrack(i + 1, path + '+' + curr_str,
+                                value + curr, curr)
+                      backtrack(i + 1, path + '-' + curr_str,
+                                value - curr, -curr)
+                      backtrack(i + 1, path + '*' + curr_str,
+                                value - prev + prev * curr, prev * curr)
+
+          if num:
+              backtrack(0, '', 0, 0)
+          return result
+      ```
+
+  level_3:
+    title: "Why Track Previous?"
+    content: |
+      For expression `2 + 3 * 4`:
+      - After `2 + 3`: value = 5, prev = 3
+      - For `* 4`: undo `+3`, then do `3 * 4`
+      - New value = 5 - 3 + 3 * 4 = 14
+
+      This handles precedence without parsing expression.

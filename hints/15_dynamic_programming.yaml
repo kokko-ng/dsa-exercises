@@ -1,0 +1,1207 @@
+# Hints for Dynamic Programming Patterns problems
+
+climbing_stairs:
+  level_1:
+    title: "Fibonacci Pattern"
+    content: |
+      To reach step n, you can come from:
+      - Step n-1 (taking 1 step)
+      - Step n-2 (taking 2 steps)
+
+      So: ways(n) = ways(n-1) + ways(n-2)
+
+      This is exactly the Fibonacci sequence!
+
+  level_2:
+    title: "Bottom-Up DP"
+    content: |
+      ```python
+      def climbing_stairs(n):
+          if n <= 2:
+              return n
+
+          dp = [0] * (n + 1)
+          dp[1] = 1
+          dp[2] = 2
+
+          for i in range(3, n + 1):
+              dp[i] = dp[i-1] + dp[i-2]
+
+          return dp[n]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      Only need last two values:
+
+      ```python
+      def climbing_stairs(n):
+          if n <= 2:
+              return n
+
+          prev2, prev1 = 1, 2
+          for i in range(3, n + 1):
+              curr = prev1 + prev2
+              prev2, prev1 = prev1, curr
+
+          return prev1
+      ```
+
+      Time: O(n), Space: O(1)
+
+fibonacci:
+  level_1:
+    title: "Classic Recurrence"
+    content: |
+      F(0) = 0
+      F(1) = 1
+      F(n) = F(n-1) + F(n-2)
+
+      Naive recursion is O(2^n). Use memoization!
+
+  level_2:
+    title: "Memoization"
+    content: |
+      ```python
+      def fibonacci(n, memo={}):
+          if n in memo:
+              return memo[n]
+          if n <= 1:
+              return n
+          memo[n] = fibonacci(n-1, memo) + fibonacci(n-2, memo)
+          return memo[n]
+      ```
+
+      Or bottom-up with O(1) space.
+
+  level_3:
+    title: "Iterative Solution"
+    content: |
+      ```python
+      def fibonacci(n):
+          if n <= 1:
+              return n
+
+          a, b = 0, 1
+          for _ in range(2, n + 1):
+              a, b = b, a + b
+          return b
+      ```
+
+house_robber:
+  level_1:
+    title: "Choice at Each House"
+    content: |
+      At each house, you have two choices:
+      1. Rob it (can't rob previous)
+      2. Skip it (can rob previous)
+
+      dp[i] = max money robbing houses 0..i
+
+  level_2:
+    title: "DP Recurrence"
+    content: |
+      ```python
+      # dp[i] = max(rob house i, skip house i)
+      # dp[i] = max(nums[i] + dp[i-2], dp[i-1])
+
+      def house_robber(nums):
+          if not nums:
+              return 0
+          if len(nums) == 1:
+              return nums[0]
+
+          dp = [0] * len(nums)
+          dp[0] = nums[0]
+          dp[1] = max(nums[0], nums[1])
+
+          for i in range(2, len(nums)):
+              dp[i] = max(nums[i] + dp[i-2], dp[i-1])
+
+          return dp[-1]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      ```python
+      def house_robber(nums):
+          if not nums:
+              return 0
+
+          prev2, prev1 = 0, 0
+          for num in nums:
+              curr = max(num + prev2, prev1)
+              prev2, prev1 = prev1, curr
+
+          return prev1
+      ```
+
+house_robber_ii:
+  level_1:
+    title: "Break the Circle"
+    content: |
+      Since houses are in a circle, you can't rob both first and last.
+
+      Two cases:
+      1. Rob houses 0 to n-2 (exclude last)
+      2. Rob houses 1 to n-1 (exclude first)
+
+      Answer = max of both cases.
+
+  level_2:
+    title: "Reuse House Robber I"
+    content: |
+      ```python
+      def house_robber_ii(nums):
+          if len(nums) == 1:
+              return nums[0]
+
+          def rob_linear(houses):
+              prev2, prev1 = 0, 0
+              for h in houses:
+                  curr = max(h + prev2, prev1)
+                  prev2, prev1 = prev1, curr
+              return prev1
+
+          return max(rob_linear(nums[:-1]), rob_linear(nums[1:]))
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Single house: return nums[0]
+      - Two houses: return max(nums[0], nums[1])
+
+min_cost_climbing_stairs:
+  level_1:
+    title: "Minimum Cost DP"
+    content: |
+      dp[i] = minimum cost to reach step i
+
+      To reach step i, you can come from:
+      - Step i-1 (paid cost[i-1])
+      - Step i-2 (paid cost[i-2])
+
+      dp[i] = min(dp[i-1] + cost[i-1], dp[i-2] + cost[i-2])
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def min_cost_climbing_stairs(cost):
+          n = len(cost)
+          dp = [0] * (n + 1)
+
+          for i in range(2, n + 1):
+              dp[i] = min(dp[i-1] + cost[i-1], dp[i-2] + cost[i-2])
+
+          return dp[n]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      ```python
+      def min_cost_climbing_stairs(cost):
+          prev2, prev1 = 0, 0
+
+          for i in range(2, len(cost) + 1):
+              curr = min(prev1 + cost[i-1], prev2 + cost[i-2])
+              prev2, prev1 = prev1, curr
+
+          return prev1
+      ```
+
+coin_change:
+  level_1:
+    title: "Classic DP Problem"
+    content: |
+      dp[i] = minimum coins to make amount i
+
+      For each coin, if we use it:
+      dp[i] = min(dp[i], dp[i - coin] + 1)
+
+  level_2:
+    title: "Bottom-Up DP"
+    content: |
+      ```python
+      def coin_change(coins, amount):
+          dp = [float('inf')] * (amount + 1)
+          dp[0] = 0
+
+          for i in range(1, amount + 1):
+              for coin in coins:
+                  if coin <= i and dp[i - coin] != float('inf'):
+                      dp[i] = min(dp[i], dp[i - coin] + 1)
+
+          return dp[amount] if dp[amount] != float('inf') else -1
+      ```
+
+  level_3:
+    title: "Alternative: BFS"
+    content: |
+      Think of it as shortest path problem:
+
+      ```python
+      from collections import deque
+
+      def coin_change(coins, amount):
+          if amount == 0:
+              return 0
+
+          visited = {0}
+          queue = deque([(0, 0)])
+
+          while queue:
+              curr, steps = queue.popleft()
+              for coin in coins:
+                  next_amt = curr + coin
+                  if next_amt == amount:
+                      return steps + 1
+                  if next_amt < amount and next_amt not in visited:
+                      visited.add(next_amt)
+                      queue.append((next_amt, steps + 1))
+
+          return -1
+      ```
+
+coin_change_ii:
+  level_1:
+    title: "Counting Combinations"
+    content: |
+      Unlike Coin Change I, we count ways, not minimum.
+
+      Key: Process coins one by one to avoid counting permutations.
+
+      dp[i] = number of ways to make amount i
+
+  level_2:
+    title: "Unbounded Knapsack"
+    content: |
+      ```python
+      def coin_change_ii(amount, coins):
+          dp = [0] * (amount + 1)
+          dp[0] = 1  # One way to make 0: use nothing
+
+          for coin in coins:
+              for i in range(coin, amount + 1):
+                  dp[i] += dp[i - coin]
+
+          return dp[amount]
+      ```
+
+      Order matters: iterate coins first, then amounts.
+
+  level_3:
+    title: "Why This Order?"
+    content: |
+      If we iterate amounts first:
+      - We'd count [1,2] and [2,1] as different
+      - That gives permutations, not combinations
+
+      By iterating coins first:
+      - Each coin is considered in order
+      - Combinations are counted correctly
+
+partition_equal_subset:
+  level_1:
+    title: "0/1 Knapsack Variant"
+    content: |
+      If sum is odd, impossible.
+
+      Otherwise, find if subset with sum = total/2 exists.
+
+      This is a subset sum problem!
+
+  level_2:
+    title: "Subset Sum DP"
+    content: |
+      ```python
+      def partition_equal_subset(nums):
+          total = sum(nums)
+          if total % 2 == 1:
+              return False
+
+          target = total // 2
+          dp = [False] * (target + 1)
+          dp[0] = True
+
+          for num in nums:
+              for i in range(target, num - 1, -1):
+                  dp[i] = dp[i] or dp[i - num]
+
+          return dp[target]
+      ```
+
+  level_3:
+    title: "Why Iterate Backwards?"
+    content: |
+      Backwards ensures each number is used only once.
+
+      If forwards: dp[i - num] might already include current num.
+
+      Alternative: Use set for possible sums:
+
+      ```python
+      possible = {0}
+      for num in nums:
+          possible = possible | {s + num for s in possible}
+      return target in possible
+      ```
+
+target_sum:
+  level_1:
+    title: "Transform to Subset Sum"
+    content: |
+      Let P = sum of positive, N = sum of negative (absolute)
+      P + N = total
+      P - N = target
+
+      So P = (total + target) / 2
+
+      Count subsets with sum P!
+
+  level_2:
+    title: "Subset Count DP"
+    content: |
+      ```python
+      def target_sum(nums, target):
+          total = sum(nums)
+          if (total + target) % 2 != 0 or abs(target) > total:
+              return 0
+
+          P = (total + target) // 2
+          dp = [0] * (P + 1)
+          dp[0] = 1
+
+          for num in nums:
+              for i in range(P, num - 1, -1):
+                  dp[i] += dp[i - num]
+
+          return dp[P]
+      ```
+
+  level_3:
+    title: "Memoization Approach"
+    content: |
+      ```python
+      from functools import lru_cache
+
+      def target_sum(nums, target):
+          @lru_cache(maxsize=None)
+          def dp(index, curr_sum):
+              if index == len(nums):
+                  return 1 if curr_sum == target else 0
+              return dp(index + 1, curr_sum + nums[index]) + \
+                     dp(index + 1, curr_sum - nums[index])
+
+          return dp(0, 0)
+      ```
+
+minimum_subset_sum_difference:
+  level_1:
+    title: "Find Closest Subset Sum"
+    content: |
+      Find subset sum S closest to total/2.
+
+      Difference = |total - 2*S|
+
+      Use subset sum DP to find all possible sums.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def minimum_subset_sum_difference(nums):
+          total = sum(nums)
+          target = total // 2
+
+          dp = [False] * (target + 1)
+          dp[0] = True
+
+          for num in nums:
+              for i in range(target, num - 1, -1):
+                  dp[i] = dp[i] or dp[i - num]
+
+          # Find largest achievable sum <= target
+          for s in range(target, -1, -1):
+              if dp[s]:
+                  return total - 2 * s
+      ```
+
+  level_3:
+    title: "Alternative with Set"
+    content: |
+      ```python
+      def minimum_subset_sum_difference(nums):
+          possible = {0}
+          for num in nums:
+              possible = possible | {s + num for s in possible}
+
+          total = sum(nums)
+          min_diff = total
+          for s in possible:
+              diff = abs(total - 2 * s)
+              min_diff = min(min_diff, diff)
+          return min_diff
+      ```
+
+longest_increasing_subsequence:
+  level_1:
+    title: "Classic LIS"
+    content: |
+      dp[i] = length of LIS ending at index i
+
+      For each j < i where nums[j] < nums[i]:
+      dp[i] = max(dp[i], dp[j] + 1)
+
+  level_2:
+    title: "O(n^2) Solution"
+    content: |
+      ```python
+      def longest_increasing_subsequence(nums):
+          if not nums:
+              return 0
+
+          dp = [1] * len(nums)
+
+          for i in range(1, len(nums)):
+              for j in range(i):
+                  if nums[j] < nums[i]:
+                      dp[i] = max(dp[i], dp[j] + 1)
+
+          return max(dp)
+      ```
+
+  level_3:
+    title: "O(n log n) with Binary Search"
+    content: |
+      ```python
+      import bisect
+
+      def longest_increasing_subsequence(nums):
+          tails = []
+          for num in nums:
+              pos = bisect.bisect_left(tails, num)
+              if pos == len(tails):
+                  tails.append(num)
+              else:
+                  tails[pos] = num
+          return len(tails)
+      ```
+
+      `tails[i]` = smallest ending element for LIS of length i+1
+
+longest_common_subsequence:
+  level_1:
+    title: "2D DP"
+    content: |
+      dp[i][j] = LCS of text1[0..i-1] and text2[0..j-1]
+
+      If text1[i-1] == text2[j-1]:
+        dp[i][j] = dp[i-1][j-1] + 1
+      Else:
+        dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def longest_common_subsequence(text1, text2):
+          m, n = len(text1), len(text2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if text1[i-1] == text2[j-1]:
+                      dp[i][j] = dp[i-1][j-1] + 1
+                  else:
+                      dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+
+          return dp[m][n]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      Only need previous row:
+
+      ```python
+      def longest_common_subsequence(text1, text2):
+          if len(text1) < len(text2):
+              text1, text2 = text2, text1
+
+          prev = [0] * (len(text2) + 1)
+          curr = [0] * (len(text2) + 1)
+
+          for i in range(1, len(text1) + 1):
+              for j in range(1, len(text2) + 1):
+                  if text1[i-1] == text2[j-1]:
+                      curr[j] = prev[j-1] + 1
+                  else:
+                      curr[j] = max(prev[j], curr[j-1])
+              prev, curr = curr, prev
+
+          return prev[len(text2)]
+      ```
+
+longest_palindromic_substring:
+  level_1:
+    title: "Expand Around Center"
+    content: |
+      A palindrome expands from its center.
+
+      For each position, try:
+      - Odd-length palindrome (center is one char)
+      - Even-length palindrome (center between two chars)
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def longest_palindromic_substring(s):
+          def expand(l, r):
+              while l >= 0 and r < len(s) and s[l] == s[r]:
+                  l -= 1
+                  r += 1
+              return s[l+1:r]
+
+          result = ""
+          for i in range(len(s)):
+              odd = expand(i, i)
+              even = expand(i, i + 1)
+              longer = odd if len(odd) > len(even) else even
+              if len(longer) > len(result):
+                  result = longer
+
+          return result
+      ```
+
+  level_3:
+    title: "DP Approach"
+    content: |
+      dp[i][j] = True if s[i:j+1] is palindrome
+
+      ```python
+      def longest_palindromic_substring(s):
+          n = len(s)
+          dp = [[False] * n for _ in range(n)]
+          start, max_len = 0, 1
+
+          for i in range(n):
+              dp[i][i] = True
+
+          for length in range(2, n + 1):
+              for i in range(n - length + 1):
+                  j = i + length - 1
+                  if s[i] == s[j]:
+                      dp[i][j] = (length == 2) or dp[i+1][j-1]
+                      if dp[i][j] and length > max_len:
+                          start, max_len = i, length
+
+          return s[start:start + max_len]
+      ```
+
+palindromic_substrings:
+  level_1:
+    title: "Count Palindromes"
+    content: |
+      Similar to longest palindromic substring.
+
+      For each center, count how many palindromes expand from it.
+
+  level_2:
+    title: "Expand and Count"
+    content: |
+      ```python
+      def palindromic_substrings(s):
+          def count_palindromes(l, r):
+              count = 0
+              while l >= 0 and r < len(s) and s[l] == s[r]:
+                  count += 1
+                  l -= 1
+                  r += 1
+              return count
+
+          total = 0
+          for i in range(len(s)):
+              total += count_palindromes(i, i)      # Odd
+              total += count_palindromes(i, i + 1)  # Even
+
+          return total
+      ```
+
+  level_3:
+    title: "Manacher's Algorithm"
+    content: |
+      O(n) algorithm exists but complex.
+
+      For interviews, O(n^2) expand-around-center is usually sufficient.
+
+edit_distance:
+  level_1:
+    title: "Classic String DP"
+    content: |
+      dp[i][j] = min operations to convert word1[0..i-1] to word2[0..j-1]
+
+      Three operations:
+      - Insert: dp[i][j-1] + 1
+      - Delete: dp[i-1][j] + 1
+      - Replace: dp[i-1][j-1] + (0 if match else 1)
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def edit_distance(word1, word2):
+          m, n = len(word1), len(word2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+          for i in range(m + 1):
+              dp[i][0] = i
+          for j in range(n + 1):
+              dp[0][j] = j
+
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if word1[i-1] == word2[j-1]:
+                      dp[i][j] = dp[i-1][j-1]
+                  else:
+                      dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+
+          return dp[m][n]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      ```python
+      def edit_distance(word1, word2):
+          m, n = len(word1), len(word2)
+          prev = list(range(n + 1))
+          curr = [0] * (n + 1)
+
+          for i in range(1, m + 1):
+              curr[0] = i
+              for j in range(1, n + 1):
+                  if word1[i-1] == word2[j-1]:
+                      curr[j] = prev[j-1]
+                  else:
+                      curr[j] = 1 + min(prev[j], curr[j-1], prev[j-1])
+              prev, curr = curr, prev
+
+          return prev[n]
+      ```
+
+unique_paths:
+  level_1:
+    title: "Grid DP"
+    content: |
+      To reach cell (i, j), you can come from:
+      - (i-1, j) - from above
+      - (i, j-1) - from left
+
+      dp[i][j] = dp[i-1][j] + dp[i][j-1]
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def unique_paths(m, n):
+          dp = [[1] * n for _ in range(m)]
+
+          for i in range(1, m):
+              for j in range(1, n):
+                  dp[i][j] = dp[i-1][j] + dp[i][j-1]
+
+          return dp[m-1][n-1]
+      ```
+
+  level_3:
+    title: "Math Solution"
+    content: |
+      Total moves = (m-1) down + (n-1) right = m+n-2 moves
+
+      Choose which moves are "down": C(m+n-2, m-1)
+
+      ```python
+      from math import comb
+      def unique_paths(m, n):
+          return comb(m + n - 2, m - 1)
+      ```
+
+unique_paths_ii:
+  level_1:
+    title: "Handle Obstacles"
+    content: |
+      Same as Unique Paths, but:
+      - Obstacle cells have 0 paths
+      - Can't come from/through obstacles
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def unique_paths_ii(obstacleGrid):
+          m, n = len(obstacleGrid), len(obstacleGrid[0])
+          if obstacleGrid[0][0] == 1:
+              return 0
+
+          dp = [[0] * n for _ in range(m)]
+          dp[0][0] = 1
+
+          for i in range(m):
+              for j in range(n):
+                  if obstacleGrid[i][j] == 1:
+                      dp[i][j] = 0
+                  else:
+                      if i > 0:
+                          dp[i][j] += dp[i-1][j]
+                      if j > 0:
+                          dp[i][j] += dp[i][j-1]
+
+          return dp[m-1][n-1]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      ```python
+      def unique_paths_ii(obstacleGrid):
+          n = len(obstacleGrid[0])
+          dp = [0] * n
+          dp[0] = 1 if obstacleGrid[0][0] == 0 else 0
+
+          for row in obstacleGrid:
+              for j in range(n):
+                  if row[j] == 1:
+                      dp[j] = 0
+                  elif j > 0:
+                      dp[j] += dp[j-1]
+
+          return dp[n-1]
+      ```
+
+minimum_path_sum:
+  level_1:
+    title: "Minimize Instead of Count"
+    content: |
+      Similar to unique paths:
+      dp[i][j] = minimum sum to reach (i, j)
+
+      dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def minimum_path_sum(grid):
+          m, n = len(grid), len(grid[0])
+          dp = [[0] * n for _ in range(m)]
+          dp[0][0] = grid[0][0]
+
+          for j in range(1, n):
+              dp[0][j] = dp[0][j-1] + grid[0][j]
+          for i in range(1, m):
+              dp[i][0] = dp[i-1][0] + grid[i][0]
+
+          for i in range(1, m):
+              for j in range(1, n):
+                  dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])
+
+          return dp[m-1][n-1]
+      ```
+
+  level_3:
+    title: "In-Place Modification"
+    content: |
+      Can modify grid itself to save space:
+
+      ```python
+      def minimum_path_sum(grid):
+          m, n = len(grid), len(grid[0])
+
+          for j in range(1, n):
+              grid[0][j] += grid[0][j-1]
+          for i in range(1, m):
+              grid[i][0] += grid[i-1][0]
+
+          for i in range(1, m):
+              for j in range(1, n):
+                  grid[i][j] += min(grid[i-1][j], grid[i][j-1])
+
+          return grid[m-1][n-1]
+      ```
+
+decode_ways:
+  level_1:
+    title: "Counting Decodings"
+    content: |
+      dp[i] = number of ways to decode s[0..i-1]
+
+      At each position:
+      - Single digit (1-9): dp[i] += dp[i-1]
+      - Two digits (10-26): dp[i] += dp[i-2]
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def decode_ways(s):
+          if not s or s[0] == '0':
+              return 0
+
+          n = len(s)
+          dp = [0] * (n + 1)
+          dp[0] = 1
+          dp[1] = 1
+
+          for i in range(2, n + 1):
+              one_digit = int(s[i-1])
+              two_digit = int(s[i-2:i])
+
+              if 1 <= one_digit <= 9:
+                  dp[i] += dp[i-1]
+              if 10 <= two_digit <= 26:
+                  dp[i] += dp[i-2]
+
+          return dp[n]
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      ```python
+      def decode_ways(s):
+          if not s or s[0] == '0':
+              return 0
+
+          prev2, prev1 = 1, 1
+
+          for i in range(1, len(s)):
+              curr = 0
+              if s[i] != '0':
+                  curr += prev1
+              if 10 <= int(s[i-1:i+1]) <= 26:
+                  curr += prev2
+              prev2, prev1 = prev1, curr
+
+          return prev1
+      ```
+
+word_break:
+  level_1:
+    title: "DP with Words"
+    content: |
+      dp[i] = True if s[0..i-1] can be segmented
+
+      For each position i, check if any word in dict
+      ends at position i and dp[i - len(word)] is True.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def word_break(s, wordDict):
+          word_set = set(wordDict)
+          dp = [False] * (len(s) + 1)
+          dp[0] = True
+
+          for i in range(1, len(s) + 1):
+              for j in range(i):
+                  if dp[j] and s[j:i] in word_set:
+                      dp[i] = True
+                      break
+
+          return dp[len(s)]
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      Limit search by max word length:
+
+      ```python
+      def word_break(s, wordDict):
+          word_set = set(wordDict)
+          max_len = max(len(w) for w in wordDict) if wordDict else 0
+          dp = [False] * (len(s) + 1)
+          dp[0] = True
+
+          for i in range(1, len(s) + 1):
+              for j in range(max(0, i - max_len), i):
+                  if dp[j] and s[j:i] in word_set:
+                      dp[i] = True
+                      break
+
+          return dp[len(s)]
+      ```
+
+word_break_ii:
+  level_1:
+    title: "Backtracking with Memoization"
+    content: |
+      Use Word Break I to check if solution exists.
+
+      Then backtrack to find all solutions.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def word_break_ii(s, wordDict):
+          word_set = set(wordDict)
+          memo = {}
+
+          def backtrack(start):
+              if start in memo:
+                  return memo[start]
+              if start == len(s):
+                  return [""]
+
+              results = []
+              for end in range(start + 1, len(s) + 1):
+                  word = s[start:end]
+                  if word in word_set:
+                      for rest in backtrack(end):
+                          if rest:
+                              results.append(word + " " + rest)
+                          else:
+                              results.append(word)
+
+              memo[start] = results
+              return results
+
+          return backtrack(0)
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      First check if word break is possible:
+
+      ```python
+      def word_break_ii(s, wordDict):
+          word_set = set(wordDict)
+
+          # Check if breakable first
+          dp = [False] * (len(s) + 1)
+          dp[0] = True
+          for i in range(1, len(s) + 1):
+              for word in word_set:
+                  if i >= len(word) and dp[i - len(word)] and s[i-len(word):i] == word:
+                      dp[i] = True
+                      break
+
+          if not dp[len(s)]:
+              return []
+
+          # Then find all solutions
+          # ... backtracking code
+      ```
+
+longest_string_chain:
+  level_1:
+    title: "LIS Variant"
+    content: |
+      Sort words by length.
+
+      dp[word] = longest chain ending at word
+
+      For each word, try removing each character to find predecessor.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def longest_string_chain(words):
+          words.sort(key=len)
+          dp = {}
+          max_chain = 1
+
+          for word in words:
+              dp[word] = 1
+              for i in range(len(word)):
+                  predecessor = word[:i] + word[i+1:]
+                  if predecessor in dp:
+                      dp[word] = max(dp[word], dp[predecessor] + 1)
+              max_chain = max(max_chain, dp[word])
+
+          return max_chain
+      ```
+
+  level_3:
+    title: "Time Complexity"
+    content: |
+      - Sorting: O(n log n)
+      - For each word: check len(word) predecessors
+      - Each predecessor lookup: O(L) where L = word length
+
+      Total: O(n * L^2) where n = number of words, L = max length
+
+maximal_square:
+  level_1:
+    title: "Square DP"
+    content: |
+      dp[i][j] = side length of largest square with bottom-right at (i,j)
+
+      If matrix[i][j] == '1':
+        dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def maximal_square(matrix):
+          if not matrix:
+              return 0
+
+          m, n = len(matrix), len(matrix[0])
+          dp = [[0] * n for _ in range(m)]
+          max_side = 0
+
+          for i in range(m):
+              for j in range(n):
+                  if matrix[i][j] == '1':
+                      if i == 0 or j == 0:
+                          dp[i][j] = 1
+                      else:
+                          dp[i][j] = min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+                      max_side = max(max_side, dp[i][j])
+
+          return max_side * max_side
+      ```
+
+  level_3:
+    title: "Space Optimization"
+    content: |
+      ```python
+      def maximal_square(matrix):
+          if not matrix:
+              return 0
+
+          m, n = len(matrix), len(matrix[0])
+          prev = [0] * n
+          max_side = 0
+
+          for i in range(m):
+              curr = [0] * n
+              for j in range(n):
+                  if matrix[i][j] == '1':
+                      if i == 0 or j == 0:
+                          curr[j] = 1
+                      else:
+                          curr[j] = min(prev[j], curr[j-1], prev[j-1]) + 1
+                      max_side = max(max_side, curr[j])
+              prev = curr
+
+          return max_side * max_side
+      ```
+
+burst_balloons:
+  level_1:
+    title: "Interval DP"
+    content: |
+      Think in reverse: which balloon to burst LAST in a range.
+
+      If balloon k is burst last in range (i, j):
+      - Left subproblem: (i, k)
+      - Right subproblem: (k, j)
+      - Coins from k: nums[i] * nums[k] * nums[j]
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def burst_balloons(nums):
+          nums = [1] + nums + [1]
+          n = len(nums)
+          dp = [[0] * n for _ in range(n)]
+
+          for length in range(2, n):
+              for left in range(n - length):
+                  right = left + length
+                  for k in range(left + 1, right):
+                      coins = nums[left] * nums[k] * nums[right]
+                      dp[left][right] = max(dp[left][right],
+                                           dp[left][k] + coins + dp[k][right])
+
+          return dp[0][n-1]
+      ```
+
+  level_3:
+    title: "Memoization Approach"
+    content: |
+      ```python
+      def burst_balloons(nums):
+          nums = [1] + nums + [1]
+          n = len(nums)
+          memo = {}
+
+          def dp(left, right):
+              if left + 1 == right:
+                  return 0
+              if (left, right) in memo:
+                  return memo[(left, right)]
+
+              result = 0
+              for k in range(left + 1, right):
+                  coins = nums[left] * nums[k] * nums[right]
+                  result = max(result, dp(left, k) + coins + dp(k, right))
+
+              memo[(left, right)] = result
+              return result
+
+          return dp(0, n - 1)
+      ```
+
+regular_expression_matching:
+  level_1:
+    title: "Handle . and *"
+    content: |
+      - `.` matches any single character
+      - `*` matches zero or more of preceding element
+
+      Key insight: `x*` can match:
+      - Empty string (zero x)
+      - One or more x's
+
+  level_2:
+    title: "DP Definition"
+    content: |
+      dp[i][j] = True if s[0..i-1] matches p[0..j-1]
+
+      Cases:
+      1. p[j-1] is letter: must match s[i-1]
+      2. p[j-1] is '.': matches any s[i-1]
+      3. p[j-1] is '*': complex case
+
+  level_3:
+    title: "Implementation"
+    content: |
+      ```python
+      def regular_expression_matching(s, p):
+          m, n = len(s), len(p)
+          dp = [[False] * (n + 1) for _ in range(m + 1)]
+          dp[0][0] = True
+
+          # Handle patterns like a*, a*b*, etc. matching empty string
+          for j in range(2, n + 1):
+              if p[j-1] == '*':
+                  dp[0][j] = dp[0][j-2]
+
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if p[j-1] == '*':
+                      # Zero occurrences
+                      dp[i][j] = dp[i][j-2]
+                      # One or more occurrences
+                      if p[j-2] == '.' or p[j-2] == s[i-1]:
+                          dp[i][j] = dp[i][j] or dp[i-1][j]
+                  elif p[j-1] == '.' or p[j-1] == s[i-1]:
+                      dp[i][j] = dp[i-1][j-1]
+
+          return dp[m][n]
+      ```

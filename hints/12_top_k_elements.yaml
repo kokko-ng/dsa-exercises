@@ -1,0 +1,472 @@
+# Hints for Top K Elements problems
+
+top_k_frequent:
+  level_1:
+    title: "Count Then Select"
+    content: |
+      Two steps:
+      1. Count frequency of each element
+      2. Find the K elements with highest frequency
+
+      For step 2, you could sort by frequency, but there's a more efficient way.
+
+  level_2:
+    title: "Heap Approach"
+    content: |
+      Use a min heap of size K:
+      - Add (frequency, element) tuples to heap
+      - Keep heap size at K by removing minimum
+      - Final heap contains K most frequent elements
+
+      ```python
+      from collections import Counter
+      import heapq
+
+      count = Counter(nums)
+      return heapq.nlargest(k, count.keys(), key=count.get)
+      ```
+
+  level_3:
+    title: "Bucket Sort Alternative"
+    content: |
+      O(n) solution using bucket sort:
+      ```python
+      count = Counter(nums)
+      buckets = [[] for _ in range(len(nums) + 1)]
+
+      for num, freq in count.items():
+          buckets[freq].append(num)
+
+      result = []
+      for i in range(len(buckets) - 1, -1, -1):
+          for num in buckets[i]:
+              result.append(num)
+              if len(result) == k:
+                  return result
+      ```
+
+kth_largest_element:
+  level_1:
+    title: "Multiple Approaches"
+    content: |
+      Options:
+      1. Sort and index - O(n log n)
+      2. Min heap of size K - O(n log k)
+      3. Quick select - O(n) average
+
+      For interview, know all three!
+
+  level_2:
+    title: "Heap Approach"
+    content: |
+      Use a min heap of size K:
+      - Add all elements to heap
+      - Keep only K largest by popping when size > K
+      - The root is the Kth largest
+
+      ```python
+      import heapq
+
+      heap = []
+      for num in nums:
+          heapq.heappush(heap, num)
+          if len(heap) > k:
+              heapq.heappop(heap)
+
+      return heap[0]
+      ```
+
+  level_3:
+    title: "Quick Select"
+    content: |
+      ```python
+      def quickselect(nums, k):
+          pivot = random.choice(nums)
+          left = [x for x in nums if x < pivot]
+          mid = [x for x in nums if x == pivot]
+          right = [x for x in nums if x > pivot]
+
+          if k <= len(right):
+              return quickselect(right, k)
+          elif k <= len(right) + len(mid):
+              return pivot
+          else:
+              return quickselect(left, k - len(right) - len(mid))
+
+      return quickselect(nums, k)
+      ```
+
+k_closest_points:
+  level_1:
+    title: "Distance Calculation"
+    content: |
+      Distance from origin: sqrt(x^2 + y^2)
+
+      Key insight: You don't need sqrt for comparison!
+      Just compare x^2 + y^2 directly.
+
+      Find K points with smallest distance.
+
+  level_2:
+    title: "Max Heap of Size K"
+    content: |
+      Use max heap (negate distances) of size K:
+      - If heap has fewer than K elements, add point
+      - If new distance < max distance in heap, replace
+
+      ```python
+      import heapq
+
+      heap = []
+      for x, y in points:
+          dist = -(x*x + y*y)  # Negate for max heap
+          if len(heap) < k:
+              heapq.heappush(heap, (dist, x, y))
+          elif dist > heap[0][0]:
+              heapq.heapreplace(heap, (dist, x, y))
+
+      return [[x, y] for (_, x, y) in heap]
+      ```
+
+  level_3:
+    title: "Alternative: nsmallest"
+    content: |
+      Python's heapq.nsmallest is perfect for this:
+
+      ```python
+      return heapq.nsmallest(k, points, key=lambda p: p[0]**2 + p[1]**2)
+      ```
+
+      Or use quick select for O(n) average.
+
+connect_ropes:
+  level_1:
+    title: "Greedy Approach"
+    content: |
+      To minimize total cost, always connect the two shortest ropes first.
+
+      Why? Longer ropes get added to cost fewer times overall.
+
+  level_2:
+    title: "Min Heap Solution"
+    content: |
+      ```python
+      import heapq
+
+      if len(ropes) <= 1:
+          return 0
+
+      heapq.heapify(ropes)
+      total_cost = 0
+
+      while len(ropes) > 1:
+          first = heapq.heappop(ropes)
+          second = heapq.heappop(ropes)
+          cost = first + second
+          total_cost += cost
+          heapq.heappush(ropes, cost)
+
+      return total_cost
+      ```
+
+  level_3:
+    title: "Complexity Analysis"
+    content: |
+      - Time: O(n log n) - n-1 merge operations, each with O(log n) heap ops
+      - Space: O(n) for heap (or O(1) if heapify in-place)
+
+      This is equivalent to building a Huffman tree.
+
+top_k_frequent_words:
+  level_1:
+    title: "Frequency + Custom Sort"
+    content: |
+      1. Count word frequencies
+      2. Sort by: frequency (desc), then word (asc)
+      3. Take top K
+
+      The tricky part is the two-level sort.
+
+  level_2:
+    title: "Heap with Custom Comparator"
+    content: |
+      Use a min heap with custom comparison:
+      - Lower frequency = higher priority (gets popped first)
+      - Same frequency: reverse alphabetical = higher priority
+
+      ```python
+      from collections import Counter
+      import heapq
+
+      count = Counter(words)
+      # Use (-freq, word) for proper ordering
+      heap = []
+      for word, freq in count.items():
+          heapq.heappush(heap, (-freq, word))
+
+      return [heapq.heappop(heap)[1] for _ in range(k)]
+      ```
+
+  level_3:
+    title: "Direct Sort Approach"
+    content: |
+      ```python
+      from collections import Counter
+
+      count = Counter(words)
+      return sorted(count.keys(), key=lambda w: (-count[w], w))[:k]
+      ```
+
+      The key sorts by:
+      1. Negative frequency (so higher freq comes first)
+      2. Word alphabetically (for ties)
+
+sort_by_frequency:
+  level_1:
+    title: "Count Then Build"
+    content: |
+      1. Count character frequencies
+      2. Sort characters by frequency (descending)
+      3. Build result string with repeated characters
+
+  level_2:
+    title: "Heap or Sort Approach"
+    content: |
+      ```python
+      from collections import Counter
+
+      count = Counter(s)
+      # Sort by frequency descending
+      sorted_chars = sorted(count.items(), key=lambda x: -x[1])
+      return ''.join(char * freq for char, freq in sorted_chars)
+      ```
+
+  level_3:
+    title: "Bucket Sort for O(n)"
+    content: |
+      ```python
+      from collections import Counter
+
+      count = Counter(s)
+      buckets = [[] for _ in range(len(s) + 1)]
+
+      for char, freq in count.items():
+          buckets[freq].append(char)
+
+      result = []
+      for freq in range(len(s), 0, -1):
+          for char in buckets[freq]:
+              result.append(char * freq)
+
+      return ''.join(result)
+      ```
+
+kth_largest_in_stream:
+  level_1:
+    title: "Maintain K Elements"
+    content: |
+      Keep only K largest elements seen so far.
+
+      When a new element comes:
+      - If it's larger than Kth largest, it might become part of top K
+      - The new Kth largest is the minimum of the top K
+
+  level_2:
+    title: "Min Heap of Size K"
+    content: |
+      ```python
+      import heapq
+
+      class KthLargest:
+          def __init__(self, k, nums):
+              self.k = k
+              self.heap = nums
+              heapq.heapify(self.heap)
+              while len(self.heap) > k:
+                  heapq.heappop(self.heap)
+
+          def add(self, val):
+              if len(self.heap) < self.k:
+                  heapq.heappush(self.heap, val)
+              elif val > self.heap[0]:
+                  heapq.heapreplace(self.heap, val)
+              return self.heap[0]
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Min heap stores K largest elements
+      - Root is smallest of K largest = Kth largest
+      - New element only matters if > current Kth largest
+      - Time: O(log k) per add, Space: O(k)
+
+closest_numbers:
+  level_1:
+    title: "Binary Search + Expand"
+    content: |
+      Since array is sorted:
+      1. Find position closest to x using binary search
+      2. Expand outward from that position
+      3. Pick the K closest elements
+
+  level_2:
+    title: "Two Pointer Approach"
+    content: |
+      ```python
+      left, right = 0, len(arr) - 1
+
+      while right - left >= k:
+          if abs(arr[left] - x) > abs(arr[right] - x):
+              left += 1
+          else:
+              right -= 1
+
+      return arr[left:right + 1]
+      ```
+
+      Start with full range, shrink from the end farther from x.
+
+  level_3:
+    title: "Binary Search for Left Bound"
+    content: |
+      ```python
+      left, right = 0, len(arr) - k
+
+      while left < right:
+          mid = (left + right) // 2
+          if x - arr[mid] > arr[mid + k] - x:
+              left = mid + 1
+          else:
+              right = mid
+
+      return arr[left:left + k]
+      ```
+
+      Binary search for the starting index of K elements.
+
+maximum_distinct_elements:
+  level_1:
+    title: "Remove Duplicates First"
+    content: |
+      Strategy:
+      1. Count frequencies
+      2. Use K removals to eliminate duplicates first (freq > 1)
+      3. If K remains, we must remove distinct elements
+
+  level_2:
+    title: "Greedy with Min Heap"
+    content: |
+      Priority: Remove duplicates starting with elements having most duplicates.
+
+      Actually, we should remove elements with LOWEST frequency first!
+      - Removing one of freq=5 saves us 4 removals
+      - Removing one of freq=2 saves us 1 removal
+
+      ```python
+      from collections import Counter
+      import heapq
+
+      count = Counter(nums)
+      # Min heap of frequencies
+      heap = list(count.values())
+      heapq.heapify(heap)
+
+      remaining_k = k
+      while heap and remaining_k > 0:
+          freq = heapq.heappop(heap)
+          if remaining_k >= freq:
+              remaining_k -= freq  # Remove all of this element
+          else:
+              heapq.heappush(heap, freq - remaining_k)
+              remaining_k = 0
+
+      return len(heap)
+      ```
+
+  level_3:
+    title: "Corrected Approach"
+    content: |
+      Actually need to:
+      1. Count frequencies
+      2. Remove excess duplicates first (reduce freq to 1)
+      3. If k remains, remove distinct elements
+
+      ```python
+      from collections import Counter
+      import heapq
+
+      count = Counter(nums)
+      duplicates = [(freq - 1, num) for num, freq in count.items() if freq > 1]
+      heapq.heapify(duplicates)
+      distinct = len(count)
+
+      remaining = k
+      # First, reduce duplicates
+      for num, freq in count.items():
+          excess = freq - 1
+          if remaining >= excess:
+              remaining -= excess
+          else:
+              remaining = 0
+              break
+
+      # Then, if k remains, remove distinct elements
+      return max(0, distinct - remaining)
+      ```
+
+sum_of_elements:
+  level_1:
+    title: "Find Boundaries Then Sum"
+    content: |
+      1. Find the k1th smallest element
+      2. Find the k2th smallest element
+      3. Sum all elements strictly between them
+
+  level_2:
+    title: "Heap Approach"
+    content: |
+      Use a max heap of size K to find Kth smallest:
+
+      ```python
+      import heapq
+
+      def kth_smallest(nums, k):
+          heap = []
+          for num in nums:
+              heapq.heappush(heap, -num)
+              if len(heap) > k:
+                  heapq.heappop(heap)
+          return -heap[0]
+
+      bound1 = kth_smallest(nums, k1)
+      bound2 = kth_smallest(nums, k2)
+
+      return sum(x for x in nums if bound1 < x < bound2)
+      ```
+
+  level_3:
+    title: "Single Pass Optimization"
+    content: |
+      ```python
+      import heapq
+
+      # Find k2th smallest using max heap of size k2
+      heap = []
+      for num in nums:
+          heapq.heappush(heap, -num)
+          if len(heap) > k2:
+              heapq.heappop(heap)
+
+      # Now heap has k2 smallest elements
+      # k1th smallest is somewhere in this heap
+      # Sum elements except the k1 smallest
+      sorted_k2 = sorted(-x for x in heap)
+      return sum(sorted_k2[k1:k2-1])
+      ```
+
+      Or simply sort and slice:
+      ```python
+      sorted_nums = sorted(nums)
+      return sum(sorted_nums[k1:k2-1])
+      ```

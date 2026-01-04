@@ -1,0 +1,335 @@
+# Hints for Cyclic Sort problems
+
+cyclic_sort:
+  level_1:
+    title: "Place Each Number at Its Correct Index"
+    content: |
+      For numbers 1 to n, number `x` should be at index `x - 1`.
+
+      Instead of traditional sorting, **swap each number to its correct position**.
+
+  level_2:
+    title: "Swap Until Correct"
+    content: |
+      ```python
+      i = 0
+      while i < len(nums):
+          correct_idx = nums[i] - 1  # Where this number should be
+          if nums[i] != nums[correct_idx]:
+              # Swap to correct position
+              nums[i], nums[correct_idx] = nums[correct_idx], nums[i]
+          else:
+              # Current position is correct, move on
+              i += 1
+      return nums
+      ```
+
+  level_3:
+    title: "Why O(n)?"
+    content: |
+      Even though there's a while loop inside, each number is swapped **at most once** to its correct position.
+
+      Total swaps = n - 1 in worst case.
+      Time: O(n), Space: O(1)
+
+find_missing_number:
+  level_1:
+    title: "Range is [0, n]"
+    content: |
+      Array has n elements, range is [0, n], so one number is missing.
+
+      Multiple approaches:
+      1. **Sum formula**: Sum of 0 to n minus actual sum
+      2. **XOR**: XOR all indices with all numbers
+      3. **Cyclic sort**: Place each number, find missing spot
+
+  level_2:
+    title: "XOR Approach"
+    content: |
+      XOR has properties: `a ^ a = 0` and `a ^ 0 = a`
+
+      ```python
+      xor = len(nums)  # XOR with n
+      for i, num in enumerate(nums):
+          xor ^= i ^ num
+
+      return xor
+      ```
+
+      All matching pairs cancel out, leaving the missing number.
+
+  level_3:
+    title: "Cyclic Sort Approach"
+    content: |
+      Place numbers at index = number (for range [0, n-1]):
+
+      ```python
+      i = 0
+      while i < len(nums):
+          if nums[i] < len(nums) and nums[i] != nums[nums[i]]:
+              nums[nums[i]], nums[i] = nums[i], nums[nums[i]]
+          else:
+              i += 1
+
+      for i in range(len(nums)):
+          if nums[i] != i:
+              return i
+      return len(nums)
+      ```
+
+find_all_missing_numbers:
+  level_1:
+    title: "Cyclic Sort First"
+    content: |
+      After cyclic sort, each position tells you what's missing.
+
+      Number at index i should be i + 1.
+      If nums[i] != i + 1, then i + 1 is missing.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      i = 0
+      while i < len(nums):
+          j = nums[i] - 1
+          if nums[i] != nums[j]:
+              nums[i], nums[j] = nums[j], nums[i]
+          else:
+              i += 1
+
+      missing = []
+      for i in range(len(nums)):
+          if nums[i] != i + 1:
+              missing.append(i + 1)
+
+      return missing
+      ```
+
+  level_3:
+    title: "Negative Marking Alternative"
+    content: |
+      Mark seen numbers by negating value at their index:
+
+      ```python
+      for num in nums:
+          idx = abs(num) - 1
+          if nums[idx] > 0:
+              nums[idx] = -nums[idx]
+
+      missing = []
+      for i in range(len(nums)):
+          if nums[i] > 0:
+              missing.append(i + 1)
+      return missing
+      ```
+
+find_duplicate:
+  level_1:
+    title: "Floyd's Cycle Detection"
+    content: |
+      Treat array as linked list: `nums[i]` points to next index.
+
+      Since there's a duplicate, there must be a cycle!
+
+      Use slow and fast pointers to find the cycle.
+
+  level_2:
+    title: "Two Phase Algorithm"
+    content: |
+      **Phase 1**: Find intersection point in cycle
+      ```python
+      slow = fast = 0
+      while True:
+          slow = nums[slow]
+          fast = nums[nums[fast]]
+          if slow == fast:
+              break
+      ```
+
+      **Phase 2**: Find cycle entrance (the duplicate)
+      ```python
+      slow = 0
+      while slow != fast:
+          slow = nums[slow]
+          fast = nums[fast]
+      return slow
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Array indices 0 to n, values 1 to n
+      - Starting from index 0, we'll eventually enter a cycle
+      - The entrance to the cycle is the duplicate number
+      - Phase 2: Distance from start to entrance = distance from intersection to entrance
+
+find_all_duplicates:
+  level_1:
+    title: "Mark Visited Using Sign"
+    content: |
+      Use the array itself as a hash table!
+
+      For each number, negate the value at index = number - 1.
+      If already negative, it's a duplicate.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      duplicates = []
+
+      for num in nums:
+          idx = abs(num) - 1
+          if nums[idx] < 0:
+              duplicates.append(abs(num))
+          else:
+              nums[idx] = -nums[idx]
+
+      return duplicates
+      ```
+
+  level_3:
+    title: "Cyclic Sort Alternative"
+    content: |
+      After cyclic sort, duplicates are at wrong positions:
+
+      ```python
+      i = 0
+      while i < len(nums):
+          j = nums[i] - 1
+          if nums[i] != nums[j]:
+              nums[i], nums[j] = nums[j], nums[i]
+          else:
+              i += 1
+
+      duplicates = []
+      for i in range(len(nums)):
+          if nums[i] != i + 1:
+              duplicates.append(nums[i])
+      return duplicates
+      ```
+
+find_corrupt_pair:
+  level_1:
+    title: "Find Both in One Pass After Sort"
+    content: |
+      After cyclic sort:
+      - The duplicate will be at a wrong position
+      - The missing number is the correct number for that position
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      i = 0
+      while i < len(nums):
+          j = nums[i] - 1
+          if nums[i] != nums[j]:
+              nums[i], nums[j] = nums[j], nums[i]
+          else:
+              i += 1
+
+      for i in range(len(nums)):
+          if nums[i] != i + 1:
+              return [nums[i], i + 1]  # [duplicate, missing]
+
+      return [-1, -1]  # Should never reach here
+      ```
+
+  level_3:
+    title: "Math Approach"
+    content: |
+      Using sum and sum of squares:
+      - actual_sum - expected_sum = duplicate - missing
+      - actual_sq_sum - expected_sq_sum = duplicate^2 - missing^2
+
+      Solve these two equations for duplicate and missing.
+
+first_k_missing_positive:
+  level_1:
+    title: "Two Step Process"
+    content: |
+      1. Use cyclic sort to place positive numbers 1 to n
+      2. Find missing numbers up to n, then continue beyond n
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      n = len(nums)
+      i = 0
+      while i < n:
+          j = nums[i] - 1
+          if 0 < nums[i] <= n and nums[i] != nums[j]:
+              nums[i], nums[j] = nums[j], nums[i]
+          else:
+              i += 1
+
+      missing = []
+      extra_numbers = set()
+
+      for i in range(n):
+          if len(missing) >= k:
+              break
+          if nums[i] != i + 1:
+              missing.append(i + 1)
+              if nums[i] > 0:
+                  extra_numbers.add(nums[i])
+
+      # Find more missing numbers beyond n
+      i = n + 1
+      while len(missing) < k:
+          if i not in extra_numbers:
+              missing.append(i)
+          i += 1
+
+      return missing
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Negative numbers: Ignore during cyclic sort
+      - Duplicates: Handle in swap condition
+      - Numbers > n: Track them to skip when looking beyond n
+
+first_missing_positive:
+  level_1:
+    title: "Key Insight"
+    content: |
+      The answer must be in range [1, n+1].
+
+      Why? If array has n elements, at most n positive numbers can be present.
+      So either something in [1, n] is missing, or the answer is n + 1.
+
+  level_2:
+    title: "Cyclic Sort Approach"
+    content: |
+      ```python
+      n = len(nums)
+      i = 0
+
+      while i < n:
+          j = nums[i] - 1  # Correct index for nums[i]
+          if 0 < nums[i] <= n and nums[i] != nums[j]:
+              nums[i], nums[j] = nums[j], nums[i]
+          else:
+              i += 1
+
+      for i in range(n):
+          if nums[i] != i + 1:
+              return i + 1
+
+      return n + 1
+      ```
+
+  level_3:
+    title: "Why Cyclic Sort Works Here"
+    content: |
+      - Ignore negatives and numbers > n
+      - After sort, nums[i] should be i + 1
+      - First mismatch is the answer
+      - If all match, answer is n + 1
+
+      Time: O(n), Space: O(1) - true in-place algorithm!

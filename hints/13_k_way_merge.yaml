@@ -1,0 +1,414 @@
+# Hints for K-Way Merge problems
+
+merge_k_sorted_lists:
+  level_1:
+    title: "Min Heap Approach"
+    content: |
+      Use a min heap to always get the smallest element among K lists.
+
+      At any time, the heap contains one element from each non-empty list.
+      - Pop the minimum
+      - Add it to result
+      - Push the next element from that list
+
+  level_2:
+    title: "Heap Implementation"
+    content: |
+      ```python
+      import heapq
+
+      heap = []
+      # Initialize: add first element from each list
+      for i, lst in enumerate(lists):
+          if lst:
+              heapq.heappush(heap, (lst[0], i, 0))
+
+      result = []
+      while heap:
+          val, list_idx, elem_idx = heapq.heappop(heap)
+          result.append(val)
+
+          # Add next element from same list if exists
+          if elem_idx + 1 < len(lists[list_idx]):
+              next_val = lists[list_idx][elem_idx + 1]
+              heapq.heappush(heap, (next_val, list_idx, elem_idx + 1))
+
+      return result
+      ```
+
+  level_3:
+    title: "Alternative: Divide and Conquer"
+    content: |
+      Merge lists pairwise repeatedly:
+      ```python
+      def merge_two(l1, l2):
+          result = []
+          i = j = 0
+          while i < len(l1) and j < len(l2):
+              if l1[i] <= l2[j]:
+                  result.append(l1[i])
+                  i += 1
+              else:
+                  result.append(l2[j])
+                  j += 1
+          result.extend(l1[i:])
+          result.extend(l2[j:])
+          return result
+
+      while len(lists) > 1:
+          merged = []
+          for i in range(0, len(lists), 2):
+              l1 = lists[i]
+              l2 = lists[i + 1] if i + 1 < len(lists) else []
+              merged.append(merge_two(l1, l2))
+          lists = merged
+      return lists[0] if lists else []
+      ```
+
+kth_smallest_in_m_sorted:
+  level_1:
+    title: "Similar to Merge K Lists"
+    content: |
+      Use the same heap approach, but stop after K elements.
+
+      Don't merge everything - just extract K elements.
+
+  level_2:
+    title: "Heap with Early Termination"
+    content: |
+      ```python
+      import heapq
+
+      heap = []
+      for i, lst in enumerate(lists):
+          if lst:
+              heapq.heappush(heap, (lst[0], i, 0))
+
+      count = 0
+      while heap:
+          val, list_idx, elem_idx = heapq.heappop(heap)
+          count += 1
+          if count == k:
+              return val
+
+          if elem_idx + 1 < len(lists[list_idx]):
+              next_val = lists[list_idx][elem_idx + 1]
+              heapq.heappush(heap, (next_val, list_idx, elem_idx + 1))
+
+      return -1  # k is larger than total elements
+      ```
+
+  level_3:
+    title: "Binary Search Alternative"
+    content: |
+      For very large K, binary search on the answer:
+      - Guess a value mid
+      - Count how many elements are <= mid across all lists
+      - Binary search to find smallest mid where count >= k
+
+      This can be O(M log(range)) instead of O(K log M).
+
+smallest_number_range:
+  level_1:
+    title: "Track Min and Max"
+    content: |
+      We need a range that covers at least one element from each list.
+
+      Key insight: The range is [min_element, max_element] among current picks.
+
+      Use a heap to always know the minimum, track maximum separately.
+
+  level_2:
+    title: "Min Heap with Max Tracking"
+    content: |
+      ```python
+      import heapq
+
+      heap = []
+      current_max = float('-inf')
+
+      # Initialize with first element from each list
+      for i, lst in enumerate(lists):
+          heapq.heappush(heap, (lst[0], i, 0))
+          current_max = max(current_max, lst[0])
+
+      best_range = [float('-inf'), float('inf')]
+
+      while True:
+          min_val, list_idx, elem_idx = heapq.heappop(heap)
+
+          # Update best range if current is smaller
+          if current_max - min_val < best_range[1] - best_range[0]:
+              best_range = [min_val, current_max]
+
+          # Move to next element in the list with minimum
+          if elem_idx + 1 < len(lists[list_idx]):
+              next_val = lists[list_idx][elem_idx + 1]
+              heapq.heappush(heap, (next_val, list_idx, elem_idx + 1))
+              current_max = max(current_max, next_val)
+          else:
+              break  # One list exhausted
+
+      return best_range
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Heap always contains one element from each list
+      - Range is [heap_min, current_max]
+      - To potentially shrink range, we must increase minimum
+      - So we advance the list that has the minimum
+      - Stop when any list is exhausted (can't cover all lists anymore)
+
+kth_smallest_in_matrix:
+  level_1:
+    title: "Matrix as Sorted Lists"
+    content: |
+      Treat each row as a sorted list.
+      Apply K-way merge to find Kth smallest.
+
+      Alternative: Binary search on the value.
+
+  level_2:
+    title: "Min Heap Approach"
+    content: |
+      ```python
+      import heapq
+
+      n = len(matrix)
+      # Start with first element of each row
+      heap = [(matrix[i][0], i, 0) for i in range(n)]
+      heapq.heapify(heap)
+
+      for _ in range(k - 1):
+          val, row, col = heapq.heappop(heap)
+          if col + 1 < n:
+              heapq.heappush(heap, (matrix[row][col + 1], row, col + 1))
+
+      return heap[0][0]
+      ```
+
+  level_3:
+    title: "Binary Search Approach (Optimal)"
+    content: |
+      ```python
+      def count_less_equal(matrix, mid):
+          count = 0
+          n = len(matrix)
+          row, col = n - 1, 0  # Start from bottom-left
+          while row >= 0 and col < n:
+              if matrix[row][col] <= mid:
+                  count += row + 1  # All elements above are also <= mid
+                  col += 1
+              else:
+                  row -= 1
+          return count
+
+      low, high = matrix[0][0], matrix[-1][-1]
+      while low < high:
+          mid = (low + high) // 2
+          if count_less_equal(matrix, mid) < k:
+              low = mid + 1
+          else:
+              high = mid
+      return low
+      ```
+
+find_k_pairs_smallest_sums:
+  level_1:
+    title: "Like Matrix Kth Smallest"
+    content: |
+      Think of it as a virtual matrix:
+      - matrix[i][j] = nums1[i] + nums2[j]
+      - Rows are sorted (same nums1[i], increasing nums2[j])
+      - Columns are sorted (same nums2[j], increasing nums1[i])
+
+      Find K smallest elements in this matrix.
+
+  level_2:
+    title: "Min Heap Solution"
+    content: |
+      ```python
+      import heapq
+
+      if not nums1 or not nums2:
+          return []
+
+      heap = []
+      # Start with first element paired with all of nums2's first
+      for i in range(min(k, len(nums1))):
+          heapq.heappush(heap, (nums1[i] + nums2[0], i, 0))
+
+      result = []
+      while heap and len(result) < k:
+          total, i, j = heapq.heappop(heap)
+          result.append([nums1[i], nums2[j]])
+
+          if j + 1 < len(nums2):
+              heapq.heappush(heap, (nums1[i] + nums2[j + 1], i, j + 1))
+
+      return result
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      Only push (i, 0) initially for i in range(min(k, len(nums1))).
+
+      Why? The first K pairs must include at least some pairs with nums2[0].
+
+      This limits initial heap size to min(k, m) instead of m.
+
+merge_k_sorted_arrays:
+  level_1:
+    title: "Same as Merge K Lists"
+    content: |
+      Identical to Problem 1, just with arrays instead of linked lists.
+
+      Use min heap with (value, array_index, element_index).
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      import heapq
+
+      heap = []
+      for i, arr in enumerate(arrays):
+          if arr:
+              heapq.heappush(heap, (arr[0], i, 0))
+
+      result = []
+      while heap:
+          val, arr_idx, elem_idx = heapq.heappop(heap)
+          result.append(val)
+
+          if elem_idx + 1 < len(arrays[arr_idx]):
+              next_val = arrays[arr_idx][elem_idx + 1]
+              heapq.heappush(heap, (next_val, arr_idx, elem_idx + 1))
+
+      return result
+      ```
+
+  level_3:
+    title: "Alternative: heapq.merge"
+    content: |
+      Python has a built-in:
+      ```python
+      import heapq
+      return list(heapq.merge(*arrays))
+      ```
+
+      But knowing the manual implementation is important for interviews!
+
+kth_smallest_in_row_col_sorted:
+  level_1:
+    title: "Generalized Matrix Problem"
+    content: |
+      Same approach as Problem 4, but matrix may not be square.
+
+      Treat each row as a sorted list and use K-way merge.
+
+  level_2:
+    title: "Min Heap Implementation"
+    content: |
+      ```python
+      import heapq
+
+      m, n = len(matrix), len(matrix[0])
+      # Start with first element of each row
+      heap = [(matrix[i][0], i, 0) for i in range(m)]
+      heapq.heapify(heap)
+
+      for _ in range(k - 1):
+          val, row, col = heapq.heappop(heap)
+          if col + 1 < n:
+              heapq.heappush(heap, (matrix[row][col + 1], row, col + 1))
+
+      return heap[0][0]
+      ```
+
+  level_3:
+    title: "Binary Search for Non-Square"
+    content: |
+      ```python
+      def count_less_equal(matrix, mid):
+          count = 0
+          m, n = len(matrix), len(matrix[0])
+          row, col = m - 1, 0
+          while row >= 0 and col < n:
+              if matrix[row][col] <= mid:
+                  count += row + 1
+                  col += 1
+              else:
+                  row -= 1
+          return count
+
+      low, high = matrix[0][0], matrix[-1][-1]
+      while low < high:
+          mid = (low + high) // 2
+          if count_less_equal(matrix, mid) < k:
+              low = mid + 1
+          else:
+              high = mid
+      return low
+      ```
+
+median_of_sorted_arrays:
+  level_1:
+    title: "Binary Search on Partition"
+    content: |
+      The median splits the merged array into two equal halves.
+
+      Instead of merging, binary search for the correct partition point.
+
+      Key insight: If we partition both arrays, elements on left should
+      equal elements on right.
+
+  level_2:
+    title: "Partition Approach"
+    content: |
+      ```python
+      # Ensure nums1 is the shorter array
+      if len(nums1) > len(nums2):
+          nums1, nums2 = nums2, nums1
+
+      m, n = len(nums1), len(nums2)
+      low, high = 0, m
+      half = (m + n + 1) // 2
+
+      while low <= high:
+          i = (low + high) // 2  # Partition in nums1
+          j = half - i           # Partition in nums2
+
+          left1 = nums1[i - 1] if i > 0 else float('-inf')
+          right1 = nums1[i] if i < m else float('inf')
+          left2 = nums2[j - 1] if j > 0 else float('-inf')
+          right2 = nums2[j] if j < n else float('inf')
+
+          if left1 <= right2 and left2 <= right1:
+              # Found correct partition
+              if (m + n) % 2 == 1:
+                  return max(left1, left2)
+              return (max(left1, left2) + min(right1, right2)) / 2
+          elif left1 > right2:
+              high = i - 1
+          else:
+              low = i + 1
+
+      return 0.0
+      ```
+
+  level_3:
+    title: "Understanding the Partition"
+    content: |
+      We're looking for partition where:
+      - left1 <= right2 (everything on left of partition in nums1 is <= right side of nums2)
+      - left2 <= right1 (vice versa)
+
+      When found:
+      - Odd total: median = max(left1, left2)
+      - Even total: median = (max(left1, left2) + min(right1, right2)) / 2
+
+      Time: O(log(min(m, n)))

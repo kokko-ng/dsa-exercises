@@ -1,0 +1,387 @@
+# Hints for Fast & Slow Pointers problems
+
+linked_list_cycle:
+  level_1:
+    title: "Fast and Slow Pointers"
+    content: |
+      Use two pointers moving at different speeds:
+      - **Slow**: moves one step at a time
+      - **Fast**: moves two steps at a time
+
+      If there's a cycle, they will eventually meet!
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      if not head or not head.next:
+          return False
+
+      slow = head
+      fast = head
+
+      while fast and fast.next:
+          slow = slow.next
+          fast = fast.next.next
+          if slow == fast:
+              return True
+
+      return False
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - If no cycle: fast reaches end (None)
+      - If cycle: fast catches up to slow inside the cycle
+
+      Fast gains one step on slow each iteration.
+      When both are in cycle, fast will catch slow.
+
+      Time: O(n), Space: O(1)
+
+linked_list_cycle_ii:
+  level_1:
+    title: "Two Phase Algorithm"
+    content: |
+      Phase 1: Detect cycle using fast/slow pointers.
+      Phase 2: Find cycle start.
+
+      After fast and slow meet, there's a mathematical relationship
+      between meeting point and cycle start.
+
+  level_2:
+    title: "Finding Cycle Start"
+    content: |
+      After detection:
+      1. Reset one pointer to head
+      2. Move both pointers one step at a time
+      3. They meet at cycle start!
+
+      ```python
+      # Phase 1: Detect cycle
+      slow = fast = head
+      while fast and fast.next:
+          slow = slow.next
+          fast = fast.next.next
+          if slow == fast:
+              break
+      else:
+          return None  # No cycle
+
+      # Phase 2: Find start
+      slow = head
+      while slow != fast:
+          slow = slow.next
+          fast = fast.next
+
+      return slow
+      ```
+
+  level_3:
+    title: "Mathematical Proof"
+    content: |
+      Let:
+      - F = distance from head to cycle start
+      - C = cycle length
+      - a = distance from cycle start to meeting point
+
+      When they meet:
+      - slow traveled: F + a
+      - fast traveled: F + a + nC (some complete cycles)
+
+      Since fast travels 2x: 2(F + a) = F + a + nC
+      Therefore: F = nC - a = (n-1)C + (C - a)
+
+      So traveling F from head = traveling (C - a) from meeting point
+      Both end up at cycle start!
+
+happy_number_fast_slow:
+  level_1:
+    title: "Treat as Cycle Detection"
+    content: |
+      The sequence of digit-square-sums forms an implicit linked list:
+      - Each number points to the next number in sequence
+      - If it's happy: reaches 1 (which cycles to 1)
+      - If not happy: enters a cycle not including 1
+
+      Use fast/slow pointers to detect the cycle!
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def get_next(n):
+          total = 0
+          while n:
+              digit = n % 10
+              total += digit * digit
+              n //= 10
+          return total
+
+      slow = n
+      fast = get_next(n)
+
+      while fast != 1 and slow != fast:
+          slow = get_next(slow)
+          fast = get_next(get_next(fast))
+
+      return fast == 1
+      ```
+
+  level_3:
+    title: "O(1) Space Advantage"
+    content: |
+      Unlike the hash set approach, this uses O(1) space.
+
+      Both approaches are valid:
+      - Hash set: O(n) space, simpler to understand
+      - Fast/slow: O(1) space, more elegant
+
+middle_of_linked_list:
+  level_1:
+    title: "Fast and Slow Pointers"
+    content: |
+      When fast reaches the end, slow is at the middle!
+
+      - Fast moves 2 steps
+      - Slow moves 1 step
+      - When fast can't move 2 more steps, slow is at middle
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      slow = fast = head
+
+      while fast and fast.next:
+          slow = slow.next
+          fast = fast.next.next
+
+      return slow
+      ```
+
+      For even-length lists, this returns the second middle.
+
+  level_3:
+    title: "Getting First Middle"
+    content: |
+      If you need the first middle for even-length lists:
+
+      ```python
+      slow = fast = head
+
+      while fast.next and fast.next.next:
+          slow = slow.next
+          fast = fast.next.next
+
+      return slow
+      ```
+
+      The condition changes when fast stops.
+
+palindrome_linked_list:
+  level_1:
+    title: "Combine Techniques"
+    content: |
+      1. Find the middle of the list
+      2. Reverse the second half
+      3. Compare first half with reversed second half
+
+      All using O(1) extra space!
+
+  level_2:
+    title: "Step by Step"
+    content: |
+      ```python
+      # Find middle
+      slow = fast = head
+      while fast and fast.next:
+          slow = slow.next
+          fast = fast.next.next
+
+      # Reverse second half
+      prev = None
+      while slow:
+          next_node = slow.next
+          slow.next = prev
+          prev = slow
+          slow = next_node
+
+      # Compare halves
+      left, right = head, prev
+      while right:  # Right half might be shorter
+          if left.val != right.val:
+              return False
+          left = left.next
+          right = right.next
+
+      return True
+      ```
+
+  level_3:
+    title: "Restoring the List"
+    content: |
+      If you need to preserve the original list:
+      - After comparison, reverse the second half again
+      - Reconnect to first half
+
+      For interviews, mention this consideration even if not implementing.
+
+reorder_list:
+  level_1:
+    title: "Three Steps"
+    content: |
+      1. Find the middle of the list
+      2. Reverse the second half
+      3. Merge the two halves alternately
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      if not head or not head.next:
+          return
+
+      # Find middle
+      slow = fast = head
+      while fast.next and fast.next.next:
+          slow = slow.next
+          fast = fast.next.next
+
+      # Reverse second half
+      prev, curr = None, slow.next
+      slow.next = None  # Cut the list
+      while curr:
+          next_node = curr.next
+          curr.next = prev
+          prev = curr
+          curr = next_node
+
+      # Merge alternately
+      first, second = head, prev
+      while second:
+          tmp1, tmp2 = first.next, second.next
+          first.next = second
+          second.next = tmp1
+          first, second = tmp1, tmp2
+      ```
+
+  level_3:
+    title: "Visualization"
+    content: |
+      Original: 1 -> 2 -> 3 -> 4 -> 5
+
+      After middle (slow at 3):
+      First half: 1 -> 2 -> 3
+      Second half: 4 -> 5
+
+      After reverse:
+      First: 1 -> 2 -> 3
+      Second: 5 -> 4
+
+      Merge: 1 -> 5 -> 2 -> 4 -> 3
+
+circular_array_loop:
+  level_1:
+    title: "Apply Floyd's Algorithm"
+    content: |
+      For each starting position, use fast/slow to detect a cycle.
+
+      Additional constraints:
+      - All elements in cycle must have same sign
+      - Cycle length must be > 1
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      n = len(nums)
+
+      def next_idx(i):
+          return (i + nums[i]) % n
+
+      for i in range(n):
+          slow = fast = i
+
+          # Check same direction (positive or negative)
+          while nums[slow] * nums[next_idx(slow)] > 0 and \
+                nums[fast] * nums[next_idx(fast)] > 0 and \
+                nums[fast] * nums[next_idx(next_idx(fast))] > 0:
+
+              slow = next_idx(slow)
+              fast = next_idx(next_idx(fast))
+
+              if slow == fast:
+                  # Check cycle length > 1
+                  if slow == next_idx(slow):
+                      break
+                  return True
+
+      return False
+      ```
+
+  level_3:
+    title: "Optimization: Mark Visited"
+    content: |
+      After exploring from index i without finding valid cycle,
+      mark all visited indices to avoid re-exploration:
+
+      ```python
+      # Set visited indices to 0
+      j = i
+      while nums[j] * nums[next_idx(j)] > 0:
+          next_j = next_idx(j)
+          nums[j] = 0
+          j = next_j
+      ```
+
+      This ensures O(n) total time.
+
+find_duplicate_number:
+  level_1:
+    title: "Array as Linked List"
+    content: |
+      Treat the array as an implicit linked list:
+      - Index 0 is the "head"
+      - nums[i] is the "next pointer"
+
+      Since values are in [1, n], index 0 can never be part of a cycle.
+      The duplicate creates a cycle!
+
+  level_2:
+    title: "Floyd's Algorithm"
+    content: |
+      ```python
+      # Phase 1: Find meeting point in cycle
+      slow = fast = 0
+      while True:
+          slow = nums[slow]
+          fast = nums[nums[fast]]
+          if slow == fast:
+              break
+
+      # Phase 2: Find cycle entrance (the duplicate)
+      slow = 0
+      while slow != fast:
+          slow = nums[slow]
+          fast = nums[fast]
+
+      return slow
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      Consider nums = [1, 3, 4, 2, 2]:
+
+      Following the "links":
+      0 -> 1 -> 3 -> 2 -> 4 -> 2 -> 4 -> ...
+
+      There's a cycle: 2 -> 4 -> 2
+
+      The entrance to the cycle (value 2) is the duplicate!
+
+      This is exactly like finding cycle start in linked list.
+
+      Time: O(n), Space: O(1)

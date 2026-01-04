@@ -1,0 +1,726 @@
+# Hints for Tree BFS & DFS problems
+
+level_order_traversal:
+  level_1:
+    title: "Use a Queue for BFS"
+    content: |
+      BFS explores nodes level by level.
+
+      Use a queue (deque) to process nodes:
+      - Start by adding the root to the queue
+      - Process all nodes at the current level before moving to the next
+
+      How do you know when one level ends and another begins?
+
+  level_2:
+    title: "Track Level Boundaries"
+    content: |
+      Process one level at a time by tracking the queue size:
+
+      ```python
+      from collections import deque
+
+      if not root:
+          return []
+
+      result = []
+      queue = deque([root])
+
+      while queue:
+          level_size = len(queue)  # Number of nodes at current level
+          level = []
+
+          for _ in range(level_size):
+              node = queue.popleft()
+              level.append(node.val)
+
+              if node.left:
+                  queue.append(node.left)
+              if node.right:
+                  queue.append(node.right)
+
+          result.append(level)
+
+      return result
+      ```
+
+  level_3:
+    title: "Time and Space Complexity"
+    content: |
+      - **Time**: O(n) - visit each node once
+      - **Space**: O(n) - queue can hold up to n/2 nodes (bottom level of complete tree)
+
+      Alternative: Use recursion with level parameter for DFS approach
+
+reverse_level_order:
+  level_1:
+    title: "Same as Level Order, Different Output"
+    content: |
+      The traversal is the same as level order.
+
+      The only difference is the order of the result.
+
+      What's the simplest way to reverse the order of levels?
+
+  level_2:
+    title: "Two Approaches"
+    content: |
+      Option 1: Use level order traversal, then reverse the result
+      ```python
+      result = level_order_traversal(root)
+      return result[::-1]
+      ```
+
+      Option 2: Use a deque and append to the front
+      ```python
+      from collections import deque
+
+      result = deque()
+      # ... BFS traversal ...
+      result.appendleft(level)  # Add to front
+      return list(result)
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      from collections import deque
+
+      if not root:
+          return []
+
+      result = deque()
+      queue = deque([root])
+
+      while queue:
+          level_size = len(queue)
+          level = []
+
+          for _ in range(level_size):
+              node = queue.popleft()
+              level.append(node.val)
+              if node.left:
+                  queue.append(node.left)
+              if node.right:
+                  queue.append(node.right)
+
+          result.appendleft(level)  # Add to front instead of back
+
+      return list(result)
+      ```
+
+zigzag_level_order:
+  level_1:
+    title: "Track Direction"
+    content: |
+      Similar to level order traversal, but alternate direction.
+
+      Use a flag to track whether to go left-to-right or right-to-left.
+
+      Toggle the flag after each level.
+
+  level_2:
+    title: "Reverse Alternate Levels"
+    content: |
+      You can either:
+      1. Reverse the level list for odd levels
+      2. Use a deque and alternate between append and appendleft
+
+      ```python
+      left_to_right = True
+
+      while queue:
+          level = deque()
+          for _ in range(len(queue)):
+              node = queue.popleft()
+              if left_to_right:
+                  level.append(node.val)
+              else:
+                  level.appendleft(node.val)
+              # Add children...
+
+          result.append(list(level))
+          left_to_right = not left_to_right
+      ```
+
+  level_3:
+    title: "Alternative: Two Stacks"
+    content: |
+      Use two stacks, alternating between them:
+      - One stack processes left-to-right
+      - Other stack processes right-to-left
+
+      Children are added in opposite order to each stack.
+
+average_of_levels:
+  level_1:
+    title: "Sum and Count Per Level"
+    content: |
+      Use BFS to traverse level by level.
+
+      For each level, calculate:
+      - Sum of all node values
+      - Count of nodes
+      - Average = sum / count
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      from collections import deque
+
+      if not root:
+          return []
+
+      result = []
+      queue = deque([root])
+
+      while queue:
+          level_size = len(queue)
+          level_sum = 0
+
+          for _ in range(level_size):
+              node = queue.popleft()
+              level_sum += node.val
+
+              if node.left:
+                  queue.append(node.left)
+              if node.right:
+                  queue.append(node.right)
+
+          result.append(level_sum / level_size)
+
+      return result
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Single node: Return [node.val] (average of one element)
+      - Large values: Be careful with integer overflow (Python handles this)
+      - Precision: Use float division (/) not integer division (//)
+
+minimum_depth:
+  level_1:
+    title: "BFS is Optimal Here"
+    content: |
+      BFS finds the **first** leaf node encountered.
+
+      The depth of this first leaf is the minimum depth.
+
+      Why is BFS better than DFS for this problem?
+
+  level_2:
+    title: "Stop at First Leaf"
+    content: |
+      ```python
+      from collections import deque
+
+      if not root:
+          return 0
+
+      queue = deque([(root, 1)])  # (node, depth)
+
+      while queue:
+          node, depth = queue.popleft()
+
+          # Check if it's a leaf
+          if not node.left and not node.right:
+              return depth
+
+          if node.left:
+              queue.append((node.left, depth + 1))
+          if node.right:
+              queue.append((node.right, depth + 1))
+      ```
+
+  level_3:
+    title: "DFS Alternative (Less Optimal)"
+    content: |
+      DFS must explore all paths to find minimum:
+
+      ```python
+      def dfs(node):
+          if not node:
+              return float('inf')
+          if not node.left and not node.right:
+              return 1
+          return 1 + min(dfs(node.left), dfs(node.right))
+      ```
+
+      BFS is O(n) worst case but finds answer faster for unbalanced trees.
+
+maximum_depth:
+  level_1:
+    title: "DFS or BFS"
+    content: |
+      Unlike minimum depth, maximum depth requires exploring all paths.
+
+      DFS is natural: max depth = 1 + max(left_depth, right_depth)
+
+      What's the base case?
+
+  level_2:
+    title: "Recursive DFS Solution"
+    content: |
+      ```python
+      def maximum_depth(root):
+          if not root:
+              return 0
+
+          left_depth = maximum_depth(root.left)
+          right_depth = maximum_depth(root.right)
+
+          return 1 + max(left_depth, right_depth)
+      ```
+
+  level_3:
+    title: "Iterative BFS Solution"
+    content: |
+      ```python
+      from collections import deque
+
+      if not root:
+          return 0
+
+      depth = 0
+      queue = deque([root])
+
+      while queue:
+          depth += 1
+          level_size = len(queue)
+
+          for _ in range(level_size):
+              node = queue.popleft()
+              if node.left:
+                  queue.append(node.left)
+              if node.right:
+                  queue.append(node.right)
+
+      return depth
+      ```
+
+level_order_successor:
+  level_1:
+    title: "Find Node, Return Next"
+    content: |
+      Do a level order traversal.
+
+      When you find the node with the key, the next node in the queue is the successor.
+
+  level_2:
+    title: "Track Found State"
+    content: |
+      ```python
+      from collections import deque
+
+      if not root:
+          return None
+
+      queue = deque([root])
+
+      while queue:
+          node = queue.popleft()
+
+          if node.left:
+              queue.append(node.left)
+          if node.right:
+              queue.append(node.right)
+
+          if node.val == key:
+              return queue[0] if queue else None
+
+      return None
+      ```
+
+  level_3:
+    title: "Key Insight"
+    content: |
+      Note that we add children to the queue BEFORE checking if current node is the target.
+
+      This ensures the successor (if any) is already in the queue when we find the target.
+
+connect_level_order_siblings:
+  level_1:
+    title: "Connect Nodes at Same Level"
+    content: |
+      Use BFS to process level by level.
+
+      Connect each node to the next node in the queue (within the same level).
+
+      The last node of each level points to None.
+
+  level_2:
+    title: "Level-by-Level Connection"
+    content: |
+      ```python
+      from collections import deque
+
+      if not root:
+          return root
+
+      queue = deque([root])
+
+      while queue:
+          level_size = len(queue)
+          prev = None
+
+          for i in range(level_size):
+              node = queue.popleft()
+
+              if prev:
+                  prev.next = node
+              prev = node
+
+              if node.left:
+                  queue.append(node.left)
+              if node.right:
+                  queue.append(node.right)
+
+          # prev.next is already None (last node of level)
+
+      return root
+      ```
+
+  level_3:
+    title: "O(1) Space Solution (Perfect Binary Tree)"
+    content: |
+      For a perfect binary tree, use the next pointers already established:
+
+      ```python
+      leftmost = root
+      while leftmost and leftmost.left:
+          curr = leftmost
+          while curr:
+              curr.left.next = curr.right
+              if curr.next:
+                  curr.right.next = curr.next.left
+              curr = curr.next
+          leftmost = leftmost.left
+      ```
+
+path_sum:
+  level_1:
+    title: "DFS with Remaining Sum"
+    content: |
+      Use DFS to traverse from root to leaves.
+
+      Track the remaining sum needed.
+
+      At a leaf, check if remaining sum equals node value.
+
+  level_2:
+    title: "Recursive Solution"
+    content: |
+      ```python
+      def path_sum(root, target_sum):
+          if not root:
+              return False
+
+          # Check if leaf with matching sum
+          if not root.left and not root.right:
+              return root.val == target_sum
+
+          # Subtract current value and check children
+          remaining = target_sum - root.val
+          return (path_sum(root.left, remaining) or
+                  path_sum(root.right, remaining))
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Empty tree: Return False
+      - Single node: Check if node.val == target_sum
+      - Negative values: Algorithm handles them correctly
+      - Path must end at a LEAF (not just any node)
+
+all_paths_for_sum:
+  level_1:
+    title: "DFS with Backtracking"
+    content: |
+      Similar to path_sum, but collect all valid paths.
+
+      Use a current path list and backtrack after exploring each subtree.
+
+  level_2:
+    title: "Path Tracking"
+    content: |
+      ```python
+      def all_paths_for_sum(root, target_sum):
+          result = []
+
+          def dfs(node, remaining, path):
+              if not node:
+                  return
+
+              path.append(node.val)
+
+              if not node.left and not node.right and remaining == node.val:
+                  result.append(list(path))  # Make a copy!
+              else:
+                  dfs(node.left, remaining - node.val, path)
+                  dfs(node.right, remaining - node.val, path)
+
+              path.pop()  # Backtrack
+
+          dfs(root, target_sum, [])
+          return result
+      ```
+
+  level_3:
+    title: "Important: Copy the Path"
+    content: |
+      When adding a valid path to results:
+      - Use `list(path)` or `path[:]` to create a copy
+      - Otherwise, you're adding a reference that gets modified
+
+      The `path.pop()` at the end is crucial for backtracking.
+
+sum_of_path_numbers:
+  level_1:
+    title: "Build Number While Traversing"
+    content: |
+      As you traverse down, build the number:
+      - At root, number = root.val
+      - At child, number = parent_number * 10 + child.val
+
+      Sum up all leaf numbers.
+
+  level_2:
+    title: "DFS Solution"
+    content: |
+      ```python
+      def sum_of_path_numbers(root):
+          def dfs(node, current_sum):
+              if not node:
+                  return 0
+
+              current_sum = current_sum * 10 + node.val
+
+              # If leaf, return the number
+              if not node.left and not node.right:
+                  return current_sum
+
+              # Sum from both subtrees
+              return dfs(node.left, current_sum) + dfs(node.right, current_sum)
+
+          return dfs(root, 0)
+      ```
+
+  level_3:
+    title: "Iterative Approach"
+    content: |
+      ```python
+      if not root:
+          return 0
+
+      total = 0
+      stack = [(root, 0)]
+
+      while stack:
+          node, current_sum = stack.pop()
+          current_sum = current_sum * 10 + node.val
+
+          if not node.left and not node.right:
+              total += current_sum
+          if node.right:
+              stack.append((node.right, current_sum))
+          if node.left:
+              stack.append((node.left, current_sum))
+
+      return total
+      ```
+
+path_with_given_sequence:
+  level_1:
+    title: "Match Sequence with DFS"
+    content: |
+      Traverse the tree while matching the sequence.
+
+      Track your position in the sequence.
+
+      The sequence must match a complete root-to-leaf path.
+
+  level_2:
+    title: "Recursive Matching"
+    content: |
+      ```python
+      def path_with_given_sequence(root, sequence):
+          def dfs(node, index):
+              if not node:
+                  return False
+
+              # Check if current node matches sequence
+              if index >= len(sequence) or node.val != sequence[index]:
+                  return False
+
+              # Check if leaf and end of sequence
+              if not node.left and not node.right:
+                  return index == len(sequence) - 1
+
+              # Continue matching in subtrees
+              return dfs(node.left, index + 1) or dfs(node.right, index + 1)
+
+          if not root:
+              return len(sequence) == 0
+
+          return dfs(root, 0)
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Sequence longer than any path: Return False
+      - Sequence matches non-leaf path: Return False
+      - Empty sequence with non-empty tree: Return False
+      - Both empty: Return True
+
+count_paths_for_sum:
+  level_1:
+    title: "Prefix Sum Technique"
+    content: |
+      Unlike previous problems, paths don't need to start at root.
+
+      Key insight: Use prefix sums!
+      - Track cumulative sum from root to current node
+      - Check if any prefix sum equals (current_sum - target)
+
+      This is similar to the "subarray sum equals k" problem.
+
+  level_2:
+    title: "Hash Map for Prefix Sums"
+    content: |
+      ```python
+      def count_paths_for_sum(root, target_sum):
+          def dfs(node, current_sum, prefix_sums):
+              if not node:
+                  return 0
+
+              current_sum += node.val
+
+              # Check if there's a prefix that gives us target
+              count = prefix_sums.get(current_sum - target_sum, 0)
+
+              # Add current sum to prefix map
+              prefix_sums[current_sum] = prefix_sums.get(current_sum, 0) + 1
+
+              # Recurse to children
+              count += dfs(node.left, current_sum, prefix_sums)
+              count += dfs(node.right, current_sum, prefix_sums)
+
+              # Backtrack: remove current sum
+              prefix_sums[current_sum] -= 1
+
+              return count
+
+          return dfs(root, 0, {0: 1})  # {0: 1} handles paths from root
+      ```
+
+  level_3:
+    title: "Why {0: 1}?"
+    content: |
+      The initial `{0: 1}` handles paths that start from the root.
+
+      If `current_sum == target_sum`, then `current_sum - target_sum = 0`.
+      We need `prefix_sums[0] = 1` to count this path.
+
+      **Time**: O(n), **Space**: O(n)
+
+tree_diameter:
+  level_1:
+    title: "Longest Path Through Each Node"
+    content: |
+      The diameter passes through some node as the "highest" point.
+
+      For each node, the path through it is:
+      - Height of left subtree + height of right subtree
+
+      Track the maximum across all nodes.
+
+  level_2:
+    title: "DFS with Global Maximum"
+    content: |
+      ```python
+      def tree_diameter(root):
+          max_diameter = 0
+
+          def height(node):
+              nonlocal max_diameter
+
+              if not node:
+                  return 0
+
+              left_height = height(node.left)
+              right_height = height(node.right)
+
+              # Update diameter (path through this node)
+              max_diameter = max(max_diameter, left_height + right_height)
+
+              # Return height of subtree rooted at this node
+              return 1 + max(left_height, right_height)
+
+          height(root)
+          return max_diameter
+      ```
+
+  level_3:
+    title: "Understanding the Result"
+    content: |
+      The diameter is the number of **edges**, not nodes.
+
+      For a single node: diameter = 0
+      For two nodes: diameter = 1
+
+      The height function returns depth in nodes, but we add left + right for edges.
+
+path_with_maximum_sum:
+  level_1:
+    title: "Similar to Diameter, but with Values"
+    content: |
+      For each node, consider:
+      - The node itself
+      - Node + best path from left child
+      - Node + best path from right child
+      - Node + best paths from both children (forms a "complete path")
+
+      The best path FROM a node (going down) can only use one child.
+
+  level_2:
+    title: "Track Maximum Path Sum"
+    content: |
+      ```python
+      def path_with_maximum_sum(root):
+          max_sum = float('-inf')
+
+          def max_gain(node):
+              nonlocal max_sum
+
+              if not node:
+                  return 0
+
+              # Max sum going down from left/right children
+              left_gain = max(max_gain(node.left), 0)
+              right_gain = max(max_gain(node.right), 0)
+
+              # Path through this node
+              path_sum = node.val + left_gain + right_gain
+              max_sum = max(max_sum, path_sum)
+
+              # Return max gain if we continue up through this node
+              return node.val + max(left_gain, right_gain)
+
+          max_gain(root)
+          return max_sum
+      ```
+
+  level_3:
+    title: "Key Insight: max(gain, 0)"
+    content: |
+      We use `max(gain, 0)` because:
+      - If a subtree's best path is negative, we're better off not using it
+      - A path can start and end anywhere, so we can skip bad subtrees
+
+      The `max_sum` tracks the best "complete path" (can go through node).
+      The return value is the best "half path" (continuing up to parent).

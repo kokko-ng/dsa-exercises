@@ -1,0 +1,418 @@
+# Hints for Merge Intervals problems
+
+merge_intervals:
+  level_1:
+    title: "Sort First"
+    content: |
+      The key insight is to **sort intervals by start time**.
+
+      After sorting, overlapping intervals are adjacent.
+
+      Two intervals overlap if: `intervals[i].end >= intervals[i+1].start`
+
+  level_2:
+    title: "Merge Logic"
+    content: |
+      Iterate through sorted intervals:
+
+      ```python
+      intervals.sort(key=lambda x: x[0])
+      merged = [intervals[0]]
+
+      for current in intervals[1:]:
+          last = merged[-1]
+          if current[0] <= last[1]:  # Overlapping
+              last[1] = max(last[1], current[1])
+          else:
+              merged.append(current)
+
+      return merged
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Single interval: return as-is
+      - All overlapping: return single merged interval
+      - No overlapping: return original (sorted) list
+      - Touching intervals `[1,4],[4,5]` are considered overlapping
+
+insert_interval:
+  level_1:
+    title: "Three Regions"
+    content: |
+      Think of intervals as three groups:
+      1. Intervals **before** newInterval (no overlap)
+      2. Intervals **overlapping** with newInterval (merge all)
+      3. Intervals **after** newInterval (no overlap)
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      result = []
+      i = 0
+      n = len(intervals)
+
+      # Add all intervals before newInterval
+      while i < n and intervals[i][1] < newInterval[0]:
+          result.append(intervals[i])
+          i += 1
+
+      # Merge overlapping intervals
+      while i < n and intervals[i][0] <= newInterval[1]:
+          newInterval[0] = min(newInterval[0], intervals[i][0])
+          newInterval[1] = max(newInterval[1], intervals[i][1])
+          i += 1
+      result.append(newInterval)
+
+      # Add remaining intervals
+      while i < n:
+          result.append(intervals[i])
+          i += 1
+
+      return result
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Empty intervals list: return [newInterval]
+      - newInterval before all: insert at beginning
+      - newInterval after all: append at end
+      - newInterval spans all: return single merged interval
+
+intervals_intersection:
+  level_1:
+    title: "Two Pointer Approach"
+    content: |
+      Use two pointers, one for each list.
+
+      For intersection of two intervals:
+      - Start = max(a.start, b.start)
+      - End = min(a.end, b.end)
+      - If Start <= End, we have an intersection!
+
+  level_2:
+    title: "Which Pointer to Move?"
+    content: |
+      ```python
+      i, j = 0, 0
+      result = []
+
+      while i < len(firstList) and j < len(secondList):
+          a, b = firstList[i], secondList[j]
+
+          # Find intersection
+          start = max(a[0], b[0])
+          end = min(a[1], b[1])
+
+          if start <= end:
+              result.append([start, end])
+
+          # Move pointer for interval that ends first
+          if a[1] < b[1]:
+              i += 1
+          else:
+              j += 1
+
+      return result
+      ```
+
+  level_3:
+    title: "Why Move Smaller End?"
+    content: |
+      The interval with smaller end time cannot intersect with any future intervals from the other list.
+
+      It's "exhausted" - move to the next one!
+
+meeting_rooms:
+  level_1:
+    title: "Check for Any Overlap"
+    content: |
+      If ANY two meetings overlap, return False.
+
+      Sort by start time, then check adjacent pairs.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      intervals.sort(key=lambda x: x[0])
+
+      for i in range(1, len(intervals)):
+          if intervals[i][0] < intervals[i-1][1]:
+              return False  # Overlap found
+
+      return True
+      ```
+
+      Note: `intervals[i][0] < intervals[i-1][1]` checks if current starts before previous ends.
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Empty or single interval: return True
+      - Adjacent meetings `[1,2],[2,3]`: NOT overlapping (end == start is OK)
+      - All same time: return False
+
+meeting_rooms_ii:
+  level_1:
+    title: "Track Concurrent Meetings"
+    content: |
+      Count how many meetings are happening at any point in time.
+
+      Maximum concurrent meetings = minimum rooms needed.
+
+  level_2:
+    title: "Sweep Line Approach"
+    content: |
+      Create events for start (+1) and end (-1):
+
+      ```python
+      events = []
+      for start, end in intervals:
+          events.append((start, 1))   # Meeting starts
+          events.append((end, -1))    # Meeting ends
+
+      events.sort()
+
+      rooms = 0
+      max_rooms = 0
+      for time, delta in events:
+          rooms += delta
+          max_rooms = max(max_rooms, rooms)
+
+      return max_rooms
+      ```
+
+  level_3:
+    title: "Alternative: Min-Heap"
+    content: |
+      Use min-heap to track meeting end times:
+
+      ```python
+      import heapq
+
+      intervals.sort(key=lambda x: x[0])
+      heap = []  # Stores end times
+
+      for start, end in intervals:
+          # If earliest ending meeting has ended
+          if heap and heap[0] <= start:
+              heapq.heappop(heap)
+          heapq.heappush(heap, end)
+
+      return len(heap)
+      ```
+
+non_overlapping_intervals:
+  level_1:
+    title: "Greedy: Keep Intervals That End Early"
+    content: |
+      This is the **Activity Selection** problem!
+
+      To maximize non-overlapping intervals, always keep the one that ends earliest.
+
+      Intervals to remove = Total - Maximum non-overlapping
+
+  level_2:
+    title: "Sort by End Time"
+    content: |
+      ```python
+      intervals.sort(key=lambda x: x[1])
+
+      count = 0  # Intervals to keep
+      end = float('-inf')
+
+      for interval in intervals:
+          if interval[0] >= end:
+              count += 1
+              end = interval[1]
+
+      return len(intervals) - count
+      ```
+
+  level_3:
+    title: "Why End Time?"
+    content: |
+      Sorting by end time is greedy:
+      - Earlier end time = more room for future intervals
+      - If we skip an interval, we might miss opportunities
+
+      Alternatively, sort by start and track minimum end seen.
+
+minimum_platforms:
+  level_1:
+    title: "Similar to Meeting Rooms II"
+    content: |
+      This is the same as counting maximum concurrent events.
+
+      Maximum trains at station = minimum platforms needed.
+
+  level_2:
+    title: "Two Arrays Approach"
+    content: |
+      Sort arrivals and departures separately:
+
+      ```python
+      arrivals.sort()
+      departures.sort()
+
+      platforms = 0
+      max_platforms = 0
+      i = j = 0
+
+      while i < len(arrivals):
+          if arrivals[i] <= departures[j]:
+              platforms += 1
+              max_platforms = max(max_platforms, platforms)
+              i += 1
+          else:
+              platforms -= 1
+              j += 1
+
+      return max_platforms
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - Process events in chronological order
+      - When arrival <= departure: new train arrives before any leaves
+      - When arrival > departure: a train departs, freeing a platform
+      - Use `<=` because arrival at same time as departure still needs platform
+
+employee_free_time:
+  level_1:
+    title: "Merge All Intervals"
+    content: |
+      Free time = gaps between merged work intervals.
+
+      1. Flatten all intervals into one list
+      2. Sort and merge overlapping intervals
+      3. Find gaps between merged intervals
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      # Flatten all intervals
+      all_intervals = []
+      for employee in schedule:
+          all_intervals.extend(employee)
+
+      # Sort by start time
+      all_intervals.sort(key=lambda x: x[0])
+
+      # Merge and find gaps
+      merged_end = all_intervals[0][1]
+      free_time = []
+
+      for start, end in all_intervals[1:]:
+          if start > merged_end:
+              free_time.append([merged_end, start])
+          merged_end = max(merged_end, end)
+
+      return free_time
+      ```
+
+  level_3:
+    title: "Min-Heap Alternative"
+    content: |
+      Use min-heap for efficiency with many employees:
+      - Add first interval of each employee to heap
+      - Process intervals in order, tracking gaps
+      - When processing employee's interval, add their next interval
+
+interval_list_intersections:
+  level_1:
+    title: "Two Pointer Intersection"
+    content: |
+      Same as Problem 3 (intervals_intersection).
+
+      Two pointers, move the one with smaller end.
+
+  level_2:
+    title: "Clean Implementation"
+    content: |
+      ```python
+      result = []
+      i = j = 0
+
+      while i < len(firstList) and j < len(secondList):
+          # Find intersection bounds
+          lo = max(firstList[i][0], secondList[j][0])
+          hi = min(firstList[i][1], secondList[j][1])
+
+          if lo <= hi:
+              result.append([lo, hi])
+
+          # Advance the pointer with smaller end
+          if firstList[i][1] < secondList[j][1]:
+              i += 1
+          else:
+              j += 1
+
+      return result
+      ```
+
+  level_3:
+    title: "Complexity Analysis"
+    content: |
+      - Time: O(m + n) where m, n are list lengths
+      - Space: O(1) extra (excluding output)
+      - Each pointer moves at most once per iteration
+
+car_pooling:
+  level_1:
+    title: "Track Passenger Count at Each Location"
+    content: |
+      At each location, passengers change:
+      - Pick up: +passengers
+      - Drop off: -passengers
+
+      Check if count ever exceeds capacity.
+
+  level_2:
+    title: "Sweep Line with Events"
+    content: |
+      ```python
+      events = []
+      for passengers, start, end in trips:
+          events.append((start, passengers))   # Pick up
+          events.append((end, -passengers))    # Drop off
+
+      events.sort()
+
+      current = 0
+      for location, delta in events:
+          current += delta
+          if current > capacity:
+              return False
+
+      return True
+      ```
+
+  level_3:
+    title: "Array-Based Solution"
+    content: |
+      Since locations are bounded (0-1000):
+
+      ```python
+      stops = [0] * 1001
+
+      for passengers, start, end in trips:
+          stops[start] += passengers
+          stops[end] -= passengers
+
+      current = 0
+      for delta in stops:
+          current += delta
+          if current > capacity:
+              return False
+
+      return True
+      ```
+
+      This is O(n + max_location) time.

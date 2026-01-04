@@ -1,0 +1,496 @@
+# Hints for Linked List In-Place Reversal problems
+
+reverse_linked_list:
+  level_1:
+    title: "Three Pointer Technique"
+    content: |
+      Use three pointers:
+      - `prev`: Previously processed node (starts as None)
+      - `curr`: Current node being processed
+      - `next`: Next node to process (saved before we change curr.next)
+
+  level_2:
+    title: "Iterative Implementation"
+    content: |
+      ```python
+      prev = None
+      curr = head
+
+      while curr:
+          next_temp = curr.next  # Save next
+          curr.next = prev       # Reverse link
+          prev = curr            # Move prev forward
+          curr = next_temp       # Move curr forward
+
+      return prev  # prev is now the new head
+      ```
+
+  level_3:
+    title: "Recursive Alternative"
+    content: |
+      ```python
+      def reverse(head):
+          if not head or not head.next:
+              return head
+
+          new_head = reverse(head.next)
+          head.next.next = head
+          head.next = None
+
+          return new_head
+      ```
+
+      Base case: empty or single node.
+      Recursive case: reverse rest, then fix current node's links.
+
+reverse_linked_list_ii:
+  level_1:
+    title: "Find the Sublist, Then Reverse"
+    content: |
+      Three steps:
+      1. Find the node BEFORE position `left`
+      2. Reverse nodes from `left` to `right`
+      3. Connect the reversed portion back
+
+  level_2:
+    title: "Using a Dummy Node"
+    content: |
+      ```python
+      dummy = ListNode(0)
+      dummy.next = head
+      prev = dummy
+
+      # Move to position before left
+      for _ in range(left - 1):
+          prev = prev.next
+
+      # Reverse from left to right
+      curr = prev.next
+      for _ in range(right - left):
+          next_node = curr.next
+          curr.next = next_node.next
+          next_node.next = prev.next
+          prev.next = next_node
+
+      return dummy.next
+      ```
+
+  level_3:
+    title: "Visualization"
+    content: |
+      For [1,2,3,4,5] with left=2, right=4:
+
+      Step 0: 1 -> [2 -> 3 -> 4] -> 5
+      Step 1: 1 -> [3 -> 2 -> 4] -> 5  (move 3 to front)
+      Step 2: 1 -> [4 -> 3 -> 2] -> 5  (move 4 to front)
+
+      Each iteration moves the next node to the front of the reversed portion.
+
+reverse_k_group:
+  level_1:
+    title: "Check, Then Reverse"
+    content: |
+      For each group of k nodes:
+      1. Check if k nodes remain
+      2. If yes, reverse them
+      3. Connect to previous group
+      4. Move to next group
+
+  level_2:
+    title: "Implementation with Helper"
+    content: |
+      ```python
+      def reverse_k_group(head, k):
+          dummy = ListNode(0)
+          dummy.next = head
+          prev_group_end = dummy
+
+          while True:
+              # Check if k nodes exist
+              kth = prev_group_end
+              for _ in range(k):
+                  kth = kth.next
+                  if not kth:
+                      return dummy.next
+
+              # Reverse k nodes
+              group_start = prev_group_end.next
+              prev = kth.next
+              curr = group_start
+
+              while curr != kth.next:
+                  next_temp = curr.next
+                  curr.next = prev
+                  prev = curr
+                  curr = next_temp
+
+              # Connect
+              prev_group_end.next = kth
+              prev_group_end = group_start
+      ```
+
+  level_3:
+    title: "Key Insight"
+    content: |
+      After reversing a group:
+      - `kth` node is now the first of the reversed group
+      - Original first node is now the last
+      - Update `prev_group_end` for next iteration
+
+reverse_alternating_k:
+  level_1:
+    title: "Alternate Between Reverse and Skip"
+    content: |
+      Maintain a flag to track whether to reverse or skip.
+
+      After processing each group, toggle the flag.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      dummy = ListNode(0)
+      dummy.next = head
+      prev = dummy
+      should_reverse = True
+
+      while prev.next:
+          # Count k nodes
+          count = 0
+          curr = prev.next
+          while curr and count < k:
+              curr = curr.next
+              count += 1
+
+          if should_reverse and count == k:
+              # Reverse k nodes
+              curr = prev.next
+              for _ in range(k - 1):
+                  next_node = curr.next
+                  curr.next = next_node.next
+                  next_node.next = prev.next
+                  prev.next = next_node
+              prev = curr
+          else:
+              # Skip k nodes
+              for _ in range(min(k, count)):
+                  prev = prev.next
+
+          should_reverse = not should_reverse
+
+      return dummy.next
+      ```
+
+  level_3:
+    title: "Handling Remaining Nodes"
+    content: |
+      If fewer than k nodes remain:
+      - Don't reverse (leave as-is)
+      - This matches the behavior of reverse_k_group
+
+rotate_list:
+  level_1:
+    title: "Find New Head Position"
+    content: |
+      Rotation by k = making the (n-k)th node the new tail.
+
+      Key insight: k might be larger than list length!
+      Use `k = k % n` to get effective rotation.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      if not head or not head.next or k == 0:
+          return head
+
+      # Find length and last node
+      length = 1
+      tail = head
+      while tail.next:
+          tail = tail.next
+          length += 1
+
+      k = k % length
+      if k == 0:
+          return head
+
+      # Find new tail (at position length - k - 1)
+      new_tail = head
+      for _ in range(length - k - 1):
+          new_tail = new_tail.next
+
+      new_head = new_tail.next
+      new_tail.next = None
+      tail.next = head
+
+      return new_head
+      ```
+
+  level_3:
+    title: "Alternative: Make Circular First"
+    content: |
+      1. Connect tail to head (make circular)
+      2. Move (length - k) steps from head
+      3. Break the link there
+
+      ```python
+      tail.next = head  # Make circular
+      # Move to new tail position
+      for _ in range(length - k):
+          tail = tail.next
+      new_head = tail.next
+      tail.next = None
+      ```
+
+swap_pairs:
+  level_1:
+    title: "This is reverse_k_group with k=2"
+    content: |
+      You can use the same approach as k-group reversal.
+
+      Or use a simpler approach since k is always 2.
+
+  level_2:
+    title: "Iterative Solution"
+    content: |
+      ```python
+      dummy = ListNode(0)
+      dummy.next = head
+      prev = dummy
+
+      while prev.next and prev.next.next:
+          first = prev.next
+          second = prev.next.next
+
+          # Swap
+          first.next = second.next
+          second.next = first
+          prev.next = second
+
+          # Move to next pair
+          prev = first
+
+      return dummy.next
+      ```
+
+  level_3:
+    title: "Recursive Solution"
+    content: |
+      ```python
+      def swap_pairs(head):
+          if not head or not head.next:
+              return head
+
+          first = head
+          second = head.next
+
+          # Swap and recurse
+          first.next = swap_pairs(second.next)
+          second.next = first
+
+          return second  # Second is now first
+      ```
+
+reverse_between:
+  level_1:
+    title: "One-Pass In-Place Reversal"
+    content: |
+      Similar to reverse_linked_list_ii but emphasizing single pass.
+
+      Keep moving nodes to the front of the reversed section.
+
+  level_2:
+    title: "One-Pass Implementation"
+    content: |
+      ```python
+      if not head or m == n:
+          return head
+
+      dummy = ListNode(0)
+      dummy.next = head
+      prev = dummy
+
+      # Move to node before m
+      for _ in range(m - 1):
+          prev = prev.next
+
+      # Reverse from m to n
+      tail = prev.next  # Will be tail of reversed section
+      for _ in range(n - m):
+          # Move next node to front
+          temp = tail.next
+          tail.next = temp.next
+          temp.next = prev.next
+          prev.next = temp
+
+      return dummy.next
+      ```
+
+  level_3:
+    title: "Why One Pass Works"
+    content: |
+      We don't need to find position n first.
+
+      Just count (n - m) moves:
+      - Each move takes the node after `tail`
+      - Places it right after `prev`
+
+      `tail` stays in place, other nodes move in front of it.
+
+odd_even_linked_list:
+  level_1:
+    title: "Two Separate Lists"
+    content: |
+      Build two lists simultaneously:
+      1. Odd-indexed nodes
+      2. Even-indexed nodes
+
+      Then connect odd list's tail to even list's head.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      if not head:
+          return head
+
+      odd = head
+      even = head.next
+      even_head = even
+
+      while even and even.next:
+          odd.next = even.next
+          odd = odd.next
+          even.next = odd.next
+          even = even.next
+
+      odd.next = even_head
+      return head
+      ```
+
+  level_3:
+    title: "Key Points"
+    content: |
+      - `even_head` saves the start of even list for final connection
+      - Loop continues while `even` and `even.next` exist
+      - After loop, `odd.next = even_head` connects the two lists
+      - O(1) space, O(n) time
+
+split_linked_list:
+  level_1:
+    title: "Calculate Part Sizes"
+    content: |
+      For n nodes and k parts:
+      - Base size: n // k
+      - First (n % k) parts get one extra node
+
+      Example: 10 nodes, 3 parts = 4, 3, 3
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      # Get length
+      length = 0
+      curr = head
+      while curr:
+          length += 1
+          curr = curr.next
+
+      base_size = length // k
+      extra = length % k
+
+      result = []
+      curr = head
+
+      for i in range(k):
+          result.append(curr)
+          size = base_size + (1 if i < extra else 0)
+
+          # Move to end of this part
+          for _ in range(size - 1):
+              if curr:
+                  curr = curr.next
+
+          # Cut the list
+          if curr:
+              next_part = curr.next
+              curr.next = None
+              curr = next_part
+
+      return result
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Empty list: return [None] * k
+      - k > length: some parts will be None
+      - k == 1: return entire list as single part
+
+flatten_multilevel_list:
+  level_1:
+    title: "DFS Approach"
+    content: |
+      When you encounter a child:
+      1. Save the current next
+      2. Process child list completely
+      3. Connect back to saved next
+
+      This is essentially DFS through the structure.
+
+  level_2:
+    title: "Iterative with Stack"
+    content: |
+      ```python
+      if not head:
+          return head
+
+      stack = []
+      curr = head
+
+      while curr:
+          if curr.child:
+              if curr.next:
+                  stack.append(curr.next)
+              curr.next = curr.child
+              curr.child = None
+
+          if not curr.next and stack:
+              curr.next = stack.pop()
+
+          curr = curr.next
+
+      return head
+      ```
+
+  level_3:
+    title: "Recursive Approach"
+    content: |
+      ```python
+      def flatten(head):
+          if not head:
+              return None
+
+          curr = head
+          while curr:
+              if curr.child:
+                  # Flatten child
+                  child_head = flatten(curr.child)
+                  child_tail = child_head
+                  while child_tail.next:
+                      child_tail = child_tail.next
+
+                  # Insert child list
+                  next_temp = curr.next
+                  curr.next = child_head
+                  child_tail.next = next_temp
+                  curr.child = None
+
+              curr = curr.next
+
+          return head
+      ```
+
+      Find tail of flattened child, then splice it in.

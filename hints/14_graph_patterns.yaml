@@ -1,0 +1,832 @@
+# Hints for Graph Patterns problems
+
+number_of_islands:
+  level_1:
+    title: "Grid Traversal"
+    content: |
+      Think of the grid as a graph where each cell is a node.
+
+      Key insight: When you find a '1', you need to:
+      1. Count it as part of an island
+      2. Mark all connected '1's as visited (same island)
+
+      What traversal algorithm can explore all connected cells?
+
+  level_2:
+    title: "DFS/BFS Approach"
+    content: |
+      Use DFS or BFS to explore islands:
+
+      ```python
+      def dfs(grid, i, j):
+          if i < 0 or i >= len(grid) or j < 0 or j >= len(grid[0]):
+              return
+          if grid[i][j] != '1':
+              return
+
+          grid[i][j] = '0'  # Mark as visited
+          dfs(grid, i+1, j)
+          dfs(grid, i-1, j)
+          dfs(grid, i, j+1)
+          dfs(grid, i, j-1)
+      ```
+
+      Count islands by counting DFS calls from main loop.
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      count = 0
+      for i in range(len(grid)):
+          for j in range(len(grid[0])):
+              if grid[i][j] == '1':
+                  count += 1
+                  dfs(grid, i, j)
+      return count
+      ```
+
+      Alternative: Use Union-Find to group connected cells.
+
+clone_graph:
+  level_1:
+    title: "Track Cloned Nodes"
+    content: |
+      The challenge is avoiding infinite loops when cloning a cyclic graph.
+
+      Use a hash map to track:
+      - **Key**: Original node
+      - **Value**: Cloned node
+
+      If you've already cloned a node, return the existing clone.
+
+  level_2:
+    title: "DFS Clone"
+    content: |
+      ```python
+      def clone_graph(node):
+          if not node:
+              return None
+
+          cloned = {}
+
+          def dfs(node):
+              if node in cloned:
+                  return cloned[node]
+
+              copy = Node(node.val)
+              cloned[node] = copy
+
+              for neighbor in node.neighbors:
+                  copy.neighbors.append(dfs(neighbor))
+
+              return copy
+
+          return dfs(node)
+      ```
+
+  level_3:
+    title: "BFS Alternative"
+    content: |
+      BFS approach using queue:
+
+      ```python
+      if not node:
+          return None
+
+      cloned = {node: Node(node.val)}
+      queue = deque([node])
+
+      while queue:
+          curr = queue.popleft()
+          for neighbor in curr.neighbors:
+              if neighbor not in cloned:
+                  cloned[neighbor] = Node(neighbor.val)
+                  queue.append(neighbor)
+              cloned[curr].neighbors.append(cloned[neighbor])
+
+      return cloned[node]
+      ```
+
+course_schedule:
+  level_1:
+    title: "Cycle Detection"
+    content: |
+      This is a cycle detection problem in a directed graph.
+
+      If there's a cycle in prerequisites, you can't complete all courses.
+
+      Build a graph where edge (a, b) means "a depends on b".
+
+  level_2:
+    title: "DFS with States"
+    content: |
+      Use three states for each node:
+      - **0**: Unvisited
+      - **1**: Currently visiting (in current DFS path)
+      - **2**: Completely visited
+
+      If you visit a node with state 1, there's a cycle!
+
+      ```python
+      def has_cycle(course):
+          if state[course] == 1:
+              return True  # Cycle!
+          if state[course] == 2:
+              return False  # Already processed
+
+          state[course] = 1
+          for prereq in graph[course]:
+              if has_cycle(prereq):
+                  return True
+          state[course] = 2
+          return False
+      ```
+
+  level_3:
+    title: "Kahn's Algorithm (BFS)"
+    content: |
+      Alternative: Topological sort with indegree
+
+      ```python
+      indegree = [0] * numCourses
+      for course, prereq in prerequisites:
+          indegree[course] += 1
+
+      queue = deque([i for i in range(numCourses) if indegree[i] == 0])
+      completed = 0
+
+      while queue:
+          course = queue.popleft()
+          completed += 1
+          for next_course in graph[course]:
+              indegree[next_course] -= 1
+              if indegree[next_course] == 0:
+                  queue.append(next_course)
+
+      return completed == numCourses
+      ```
+
+course_schedule_ii:
+  level_1:
+    title: "Topological Sort"
+    content: |
+      This extends Course Schedule to output the order.
+
+      A valid ordering means: for each edge (a, b), b appears before a.
+
+      This is called topological sorting.
+
+  level_2:
+    title: "DFS Post-Order"
+    content: |
+      DFS approach: add node to result after visiting all dependencies.
+
+      ```python
+      result = []
+      state = [0] * numCourses
+
+      def dfs(course):
+          if state[course] == 1:
+              return False  # Cycle
+          if state[course] == 2:
+              return True
+
+          state[course] = 1
+          for prereq in graph[course]:
+              if not dfs(prereq):
+                  return False
+          state[course] = 2
+          result.append(course)
+          return True
+      ```
+
+      Don't forget to reverse the result (or prepend).
+
+  level_3:
+    title: "Kahn's Algorithm"
+    content: |
+      BFS gives order directly:
+
+      ```python
+      result = []
+      queue = deque([i for i in range(numCourses) if indegree[i] == 0])
+
+      while queue:
+          course = queue.popleft()
+          result.append(course)
+          for dependent in graph[course]:
+              indegree[dependent] -= 1
+              if indegree[dependent] == 0:
+                  queue.append(dependent)
+
+      return result if len(result) == numCourses else []
+      ```
+
+alien_dictionary:
+  level_1:
+    title: "Extract Ordering from Words"
+    content: |
+      Compare adjacent words to extract letter ordering.
+
+      If word1[i] != word2[i], then word1[i] comes before word2[i].
+
+      Build a graph of these relationships.
+
+  level_2:
+    title: "Build Graph and Topological Sort"
+    content: |
+      ```python
+      # Build graph from adjacent word comparisons
+      for i in range(len(words) - 1):
+          w1, w2 = words[i], words[i + 1]
+          min_len = min(len(w1), len(w2))
+
+          # Check for invalid case: prefix comes after longer word
+          if len(w1) > len(w2) and w1[:min_len] == w2[:min_len]:
+              return ""
+
+          for j in range(min_len):
+              if w1[j] != w2[j]:
+                  graph[w1[j]].add(w2[j])
+                  indegree[w2[j]] += 1
+                  break
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      After building graph, do topological sort:
+
+      ```python
+      # Include all unique characters
+      chars = set()
+      for word in words:
+          chars.update(word)
+
+      # Topological sort
+      queue = deque([c for c in chars if indegree[c] == 0])
+      result = []
+
+      while queue:
+          char = queue.popleft()
+          result.append(char)
+          for next_char in graph[char]:
+              indegree[next_char] -= 1
+              if indegree[next_char] == 0:
+                  queue.append(next_char)
+
+      return "".join(result) if len(result) == len(chars) else ""
+      ```
+
+minimum_height_trees:
+  level_1:
+    title: "Find the Center"
+    content: |
+      The MHT roots are the "centers" of the tree.
+
+      A tree has at most 2 centers (middle nodes of longest path).
+
+      Think about removing leaf nodes layer by layer.
+
+  level_2:
+    title: "Topological Trimming"
+    content: |
+      Remove leaves repeatedly until 1-2 nodes remain:
+
+      ```python
+      if n <= 2:
+          return list(range(n))
+
+      # Build adjacency list
+      neighbors = [set() for _ in range(n)]
+      for u, v in edges:
+          neighbors[u].add(v)
+          neighbors[v].add(u)
+
+      # Start with all leaves
+      leaves = [i for i in range(n) if len(neighbors[i]) == 1]
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      remaining = n
+      while remaining > 2:
+          remaining -= len(leaves)
+          new_leaves = []
+
+          for leaf in leaves:
+              neighbor = neighbors[leaf].pop()
+              neighbors[neighbor].remove(leaf)
+              if len(neighbors[neighbor]) == 1:
+                  new_leaves.append(neighbor)
+
+          leaves = new_leaves
+
+      return leaves
+      ```
+
+all_paths_from_source:
+  level_1:
+    title: "DFS Backtracking"
+    content: |
+      Since graph is a DAG, no cycle detection needed.
+
+      Use DFS to explore all paths from node 0 to node n-1.
+
+      Backtrack after exploring each path.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      def all_paths_from_source(graph):
+          target = len(graph) - 1
+          result = []
+
+          def dfs(node, path):
+              if node == target:
+                  result.append(path[:])
+                  return
+
+              for neighbor in graph[node]:
+                  path.append(neighbor)
+                  dfs(neighbor, path)
+                  path.pop()
+
+          dfs(0, [0])
+          return result
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      Since it's a DAG, you can also use memoization:
+
+      ```python
+      from functools import lru_cache
+
+      @lru_cache(maxsize=None)
+      def all_paths(node):
+          if node == target:
+              return [[target]]
+          paths = []
+          for neighbor in graph[node]:
+              for path in all_paths(neighbor):
+                  paths.append([node] + path)
+          return paths
+
+      return all_paths(0)
+      ```
+
+pacific_atlantic_water:
+  level_1:
+    title: "Reverse the Problem"
+    content: |
+      Instead of checking where water can flow FROM, check where water can flow TO.
+
+      Start from ocean borders and flow "uphill" (to higher or equal cells).
+
+      Find cells reachable from both oceans.
+
+  level_2:
+    title: "Two BFS/DFS"
+    content: |
+      ```python
+      def pacific_atlantic_water(heights):
+          if not heights:
+              return []
+
+          m, n = len(heights), len(heights[0])
+          pacific = set()
+          atlantic = set()
+
+          def dfs(r, c, visited, prev_height):
+              if (r, c) in visited:
+                  return
+              if r < 0 or r >= m or c < 0 or c >= n:
+                  return
+              if heights[r][c] < prev_height:
+                  return
+
+              visited.add((r, c))
+              for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+                  dfs(r + dr, c + dc, visited, heights[r][c])
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      # Start DFS from Pacific border (top and left)
+      for c in range(n):
+          dfs(0, c, pacific, heights[0][c])
+      for r in range(m):
+          dfs(r, 0, pacific, heights[r][0])
+
+      # Start DFS from Atlantic border (bottom and right)
+      for c in range(n):
+          dfs(m - 1, c, atlantic, heights[m - 1][c])
+      for r in range(m):
+          dfs(r, n - 1, atlantic, heights[r][n - 1])
+
+      # Return intersection
+      return [[r, c] for r, c in pacific & atlantic]
+      ```
+
+word_ladder:
+  level_1:
+    title: "Shortest Path = BFS"
+    content: |
+      This is a shortest path problem in an unweighted graph.
+
+      Each word is a node, edges connect words differing by one letter.
+
+      Use BFS to find shortest transformation sequence.
+
+  level_2:
+    title: "BFS Implementation"
+    content: |
+      ```python
+      from collections import deque
+
+      def word_ladder(beginWord, endWord, wordList):
+          wordSet = set(wordList)
+          if endWord not in wordSet:
+              return 0
+
+          queue = deque([(beginWord, 1)])
+          visited = {beginWord}
+
+          while queue:
+              word, length = queue.popleft()
+              if word == endWord:
+                  return length
+
+              for i in range(len(word)):
+                  for c in 'abcdefghijklmnopqrstuvwxyz':
+                      next_word = word[:i] + c + word[i+1:]
+                      if next_word in wordSet and next_word not in visited:
+                          visited.add(next_word)
+                          queue.append((next_word, length + 1))
+
+          return 0
+      ```
+
+  level_3:
+    title: "Optimization: Bidirectional BFS"
+    content: |
+      For better performance, search from both ends:
+
+      ```python
+      front, back = {beginWord}, {endWord}
+      visited = set()
+      length = 1
+
+      while front and back:
+          if len(front) > len(back):
+              front, back = back, front
+
+          next_front = set()
+          for word in front:
+              for i in range(len(word)):
+                  for c in 'abcdefghijklmnopqrstuvwxyz':
+                      next_word = word[:i] + c + word[i+1:]
+                      if next_word in back:
+                          return length + 1
+                      if next_word in wordSet and next_word not in visited:
+                          visited.add(next_word)
+                          next_front.add(next_word)
+
+          front = next_front
+          length += 1
+      ```
+
+word_ladder_ii:
+  level_1:
+    title: "BFS + Backtracking"
+    content: |
+      First, use BFS to find the shortest distance to each word.
+
+      Then, use backtracking to reconstruct all shortest paths.
+
+  level_2:
+    title: "Build Distance Map"
+    content: |
+      ```python
+      from collections import deque, defaultdict
+
+      wordSet = set(wordList)
+      if endWord not in wordSet:
+          return []
+
+      # BFS to find distances from beginWord
+      distance = {beginWord: 0}
+      queue = deque([beginWord])
+
+      while queue:
+          word = queue.popleft()
+          for i in range(len(word)):
+              for c in 'abcdefghijklmnopqrstuvwxyz':
+                  next_word = word[:i] + c + word[i+1:]
+                  if next_word in wordSet and next_word not in distance:
+                      distance[next_word] = distance[word] + 1
+                      queue.append(next_word)
+      ```
+
+  level_3:
+    title: "Backtrack for Paths"
+    content: |
+      ```python
+      result = []
+
+      def backtrack(word, path):
+          if word == endWord:
+              result.append(path[:])
+              return
+
+          for i in range(len(word)):
+              for c in 'abcdefghijklmnopqrstuvwxyz':
+                  next_word = word[:i] + c + word[i+1:]
+                  # Only follow edges that lead to shorter path
+                  if next_word in distance and distance[next_word] == distance[word] + 1:
+                      path.append(next_word)
+                      backtrack(next_word, path)
+                      path.pop()
+
+      backtrack(beginWord, [beginWord])
+      return result
+      ```
+
+network_delay_time:
+  level_1:
+    title: "Dijkstra's Algorithm"
+    content: |
+      This is a single-source shortest path problem with weighted edges.
+
+      Use Dijkstra's algorithm to find shortest time to each node.
+
+      Answer is the maximum of all shortest times.
+
+  level_2:
+    title: "Priority Queue Implementation"
+    content: |
+      ```python
+      import heapq
+      from collections import defaultdict
+
+      def network_delay_time(times, n, k):
+          graph = defaultdict(list)
+          for u, v, w in times:
+              graph[u].append((v, w))
+
+          dist = {k: 0}
+          heap = [(0, k)]
+
+          while heap:
+              time, node = heapq.heappop(heap)
+              if time > dist.get(node, float('inf')):
+                  continue
+
+              for neighbor, weight in graph[node]:
+                  new_time = time + weight
+                  if new_time < dist.get(neighbor, float('inf')):
+                      dist[neighbor] = new_time
+                      heapq.heappush(heap, (new_time, neighbor))
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      if len(dist) < n:
+          return -1
+
+      return max(dist.values())
+      ```
+
+      Time: O(E log V) with priority queue
+      Space: O(V + E)
+
+cheapest_flights:
+  level_1:
+    title: "BFS with Stops Limit"
+    content: |
+      Similar to Network Delay Time, but with a constraint on stops.
+
+      Can use modified Dijkstra or Bellman-Ford.
+
+      BFS with (city, cost, stops) state also works.
+
+  level_2:
+    title: "Modified BFS/Dijkstra"
+    content: |
+      ```python
+      import heapq
+      from collections import defaultdict
+
+      def cheapest_flights(n, flights, src, dst, k):
+          graph = defaultdict(list)
+          for u, v, p in flights:
+              graph[u].append((v, p))
+
+          # (cost, city, stops)
+          heap = [(0, src, 0)]
+          visited = {}  # city -> min stops to reach
+
+          while heap:
+              cost, city, stops = heapq.heappop(heap)
+
+              if city == dst:
+                  return cost
+
+              if stops > k:
+                  continue
+
+              if city in visited and visited[city] <= stops:
+                  continue
+              visited[city] = stops
+
+              for neighbor, price in graph[city]:
+                  heapq.heappush(heap, (cost + price, neighbor, stops + 1))
+
+          return -1
+      ```
+
+  level_3:
+    title: "Bellman-Ford Approach"
+    content: |
+      Alternative: k+1 iterations of Bellman-Ford
+
+      ```python
+      dist = [float('inf')] * n
+      dist[src] = 0
+
+      for _ in range(k + 1):
+          temp = dist[:]
+          for u, v, p in flights:
+              if dist[u] + p < temp[v]:
+                  temp[v] = dist[u] + p
+          dist = temp
+
+      return dist[dst] if dist[dst] != float('inf') else -1
+      ```
+
+reconstruct_itinerary:
+  level_1:
+    title: "Eulerian Path"
+    content: |
+      This is finding an Eulerian path (visiting each edge once).
+
+      Use Hierholzer's algorithm.
+
+      Sort destinations for lexical order.
+
+  level_2:
+    title: "Hierholzer's Algorithm"
+    content: |
+      ```python
+      from collections import defaultdict
+
+      def reconstruct_itinerary(tickets):
+          graph = defaultdict(list)
+          for src, dst in sorted(tickets, reverse=True):
+              graph[src].append(dst)
+
+          result = []
+
+          def dfs(airport):
+              while graph[airport]:
+                  dfs(graph[airport].pop())
+              result.append(airport)
+
+          dfs("JFK")
+          return result[::-1]
+      ```
+
+  level_3:
+    title: "Iterative Version"
+    content: |
+      ```python
+      def reconstruct_itinerary(tickets):
+          graph = defaultdict(list)
+          for src, dst in sorted(tickets, reverse=True):
+              graph[src].append(dst)
+
+          stack = ["JFK"]
+          result = []
+
+          while stack:
+              while graph[stack[-1]]:
+                  stack.append(graph[stack[-1]].pop())
+              result.append(stack.pop())
+
+          return result[::-1]
+      ```
+
+      Key: Visit all outgoing edges before adding to result.
+
+critical_connections:
+  level_1:
+    title: "Tarjan's Algorithm"
+    content: |
+      A critical connection (bridge) is an edge whose removal disconnects the graph.
+
+      Use Tarjan's algorithm to find bridges.
+
+      Track discovery time and lowest reachable time.
+
+  level_2:
+    title: "Discovery and Low Values"
+    content: |
+      ```python
+      def critical_connections(n, connections):
+          graph = [[] for _ in range(n)]
+          for u, v in connections:
+              graph[u].append(v)
+              graph[v].append(u)
+
+          disc = [0] * n
+          low = [0] * n
+          time = [1]
+          result = []
+
+          def dfs(node, parent):
+              disc[node] = low[node] = time[0]
+              time[0] += 1
+
+              for neighbor in graph[node]:
+                  if disc[neighbor] == 0:  # Not visited
+                      dfs(neighbor, node)
+                      low[node] = min(low[node], low[neighbor])
+                      if low[neighbor] > disc[node]:
+                          result.append([node, neighbor])
+                  elif neighbor != parent:
+                      low[node] = min(low[node], disc[neighbor])
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      for i in range(n):
+          if disc[i] == 0:
+              dfs(i, -1)
+
+      return result
+      ```
+
+      - `disc[v]`: Discovery time of node v
+      - `low[v]`: Lowest discovery time reachable from subtree of v
+      - Edge (u, v) is bridge if `low[v] > disc[u]`
+
+redundant_connection:
+  level_1:
+    title: "Union-Find"
+    content: |
+      A tree with n nodes has n-1 edges. One extra edge creates a cycle.
+
+      Use Union-Find to detect when adding an edge creates a cycle.
+
+      The first such edge (processing in order) is the answer.
+
+  level_2:
+    title: "Union-Find Implementation"
+    content: |
+      ```python
+      def redundant_connection(edges):
+          parent = list(range(len(edges) + 1))
+          rank = [0] * (len(edges) + 1)
+
+          def find(x):
+              if parent[x] != x:
+                  parent[x] = find(parent[x])  # Path compression
+              return parent[x]
+
+          def union(x, y):
+              px, py = find(x), find(y)
+              if px == py:
+                  return False  # Already connected!
+              if rank[px] < rank[py]:
+                  px, py = py, px
+              parent[py] = px
+              if rank[px] == rank[py]:
+                  rank[px] += 1
+              return True
+      ```
+
+  level_3:
+    title: "Complete Solution"
+    content: |
+      ```python
+      for u, v in edges:
+          if not union(u, v):
+              return [u, v]
+      ```
+
+      The last edge that creates a cycle is the answer because:
+      - We process edges in order
+      - Problem says "return the answer that occurs last"
+      - The redundant edge is the one that completes the cycle

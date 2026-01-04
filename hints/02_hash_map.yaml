@@ -1,0 +1,521 @@
+# Hints for Hash Map Patterns problems
+
+group_anagrams:
+  level_1:
+    title: "What Makes Anagrams the Same?"
+    content: |
+      Anagrams have the same characters with the same frequencies.
+
+      How can you create a **unique key** for each group of anagrams?
+
+      Think about what property is shared by all anagrams of a word.
+
+  level_2:
+    title: "Sorting as Key"
+    content: |
+      Key insight: All anagrams, when sorted, produce the same string!
+
+      "eat", "tea", "ate" all become "aet" when sorted.
+
+      ```python
+      from collections import defaultdict
+
+      groups = defaultdict(list)
+      for s in strs:
+          key = tuple(sorted(s))  # or ''.join(sorted(s))
+          groups[key].append(s)
+
+      return list(groups.values())
+      ```
+
+  level_3:
+    title: "Alternative: Character Count Key"
+    content: |
+      Instead of sorting O(k log k), use character counts O(k):
+
+      ```python
+      def get_key(s):
+          count = [0] * 26
+          for c in s:
+              count[ord(c) - ord('a')] += 1
+          return tuple(count)
+      ```
+
+      This is faster for longer strings.
+
+two_sum_ii:
+  level_1:
+    title: "Leverage the Sorted Property"
+    content: |
+      The array is **sorted** - this is a huge hint!
+
+      For a sorted array, two pointers from opposite ends
+      can find a target sum efficiently.
+
+  level_2:
+    title: "Two Pointer Approach"
+    content: |
+      ```python
+      left, right = 0, len(numbers) - 1
+
+      while left < right:
+          current_sum = numbers[left] + numbers[right]
+          if current_sum == target:
+              return [left + 1, right + 1]  # 1-indexed!
+          elif current_sum < target:
+              left += 1   # Need larger sum
+          else:
+              right -= 1  # Need smaller sum
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - If sum too small, moving left pointer right increases the sum
+      - If sum too large, moving right pointer left decreases the sum
+      - Since array is sorted, we won't miss any valid pairs
+
+      Time: O(n), Space: O(1)
+
+contains_duplicate:
+  level_1:
+    title: "Track What You've Seen"
+    content: |
+      As you iterate through the array, keep track of
+      numbers you've already seen.
+
+      What data structure provides O(1) lookup?
+
+  level_2:
+    title: "Set Solution"
+    content: |
+      ```python
+      seen = set()
+      for num in nums:
+          if num in seen:
+              return True
+          seen.add(num)
+      return False
+      ```
+
+      Or even simpler:
+      ```python
+      return len(nums) != len(set(nums))
+      ```
+
+  level_3:
+    title: "Alternative Approaches"
+    content: |
+      1. **Sorting**: Sort and check adjacent elements O(n log n)
+      2. **Set comparison**: One-liner but creates full set
+
+      The hash set approach is optimal at O(n) time, O(n) space.
+
+isomorphic_strings:
+  level_1:
+    title: "Character Mapping"
+    content: |
+      Each character in `s` must map to exactly one character in `t`.
+      And vice versa - no two characters in `s` can map to the same character in `t`.
+
+      This is a **bijection** - a one-to-one mapping in both directions.
+
+  level_2:
+    title: "Two Hash Maps"
+    content: |
+      Track mappings in both directions:
+
+      ```python
+      s_to_t = {}
+      t_to_s = {}
+
+      for c1, c2 in zip(s, t):
+          if c1 in s_to_t:
+              if s_to_t[c1] != c2:
+                  return False
+          else:
+              s_to_t[c1] = c2
+
+          if c2 in t_to_s:
+              if t_to_s[c2] != c1:
+                  return False
+          else:
+              t_to_s[c2] = c1
+
+      return True
+      ```
+
+  level_3:
+    title: "Elegant Alternative"
+    content: |
+      Use the pattern of first occurrences:
+
+      ```python
+      def pattern(s):
+          mapping = {}
+          return [mapping.setdefault(c, len(mapping)) for c in s]
+
+      return pattern(s) == pattern(t)
+      ```
+
+      "egg" -> [0, 1, 1], "add" -> [0, 1, 1] - same pattern!
+
+word_pattern:
+  level_1:
+    title: "Similar to Isomorphic Strings"
+    content: |
+      This is the same concept as isomorphic strings:
+      - Each letter in pattern maps to exactly one word
+      - Each word maps to exactly one letter
+
+      First, split the string into words.
+
+  level_2:
+    title: "Bijection with Words"
+    content: |
+      ```python
+      words = s.split()
+      if len(pattern) != len(words):
+          return False
+
+      char_to_word = {}
+      word_to_char = {}
+
+      for c, w in zip(pattern, words):
+          if c in char_to_word:
+              if char_to_word[c] != w:
+                  return False
+          else:
+              char_to_word[c] = w
+
+          if w in word_to_char:
+              if word_to_char[w] != c:
+                  return False
+          else:
+              word_to_char[w] = c
+
+      return True
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Different lengths: "abba" with "dog cat cat" should return False
+      - Same word for different letters: "abba" with "dog dog dog dog"
+      - Empty strings/patterns
+
+happy_number:
+  level_1:
+    title: "Detecting Cycles"
+    content: |
+      The process either reaches 1 or enters a cycle.
+
+      How do you detect if you've seen a number before?
+
+  level_2:
+    title: "Hash Set for Cycle Detection"
+    content: |
+      ```python
+      def get_next(n):
+          total = 0
+          while n:
+              digit = n % 10
+              total += digit * digit
+              n //= 10
+          return total
+
+      seen = set()
+      while n != 1 and n not in seen:
+          seen.add(n)
+          n = get_next(n)
+
+      return n == 1
+      ```
+
+  level_3:
+    title: "Floyd's Cycle Detection"
+    content: |
+      You can also use slow/fast pointers (no extra space):
+
+      ```python
+      slow = n
+      fast = get_next(n)
+
+      while fast != 1 and slow != fast:
+          slow = get_next(slow)
+          fast = get_next(get_next(fast))
+
+      return fast == 1
+      ```
+
+      This is covered in the Fast & Slow Pointers section!
+
+first_unique_character:
+  level_1:
+    title: "Two Pass Approach"
+    content: |
+      First, count the frequency of each character.
+      Then, find the first character with frequency 1.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      from collections import Counter
+
+      count = Counter(s)
+
+      for i, char in enumerate(s):
+          if count[char] == 1:
+              return i
+
+      return -1
+      ```
+
+  level_3:
+    title: "Optimization for Fixed Alphabet"
+    content: |
+      With only 26 letters, you can use an array:
+
+      ```python
+      count = [0] * 26
+      for c in s:
+          count[ord(c) - ord('a')] += 1
+
+      for i, c in enumerate(s):
+          if count[ord(c) - ord('a')] == 1:
+              return i
+      return -1
+      ```
+
+intersection_of_two_arrays:
+  level_1:
+    title: "Set Operations"
+    content: |
+      The intersection of two arrays contains elements
+      that appear in **both** arrays.
+
+      What data structure is perfect for membership testing?
+
+  level_2:
+    title: "Set Intersection"
+    content: |
+      ```python
+      return list(set(nums1) & set(nums2))
+      ```
+
+      Or manually:
+      ```python
+      set1 = set(nums1)
+      result = set()
+      for num in nums2:
+          if num in set1:
+              result.add(num)
+      return list(result)
+      ```
+
+  level_3:
+    title: "Follow-up: What if sorted?"
+    content: |
+      If both arrays are sorted, use two pointers:
+
+      ```python
+      i, j = 0, 0
+      result = set()
+      while i < len(nums1) and j < len(nums2):
+          if nums1[i] < nums2[j]:
+              i += 1
+          elif nums1[i] > nums2[j]:
+              j += 1
+          else:
+              result.add(nums1[i])
+              i += 1
+              j += 1
+      return list(result)
+      ```
+
+longest_consecutive_sequence:
+  level_1:
+    title: "Find Sequence Starts"
+    content: |
+      A number is the **start** of a sequence if `num - 1` is not in the set.
+
+      Only start counting from sequence beginnings to avoid
+      redundant work.
+
+  level_2:
+    title: "Hash Set Solution"
+    content: |
+      ```python
+      num_set = set(nums)
+      max_length = 0
+
+      for num in num_set:
+          # Only start counting if this is the beginning
+          if num - 1 not in num_set:
+              current = num
+              length = 1
+
+              while current + 1 in num_set:
+                  current += 1
+                  length += 1
+
+              max_length = max(max_length, length)
+
+      return max_length
+      ```
+
+  level_3:
+    title: "Why O(n)?"
+    content: |
+      Even though there's a nested while loop:
+      - Each number is only visited as a sequence start OR
+      - As part of extending from a start
+
+      Total visits = O(n), not O(n^2)
+
+subarray_sum_equals_k:
+  level_1:
+    title: "Prefix Sum Insight"
+    content: |
+      If `prefix[j] - prefix[i] = k`, then `sum(nums[i+1:j+1]) = k`.
+
+      Rearranging: We need to find how many previous prefix sums
+      equal `current_prefix - k`.
+
+  level_2:
+    title: "Hash Map of Prefix Sums"
+    content: |
+      ```python
+      from collections import defaultdict
+
+      count = 0
+      prefix_sum = 0
+      prefix_counts = defaultdict(int)
+      prefix_counts[0] = 1  # Empty prefix
+
+      for num in nums:
+          prefix_sum += num
+          # How many times have we seen (prefix_sum - k)?
+          count += prefix_counts[prefix_sum - k]
+          prefix_counts[prefix_sum] += 1
+
+      return count
+      ```
+
+  level_3:
+    title: "Why Initialize with 0?"
+    content: |
+      `prefix_counts[0] = 1` handles subarrays starting at index 0.
+
+      If `prefix_sum = k`, then `prefix_sum - k = 0`, and we need
+      to count that as a valid subarray.
+
+four_sum_ii:
+  level_1:
+    title: "Reduce to Two Sum"
+    content: |
+      With 4 arrays, checking all combinations is O(n^4).
+
+      Can you group arrays to reduce this?
+
+      Hint: `a + b + c + d = 0` means `a + b = -(c + d)`
+
+  level_2:
+    title: "Two Group Approach"
+    content: |
+      ```python
+      from collections import Counter
+
+      # All sums of nums1[i] + nums2[j]
+      ab_sums = Counter()
+      for a in nums1:
+          for b in nums2:
+              ab_sums[a + b] += 1
+
+      # Count complementary sums in nums3 + nums4
+      count = 0
+      for c in nums3:
+          for d in nums4:
+              count += ab_sums[-(c + d)]
+
+      return count
+      ```
+
+  level_3:
+    title: "Complexity Analysis"
+    content: |
+      - Building ab_sums: O(n^2)
+      - Counting complements: O(n^2)
+      - Total: O(n^2) time, O(n^2) space
+
+      Much better than O(n^4)!
+
+lru_cache:
+  level_1:
+    title: "Data Structure Requirements"
+    content: |
+      Need O(1) for:
+      - Get by key (hash map)
+      - Update recency order (doubly linked list)
+      - Eviction of least recent (list tail)
+
+      Combine hash map + doubly linked list.
+
+  level_2:
+    title: "OrderedDict Solution"
+    content: |
+      Python's OrderedDict maintains insertion order:
+
+      ```python
+      from collections import OrderedDict
+
+      class LRUCache:
+          def __init__(self, capacity):
+              self.cache = OrderedDict()
+              self.capacity = capacity
+
+          def get(self, key):
+              if key not in self.cache:
+                  return -1
+              self.cache.move_to_end(key)
+              return self.cache[key]
+
+          def put(self, key, value):
+              if key in self.cache:
+                  self.cache.move_to_end(key)
+              self.cache[key] = value
+              if len(self.cache) > self.capacity:
+                  self.cache.popitem(last=False)
+      ```
+
+  level_3:
+    title: "Manual Doubly Linked List"
+    content: |
+      For interviews, you may need to implement from scratch:
+
+      ```python
+      class Node:
+          def __init__(self, key=0, val=0):
+              self.key, self.val = key, val
+              self.prev = self.next = None
+
+      class LRUCache:
+          def __init__(self, capacity):
+              self.capacity = capacity
+              self.cache = {}  # key -> node
+              self.head = Node()  # dummy head (most recent)
+              self.tail = Node()  # dummy tail (least recent)
+              self.head.next = self.tail
+              self.tail.prev = self.head
+
+          def _remove(self, node):
+              node.prev.next = node.next
+              node.next.prev = node.prev
+
+          def _add_to_front(self, node):
+              node.next = self.head.next
+              node.prev = self.head
+              self.head.next.prev = node
+              self.head.next = node
+      ```

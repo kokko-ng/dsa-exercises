@@ -1,0 +1,547 @@
+# Hints for Modified Binary Search problems
+
+binary_search:
+  level_1:
+    title: "The Classic Pattern"
+    content: |
+      Binary search works by repeatedly dividing the search space in half.
+
+      Maintain two pointers: `left` and `right`.
+      - Calculate `mid = (left + right) // 2`
+      - Compare `nums[mid]` with target
+      - Adjust bounds based on comparison
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      left, right = 0, len(nums) - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+
+          if nums[mid] == target:
+              return mid
+          elif nums[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      return -1
+      ```
+
+      Key: Use `left <= right` to check all elements.
+
+  level_3:
+    title: "Common Pitfalls"
+    content: |
+      - **Overflow**: In some languages, `(left + right)` can overflow.
+        Use `left + (right - left) // 2` instead.
+      - **Off-by-one**: Use `left <= right`, not `left < right`
+      - **Infinite loop**: Always update `left = mid + 1` or `right = mid - 1`
+        (not just `mid`)
+
+order_agnostic_search:
+  level_1:
+    title: "Determine Sort Order First"
+    content: |
+      Before searching, check if array is ascending or descending.
+
+      Compare first and last elements:
+      - If `nums[0] < nums[n-1]`: ascending
+      - If `nums[0] > nums[n-1]`: descending
+      - If equal: all elements are same
+
+  level_2:
+    title: "Adjust Binary Search Logic"
+    content: |
+      ```python
+      is_ascending = nums[0] < nums[-1]
+      left, right = 0, len(nums) - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+
+          if nums[mid] == target:
+              return mid
+
+          if is_ascending:
+              if nums[mid] < target:
+                  left = mid + 1
+              else:
+                  right = mid - 1
+          else:  # descending
+              if nums[mid] > target:
+                  left = mid + 1
+              else:
+                  right = mid - 1
+
+      return -1
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Single element array: Check if it equals target
+      - All same values: Compare once, return 0 or -1
+      - Two elements: Works with both orderings
+
+ceiling_of_number:
+  level_1:
+    title: "Modified Binary Search"
+    content: |
+      Ceiling is the smallest element >= target.
+
+      Think of it as: where would target be inserted to maintain order?
+
+      Use binary search but track the potential answer.
+
+  level_2:
+    title: "Track the Answer"
+    content: |
+      ```python
+      if target > nums[-1]:
+          return -1  # No ceiling exists
+
+      left, right = 0, len(nums) - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+
+          if nums[mid] == target:
+              return mid
+          elif nums[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      # After loop, left points to ceiling
+      return left
+      ```
+
+  level_3:
+    title: "Why Left is the Answer"
+    content: |
+      When loop ends:
+      - `right` points to largest element < target
+      - `left` points to smallest element >= target (ceiling)
+      - `left = right + 1`
+
+      If target exists, we return early.
+      If not, `left` is the insertion point = ceiling index.
+
+floor_of_number:
+  level_1:
+    title: "Mirror of Ceiling"
+    content: |
+      Floor is the largest element <= target.
+
+      Similar to ceiling, but track the largest valid element seen.
+
+  level_2:
+    title: "Track the Answer"
+    content: |
+      ```python
+      if target < nums[0]:
+          return -1  # No floor exists
+
+      left, right = 0, len(nums) - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+
+          if nums[mid] == target:
+              return mid
+          elif nums[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      # After loop, right points to floor
+      return right
+      ```
+
+  level_3:
+    title: "Why Right is the Answer"
+    content: |
+      When loop ends:
+      - `left` points to smallest element > target
+      - `right` points to largest element <= target (floor)
+      - `right = left - 1`
+
+      The floor is always at index `right` after the search.
+
+next_letter:
+  level_1:
+    title: "Similar to Ceiling"
+    content: |
+      Find the smallest letter strictly greater than target.
+
+      Key difference from ceiling:
+      - Must be strictly greater (not equal)
+      - Wraps around if no letter is greater
+
+  level_2:
+    title: "Binary Search with Wraparound"
+    content: |
+      ```python
+      n = len(letters)
+      left, right = 0, n - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+
+          if letters[mid] <= target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      # Wrap around using modulo
+      return letters[left % n]
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - We use `<=` because we want strictly greater
+      - After loop, `left` points to first letter > target
+      - If `left == n`, all letters are <= target, so wrap to index 0
+      - `left % n` handles both cases elegantly
+
+number_range:
+  level_1:
+    title: "Two Binary Searches"
+    content: |
+      To find the range [first, last]:
+      1. Find the first occurrence of target
+      2. Find the last occurrence of target
+
+      Each requires a modified binary search.
+
+  level_2:
+    title: "Find First and Last"
+    content: |
+      ```python
+      def find_first(nums, target):
+          left, right = 0, len(nums) - 1
+          result = -1
+          while left <= right:
+              mid = (left + right) // 2
+              if nums[mid] == target:
+                  result = mid
+                  right = mid - 1  # Keep searching left
+              elif nums[mid] < target:
+                  left = mid + 1
+              else:
+                  right = mid - 1
+          return result
+
+      def find_last(nums, target):
+          left, right = 0, len(nums) - 1
+          result = -1
+          while left <= right:
+              mid = (left + right) // 2
+              if nums[mid] == target:
+                  result = mid
+                  left = mid + 1  # Keep searching right
+              elif nums[mid] < target:
+                  left = mid + 1
+              else:
+                  right = mid - 1
+          return result
+      ```
+
+  level_3:
+    title: "Combining Results"
+    content: |
+      ```python
+      first = find_first(nums, target)
+      if first == -1:
+          return [-1, -1]
+      last = find_last(nums, target)
+      return [first, last]
+      ```
+
+      Optimization: If first not found, skip finding last.
+
+search_in_infinite_array:
+  level_1:
+    title: "Find Bounds First"
+    content: |
+      Since array is infinite, we can't use `len(nums)`.
+
+      Strategy:
+      1. Find a range that contains target (if it exists)
+      2. Binary search within that range
+
+      Use exponential growth to find bounds quickly.
+
+  level_2:
+    title: "Exponential Bounds"
+    content: |
+      ```python
+      # Start with bounds [0, 1]
+      left, right = 0, 1
+
+      # Double the bounds until target is in range
+      while nums[right] < target:
+          left = right
+          right *= 2
+          if right >= len(nums):  # For finite array simulation
+              right = len(nums) - 1
+              break
+
+      # Now binary search in [left, right]
+      while left <= right:
+          mid = (left + right) // 2
+          if nums[mid] == target:
+              return mid
+          elif nums[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      return -1
+      ```
+
+  level_3:
+    title: "Complexity Analysis"
+    content: |
+      - Finding bounds: O(log n) - we double each time
+      - Binary search: O(log n)
+      - Total: O(log n)
+
+      The key insight is that doubling bounds is equivalent to
+      binary search for the range containing target.
+
+minimum_difference_element:
+  level_1:
+    title: "Binary Search for Closest"
+    content: |
+      After binary search, the answer is either:
+      - The element at index `left` (ceiling)
+      - The element at index `right` (floor)
+
+      Compare both to find which is closer.
+
+  level_2:
+    title: "Implementation"
+    content: |
+      ```python
+      if target <= nums[0]:
+          return nums[0]
+      if target >= nums[-1]:
+          return nums[-1]
+
+      left, right = 0, len(nums) - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+          if nums[mid] == target:
+              return nums[mid]
+          elif nums[mid] < target:
+              left = mid + 1
+          else:
+              right = mid - 1
+
+      # Compare neighbors
+      if abs(nums[left] - target) < abs(nums[right] - target):
+          return nums[left]
+      return nums[right]
+      ```
+
+  level_3:
+    title: "Edge Cases"
+    content: |
+      - Target exists in array: return it (difference = 0)
+      - Target < first element: return first element
+      - Target > last element: return last element
+      - Equal differences: problem says return smaller (nums[right])
+
+bitonic_array_maximum:
+  level_1:
+    title: "Find the Peak"
+    content: |
+      A bitonic array increases then decreases.
+      The maximum is at the peak (transition point).
+
+      Use binary search to find where the pattern changes.
+
+  level_2:
+    title: "Binary Search for Peak"
+    content: |
+      ```python
+      left, right = 0, len(nums) - 1
+
+      while left < right:
+          mid = (left + right) // 2
+
+          if nums[mid] > nums[mid + 1]:
+              # In decreasing part, peak is at mid or left
+              right = mid
+          else:
+              # In increasing part, peak is to the right
+              left = mid + 1
+
+      return nums[left]
+      ```
+
+      Note: Use `left < right` (not `<=`) to avoid comparing with mid+1 out of bounds.
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - If `nums[mid] > nums[mid+1]`: we're in decreasing part or at peak
+        - Peak is at mid or to the left
+      - If `nums[mid] < nums[mid+1]`: we're in increasing part
+        - Peak is to the right of mid
+
+      Loop ends when `left == right`, pointing to the peak.
+
+search_bitonic_array:
+  level_1:
+    title: "Divide and Conquer"
+    content: |
+      1. Find the peak (maximum element)
+      2. Binary search in the ascending part [0, peak]
+      3. If not found, binary search in descending part [peak+1, end]
+
+  level_2:
+    title: "Three-Step Solution"
+    content: |
+      ```python
+      def find_peak(nums):
+          left, right = 0, len(nums) - 1
+          while left < right:
+              mid = (left + right) // 2
+              if nums[mid] > nums[mid + 1]:
+                  right = mid
+              else:
+                  left = mid + 1
+          return left
+
+      def binary_search(nums, target, left, right, ascending=True):
+          while left <= right:
+              mid = (left + right) // 2
+              if nums[mid] == target:
+                  return mid
+              if ascending:
+                  if nums[mid] < target:
+                      left = mid + 1
+                  else:
+                      right = mid - 1
+              else:
+                  if nums[mid] > target:
+                      left = mid + 1
+                  else:
+                      right = mid - 1
+          return -1
+
+      peak = find_peak(nums)
+      result = binary_search(nums, target, 0, peak, True)
+      if result != -1:
+          return result
+      return binary_search(nums, target, peak + 1, len(nums) - 1, False)
+      ```
+
+  level_3:
+    title: "Optimization"
+    content: |
+      - If target > nums[peak], return -1 immediately
+      - If target == nums[peak], return peak
+      - Otherwise search both halves
+
+      Time complexity: O(log n) for all operations.
+
+search_rotated_array:
+  level_1:
+    title: "One Half is Always Sorted"
+    content: |
+      In a rotated sorted array, at least one half is always sorted.
+
+      Key insight:
+      - Compare nums[mid] with nums[left] or nums[right]
+      - Determine which half is sorted
+      - Check if target is in the sorted half
+
+  level_2:
+    title: "Modified Binary Search"
+    content: |
+      ```python
+      left, right = 0, len(nums) - 1
+
+      while left <= right:
+          mid = (left + right) // 2
+
+          if nums[mid] == target:
+              return mid
+
+          # Left half is sorted
+          if nums[left] <= nums[mid]:
+              if nums[left] <= target < nums[mid]:
+                  right = mid - 1
+              else:
+                  left = mid + 1
+          # Right half is sorted
+          else:
+              if nums[mid] < target <= nums[right]:
+                  left = mid + 1
+              else:
+                  right = mid - 1
+
+      return -1
+      ```
+
+  level_3:
+    title: "Why This Works"
+    content: |
+      - If `nums[left] <= nums[mid]`: left half [left, mid] is sorted
+        - If target is in [nums[left], nums[mid]), search left
+        - Otherwise search right
+      - If `nums[mid] < nums[left]`: right half [mid, right] is sorted
+        - If target is in (nums[mid], nums[right]], search right
+        - Otherwise search left
+
+      Note: Use `<=` for left comparison to handle edge cases.
+
+rotation_count:
+  level_1:
+    title: "Find the Minimum Element"
+    content: |
+      The number of rotations equals the index of the minimum element.
+
+      Why? The minimum element is the original first element,
+      now shifted by the number of rotations.
+
+  level_2:
+    title: "Binary Search for Minimum"
+    content: |
+      ```python
+      left, right = 0, len(nums) - 1
+
+      # Array not rotated
+      if nums[left] < nums[right]:
+          return 0
+
+      while left < right:
+          mid = (left + right) // 2
+
+          if nums[mid] > nums[right]:
+              # Minimum is in right half
+              left = mid + 1
+          else:
+              # Minimum is in left half (including mid)
+              right = mid
+
+      return left
+      ```
+
+  level_3:
+    title: "Understanding the Logic"
+    content: |
+      - If `nums[mid] > nums[right]`: rotation point is after mid
+        - The minimum is in [mid+1, right]
+      - If `nums[mid] <= nums[right]`: mid could be minimum or minimum is before mid
+        - The minimum is in [left, mid]
+
+      Edge case: If array is not rotated, minimum is at index 0.

@@ -1,0 +1,540 @@
+# Hints for Subsets & Permutations problems
+
+subsets:
+  level_1:
+    title: "Iterative BFS Approach"
+    content: |
+      Think of building subsets incrementally:
+      - Start with empty set: [[]]
+      - For each number, add it to ALL existing subsets
+
+      Example with [1, 2, 3]:
+      - Start: [[]]
+      - Add 1: [[], [1]]
+      - Add 2: [[], [1], [2], [1,2]]
+      - Add 3: [[], [1], [2], [1,2], [3], [1,3], [2,3], [1,2,3]]
+
+  level_2:
+    title: "Iterative Solution"
+    content: |
+      ```python
+      def subsets(nums):
+          result = [[]]
+
+          for num in nums:
+              # Add num to each existing subset
+              new_subsets = [subset + [num] for subset in result]
+              result.extend(new_subsets)
+
+          return result
+      ```
+
+  level_3:
+    title: "Alternative: Backtracking"
+    content: |
+      ```python
+      def subsets(nums):
+          result = []
+
+          def backtrack(start, current):
+              result.append(current[:])  # Add copy of current subset
+
+              for i in range(start, len(nums)):
+                  current.append(nums[i])
+                  backtrack(i + 1, current)
+                  current.pop()  # Backtrack
+
+          backtrack(0, [])
+          return result
+      ```
+
+      Or use bit manipulation: each number from 0 to 2^n - 1 represents a subset.
+
+subsets_with_duplicates:
+  level_1:
+    title: "Sort First, Skip Duplicates"
+    content: |
+      When there are duplicates, some subsets will be repeated.
+
+      Key insight: Sort the array first.
+      - When we encounter a duplicate, we should only add it to subsets
+        that were created in the previous step (when we added the first occurrence)
+
+  level_2:
+    title: "Track Previous Step Subsets"
+    content: |
+      ```python
+      def subsets_with_duplicates(nums):
+          nums.sort()
+          result = [[]]
+
+          start = 0
+          for i, num in enumerate(nums):
+              # If duplicate, only add to subsets from last iteration
+              if i > 0 and nums[i] == nums[i - 1]:
+                  new_subsets = [subset + [num] for subset in result[start:]]
+              else:
+                  new_subsets = [subset + [num] for subset in result]
+
+              start = len(result)  # Mark where new subsets start
+              result.extend(new_subsets)
+
+          return result
+      ```
+
+  level_3:
+    title: "Backtracking Approach"
+    content: |
+      ```python
+      def subsets_with_duplicates(nums):
+          nums.sort()
+          result = []
+
+          def backtrack(start, current):
+              result.append(current[:])
+
+              for i in range(start, len(nums)):
+                  # Skip duplicates
+                  if i > start and nums[i] == nums[i - 1]:
+                      continue
+                  current.append(nums[i])
+                  backtrack(i + 1, current)
+                  current.pop()
+
+          backtrack(0, [])
+          return result
+      ```
+
+permutations:
+  level_1:
+    title: "Backtracking with Used Set"
+    content: |
+      For permutations, each element must appear exactly once.
+
+      Use backtracking:
+      - Track which elements are already used
+      - Try each unused element at current position
+      - Recurse for next position
+      - Backtrack and try next element
+
+  level_2:
+    title: "Backtracking Solution"
+    content: |
+      ```python
+      def permutations(nums):
+          result = []
+          used = [False] * len(nums)
+
+          def backtrack(current):
+              if len(current) == len(nums):
+                  result.append(current[:])
+                  return
+
+              for i in range(len(nums)):
+                  if used[i]:
+                      continue
+                  used[i] = True
+                  current.append(nums[i])
+                  backtrack(current)
+                  current.pop()
+                  used[i] = False
+
+          backtrack([])
+          return result
+      ```
+
+  level_3:
+    title: "Alternative: Swap-based"
+    content: |
+      ```python
+      def permutations(nums):
+          result = []
+
+          def backtrack(start):
+              if start == len(nums):
+                  result.append(nums[:])
+                  return
+
+              for i in range(start, len(nums)):
+                  nums[start], nums[i] = nums[i], nums[start]  # Swap
+                  backtrack(start + 1)
+                  nums[start], nums[i] = nums[i], nums[start]  # Swap back
+
+          backtrack(0)
+          return result
+      ```
+
+      This modifies the array in-place during backtracking.
+
+permutations_with_duplicates:
+  level_1:
+    title: "Sort and Skip Consecutive Duplicates"
+    content: |
+      Similar to permutations, but we need to avoid duplicates.
+
+      Key: Sort the array first.
+      Skip a number if:
+      1. It's the same as the previous number, AND
+      2. The previous number hasn't been used (to ensure we use duplicates in order)
+
+  level_2:
+    title: "Solution with Duplicate Handling"
+    content: |
+      ```python
+      def permutations_with_duplicates(nums):
+          nums.sort()
+          result = []
+          used = [False] * len(nums)
+
+          def backtrack(current):
+              if len(current) == len(nums):
+                  result.append(current[:])
+                  return
+
+              for i in range(len(nums)):
+                  if used[i]:
+                      continue
+                  # Skip duplicates: if same as prev and prev not used
+                  if i > 0 and nums[i] == nums[i - 1] and not used[i - 1]:
+                      continue
+
+                  used[i] = True
+                  current.append(nums[i])
+                  backtrack(current)
+                  current.pop()
+                  used[i] = False
+
+          backtrack([])
+          return result
+      ```
+
+  level_3:
+    title: "Understanding the Skip Condition"
+    content: |
+      Why `not used[i - 1]`?
+
+      Consider [1, 1, 2]:
+      - We want [1a, 1b, 2] but not [1b, 1a, 2]
+      - By requiring prev to be used when placing current duplicate,
+        we ensure duplicates are placed in their original order
+
+      This prevents generating the same permutation multiple times.
+
+string_permutations_by_changing_case:
+  level_1:
+    title: "Branch on Letters"
+    content: |
+      For each character:
+      - If it's a digit: keep it as is
+      - If it's a letter: branch into two versions (lowercase and uppercase)
+
+      This is like a binary tree where letters are decision points.
+
+  level_2:
+    title: "BFS-style Solution"
+    content: |
+      ```python
+      def string_permutations_by_changing_case(s):
+          result = [s]
+
+          for i, char in enumerate(s):
+              if char.isalpha():
+                  # For each existing result, add toggled version
+                  new_results = []
+                  for string in result:
+                      toggled = string[:i] + string[i].swapcase() + string[i+1:]
+                      new_results.append(toggled)
+                  result.extend(new_results)
+
+          return result
+      ```
+
+  level_3:
+    title: "Backtracking Solution"
+    content: |
+      ```python
+      def string_permutations_by_changing_case(s):
+          result = []
+
+          def backtrack(index, current):
+              if index == len(s):
+                  result.append(current)
+                  return
+
+              # Always try the original character
+              backtrack(index + 1, current + s[index])
+
+              # If it's a letter, also try the toggled case
+              if s[index].isalpha():
+                  backtrack(index + 1, current + s[index].swapcase())
+
+          backtrack(0, "")
+          return result
+      ```
+
+balanced_parentheses:
+  level_1:
+    title: "Constraints for Validity"
+    content: |
+      A valid parentheses string must satisfy:
+      1. Number of '(' equals number of ')'
+      2. At any point, count of '(' >= count of ')'
+
+      Use backtracking with two counters:
+      - `open`: number of '(' used
+      - `close`: number of ')' used
+
+  level_2:
+    title: "Backtracking Solution"
+    content: |
+      ```python
+      def balanced_parentheses(n):
+          result = []
+
+          def backtrack(current, open_count, close_count):
+              if len(current) == 2 * n:
+                  result.append(current)
+                  return
+
+              # Can add '(' if we haven't used all n
+              if open_count < n:
+                  backtrack(current + '(', open_count + 1, close_count)
+
+              # Can add ')' if we have more '(' than ')'
+              if close_count < open_count:
+                  backtrack(current + ')', open_count, close_count + 1)
+
+          backtrack("", 0, 0)
+          return result
+      ```
+
+  level_3:
+    title: "Understanding the Constraints"
+    content: |
+      Why `close_count < open_count`?
+      - We can only close a parenthesis if there's an open one to close
+      - This ensures we never have more ')' than '(' at any prefix
+
+      The total number of valid combinations is the Catalan number C(n).
+
+unique_generalized_abbreviations:
+  level_1:
+    title: "Two Choices at Each Position"
+    content: |
+      For each character, we have two choices:
+      1. Keep the character
+      2. Abbreviate it (replace with a number)
+
+      But consecutive abbreviations should be combined into one number.
+
+  level_2:
+    title: "Backtracking with Count"
+    content: |
+      ```python
+      def unique_generalized_abbreviations(word):
+          result = []
+
+          def backtrack(index, current, count):
+              if index == len(word):
+                  # Append remaining count if any
+                  if count > 0:
+                      current += str(count)
+                  result.append(current)
+                  return
+
+              # Option 1: Abbreviate current character
+              backtrack(index + 1, current, count + 1)
+
+              # Option 2: Keep current character
+              if count > 0:
+                  current += str(count)  # Flush the count
+              backtrack(index + 1, current + word[index], 0)
+
+          backtrack(0, "", 0)
+          return result
+      ```
+
+  level_3:
+    title: "Key Insight: Flush Count Before Character"
+    content: |
+      When we decide to keep a character:
+      1. First, flush any accumulated count as a number
+      2. Then add the character
+
+      This ensures numbers and characters alternate properly.
+
+      Example: "word" -> "1or1" means: (1 char abbreviated) + "or" + (1 char abbreviated)
+
+evaluate_expression:
+  level_1:
+    title: "Divide and Conquer"
+    content: |
+      Split the expression at each operator.
+
+      For each operator position:
+      - Recursively evaluate left part
+      - Recursively evaluate right part
+      - Combine all results using the operator
+
+  level_2:
+    title: "Recursive Solution"
+    content: |
+      ```python
+      def evaluate_expression(expression):
+          def compute(expr):
+              results = []
+
+              for i, char in enumerate(expr):
+                  if char in '+-*':
+                      # Split at this operator
+                      left_results = compute(expr[:i])
+                      right_results = compute(expr[i+1:])
+
+                      # Combine all possibilities
+                      for left in left_results:
+                          for right in right_results:
+                              if char == '+':
+                                  results.append(left + right)
+                              elif char == '-':
+                                  results.append(left - right)
+                              else:  # '*'
+                                  results.append(left * right)
+
+              # Base case: no operators, it's a number
+              if not results:
+                  results.append(int(expr))
+
+              return results
+
+          return compute(expression)
+      ```
+
+  level_3:
+    title: "Memoization"
+    content: |
+      ```python
+      def evaluate_expression(expression):
+          memo = {}
+
+          def compute(expr):
+              if expr in memo:
+                  return memo[expr]
+
+              results = []
+              for i, char in enumerate(expr):
+                  if char in '+-*':
+                      # ... same as before ...
+
+              if not results:
+                  results.append(int(expr))
+
+              memo[expr] = results
+              return results
+
+          return compute(expression)
+      ```
+
+      Memoization avoids recomputing the same subexpressions.
+
+structurally_unique_bst:
+  level_1:
+    title: "Choose Each Value as Root"
+    content: |
+      For values 1 to n:
+      - Each value can be the root
+      - Values smaller go to left subtree
+      - Values larger go to right subtree
+
+      Recursively generate all left and right subtrees, then combine.
+
+  level_2:
+    title: "Recursive Generation"
+    content: |
+      ```python
+      def structurally_unique_bst(n):
+          def generate(start, end):
+              if start > end:
+                  return [None]
+
+              all_trees = []
+
+              for root_val in range(start, end + 1):
+                  # Generate all left and right subtrees
+                  left_trees = generate(start, root_val - 1)
+                  right_trees = generate(root_val + 1, end)
+
+                  # Combine each left with each right
+                  for left in left_trees:
+                      for right in right_trees:
+                          root = TreeNode(root_val)
+                          root.left = left
+                          root.right = right
+                          all_trees.append(root)
+
+              return all_trees
+
+          return generate(1, n)
+      ```
+
+  level_3:
+    title: "Understanding the Structure"
+    content: |
+      The number of trees follows the Catalan number pattern.
+
+      For n = 3:
+      - Root = 1: left has 0 nodes, right has 2 nodes -> 1 * 2 = 2 trees
+      - Root = 2: left has 1 node, right has 1 node -> 1 * 1 = 1 tree
+      - Root = 3: left has 2 nodes, right has 0 nodes -> 2 * 1 = 2 trees
+      - Total: 5 trees
+
+count_unique_bst:
+  level_1:
+    title: "Dynamic Programming"
+    content: |
+      Let dp[n] = number of unique BSTs with n nodes.
+
+      For each root position i (1 to n):
+      - Left subtree has i-1 nodes
+      - Right subtree has n-i nodes
+      - Total combinations: dp[i-1] * dp[n-i]
+
+      dp[n] = sum of dp[i-1] * dp[n-i] for i from 1 to n
+
+  level_2:
+    title: "DP Solution"
+    content: |
+      ```python
+      def count_unique_bst(n):
+          dp = [0] * (n + 1)
+          dp[0] = 1  # Empty tree
+          dp[1] = 1  # Single node
+
+          for nodes in range(2, n + 1):
+              for root in range(1, nodes + 1):
+                  left_trees = dp[root - 1]
+                  right_trees = dp[nodes - root]
+                  dp[nodes] += left_trees * right_trees
+
+          return dp[n]
+      ```
+
+  level_3:
+    title: "Catalan Number Formula"
+    content: |
+      This is the nth Catalan number:
+
+      C(n) = (2n)! / ((n+1)! * n!)
+
+      Or using the recurrence:
+      C(n) = C(n-1) * 2(2n-1) / (n+1)
+
+      ```python
+      def count_unique_bst(n):
+          # Catalan number formula
+          catalan = 1
+          for i in range(n):
+              catalan = catalan * 2 * (2 * i + 1) // (i + 2)
+          return catalan
+      ```
+
+      Both approaches give O(n) time complexity.
