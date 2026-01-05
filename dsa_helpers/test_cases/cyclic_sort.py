@@ -4,14 +4,14 @@ from . import TestCase, set_compare, sorted_compare
 
 CYCLIC_SORT_TESTS = {
     "cyclic_sort": [
-        TestCase("unsorted", (([3, 1, 5, 4, 2],),), [1, 2, 3, 4, 5]),
-        TestCase("reverse", (([5, 4, 3, 2, 1],),), [1, 2, 3, 4, 5]),
-        TestCase("sorted", (([1, 2, 3, 4, 5],),), [1, 2, 3, 4, 5]),
-        TestCase("single", (([1],),), [1]),
-        TestCase("two elements", (([2, 1],),), [1, 2]),
-        TestCase("random order", (([2, 4, 1, 3],),), [1, 2, 3, 4]),
-        TestCase("first last swapped", (([5, 2, 3, 4, 1],),), [1, 2, 3, 4, 5]),
-        TestCase("large", ((list(range(100, 0, -1)),),), list(range(1, 101))),
+        TestCase("unsorted", (([3, 1, 5, 4, 2],),), [1, 2, 3, 4, 5], check_modified_arg=0),
+        TestCase("reverse", (([5, 4, 3, 2, 1],),), [1, 2, 3, 4, 5], check_modified_arg=0),
+        TestCase("sorted", (([1, 2, 3, 4, 5],),), [1, 2, 3, 4, 5], check_modified_arg=0),
+        TestCase("single", (([1],),), [1], check_modified_arg=0),
+        TestCase("two elements", (([2, 1],),), [1, 2], check_modified_arg=0),
+        TestCase("random order", (([2, 4, 1, 3],),), [1, 2, 3, 4], check_modified_arg=0),
+        TestCase("first last swapped", (([5, 2, 3, 4, 1],),), [1, 2, 3, 4, 5], check_modified_arg=0),
+        TestCase("large", ((list(range(100, 0, -1)),),), list(range(1, 101)), check_modified_arg=0),
     ],
 
     "find_missing_number": [
