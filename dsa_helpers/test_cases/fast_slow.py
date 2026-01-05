@@ -1,0 +1,89 @@
+"""Test cases for Fast & Slow Pointers problems (Category 04)."""
+
+from . import TestCase
+
+FAST_SLOW_TESTS = {
+    "linked_list_cycle": [
+        TestCase("cycle at pos 1", (({"list": [3, 2, 0, -4], "pos": 1},),), True),
+        TestCase("cycle at pos 0", (({"list": [1, 2], "pos": 0},),), True),
+        TestCase("no cycle", (({"list": [1], "pos": -1},),), False),
+        TestCase("empty list", (({"list": [], "pos": -1},),), False),
+        TestCase("two nodes cycle", (({"list": [1, 2], "pos": 1},),), True),
+        TestCase("long list no cycle", (({"list": [1, 2, 3, 4, 5], "pos": -1},),), False),
+        TestCase("cycle to self", (({"list": [1], "pos": 0},),), True),
+        TestCase("cycle at end", (({"list": [1, 2, 3, 4], "pos": 3},),), True),
+    ],
+
+    "linked_list_cycle_ii": [
+        TestCase("cycle at pos 1", (({"list": [3, 2, 0, -4], "pos": 1},),), 2),
+        TestCase("cycle at pos 0", (({"list": [1, 2], "pos": 0},),), 1),
+        TestCase("no cycle", (({"list": [1], "pos": -1},),), None),
+        TestCase("empty list", (({"list": [], "pos": -1},),), None),
+        TestCase("cycle to self", (({"list": [1], "pos": 0},),), 1),
+        TestCase("cycle at middle", (({"list": [1, 2, 3, 4, 5], "pos": 2},),), 3),
+        TestCase("long list no cycle", (({"list": [1, 2, 3, 4, 5], "pos": -1},),), None),
+    ],
+
+    "happy_number_fast_slow": [
+        TestCase("happy 19", ((19,),), True),
+        TestCase("not happy 2", ((2,),), False),
+        TestCase("happy 1", ((1,),), True),
+        TestCase("happy 7", ((7,),), True),
+        TestCase("not happy 4", ((4,),), False),
+        TestCase("happy 100", ((100,),), True),
+        TestCase("not happy 116", ((116,),), False),
+        TestCase("happy 1000", ((1000,),), True),
+    ],
+
+    "middle_of_linked_list": [
+        TestCase("odd length", (([1, 2, 3, 4, 5],),), 3),
+        TestCase("even length", (([1, 2, 3, 4, 5, 6],),), 4),
+        TestCase("single node", (([1],),), 1),
+        TestCase("two nodes", (([1, 2],),), 2),
+        TestCase("three nodes", (([1, 2, 3],),), 2),
+        TestCase("four nodes", (([1, 2, 3, 4],),), 3),
+        TestCase("long odd", (([1, 2, 3, 4, 5, 6, 7],),), 4),
+    ],
+
+    "palindrome_linked_list": [
+        TestCase("palindrome even", (([1, 2, 2, 1],),), True),
+        TestCase("not palindrome", (([1, 2],),), False),
+        TestCase("single node", (([1],),), True),
+        TestCase("palindrome odd", (([1, 2, 1],),), True),
+        TestCase("not palindrome long", (([1, 2, 3, 4],),), False),
+        TestCase("all same", (([1, 1, 1, 1],),), True),
+        TestCase("almost palindrome", (([1, 2, 3, 2, 2],),), False),
+        TestCase("long palindrome", (([1, 2, 3, 2, 1],),), True),
+    ],
+
+    "reorder_list": [
+        TestCase("four nodes", (([1, 2, 3, 4],),), [1, 4, 2, 3], check_modified_arg=0),
+        TestCase("five nodes", (([1, 2, 3, 4, 5],),), [1, 5, 2, 4, 3], check_modified_arg=0),
+        TestCase("single node", (([1],),), [1], check_modified_arg=0),
+        TestCase("two nodes", (([1, 2],),), [1, 2], check_modified_arg=0),
+        TestCase("three nodes", (([1, 2, 3],),), [1, 3, 2], check_modified_arg=0),
+        TestCase("six nodes", (([1, 2, 3, 4, 5, 6],),), [1, 6, 2, 5, 3, 4], check_modified_arg=0),
+    ],
+
+    "circular_array_loop": [
+        TestCase("has cycle", (([2, -1, 1, 2, 2],),), True),
+        TestCase("single element cycle", (([-1, 2],),), False),
+        TestCase("mixed direction", (([-2, 1, -1, -2, -2],),), False),
+        TestCase("all forward", (([1, 1, 1, 1],),), True),
+        TestCase("all backward", (([-1, -1, -1, -1],),), True),
+        TestCase("no valid cycle", (([1, -1, 1, -1],),), False),
+        TestCase("large cycle", (([2, 2, 2, 2, 2, 2],),), True),
+        TestCase("single element", (([1],),), False),
+    ],
+
+    "find_duplicate_number": [
+        TestCase("dup at end", (([1, 3, 4, 2, 2],),), 2),
+        TestCase("dup in middle", (([3, 1, 3, 4, 2],),), 3),
+        TestCase("all same", (([3, 3, 3, 3, 3],),), 3),
+        TestCase("dup is 1", (([1, 1, 2],),), 1),
+        TestCase("dup at start", (([2, 2, 2, 2],),), 2),
+        TestCase("larger array", (([1, 2, 3, 4, 5, 6, 7, 8, 9, 5],),), 5),
+        TestCase("two elements", (([1, 1],),), 1),
+        TestCase("dup is max", (([1, 2, 3, 4, 4],),), 4),
+    ],
+}
