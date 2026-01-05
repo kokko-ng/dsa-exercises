@@ -10,8 +10,10 @@ import time
 from typing import Callable, Optional, Union
 
 try:
+    from IPython import get_ipython
     from IPython.display import HTML, display
-    HAS_IPYTHON = True
+    # Check if we're actually in an IPython/Jupyter environment
+    HAS_IPYTHON = get_ipython() is not None
 except ImportError:
     HAS_IPYTHON = False
 
@@ -36,10 +38,17 @@ class TestResult:
 def _run_test(func: Callable, test: TestCase) -> TestResult:
     """Run a single test case."""
     test_args = test.args[0]  # Capture the input arguments
+    # Make a copy for functions that modify in-place
+    test_args_copy = list(test_args) if test.check_modified_arg is not None else test_args
+
     try:
         start = time.time()
-        actual = func(*test_args)
+        actual = func(*test_args_copy)
         elapsed = time.time() - start
+
+        # For in-place modifications, check the modified argument instead of return value
+        if test.check_modified_arg is not None:
+            actual = test_args_copy[test.check_modified_arg]
 
         # Check result
         if test.comparator:

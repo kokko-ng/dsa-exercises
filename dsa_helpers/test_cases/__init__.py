@@ -26,6 +26,7 @@ class TestCase:
     comparator: Optional[Callable[[Any, Any], bool]] = None
     is_performance: bool = False
     max_time: Optional[float] = None
+    check_modified_arg: Optional[int] = None  # Index of arg to check if function modifies in-place
 
 
 # Import test cases from each category module

@@ -23,7 +23,7 @@ HASH_MAP_TESTS = {
         TestCase("example 2", (([2, 3, 4], 6),), [1, 3]),
         TestCase("example 3", (([-1, 0], -1),), [1, 2]),
         TestCase("at ends", (([1, 2, 3, 4, 5], 6),), [1, 5]),
-        TestCase("duplicates", (([1, 1, 1, 1], 2),), [1, 2]),
+        TestCase("duplicates", (([1, 2, 2, 3], 4),), [1, 4]),
         TestCase("negative sum", (([-5, -3, -1, 0, 2], -8),), [1, 2]),
         TestCase("large gap", (([1, 2, 3, 50, 100], 103),), [3, 5]),
         TestCase("adjacent", (([1, 2, 3, 4, 5], 3),), [1, 2]),
