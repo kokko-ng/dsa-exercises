@@ -189,3 +189,6 @@ HASH_MAP_TESTS = {
         ),
     ],
 }
+
+# Add alias for lru_cache (lowercase version used in hints)
+HASH_MAP_TESTS["lru_cache"] = HASH_MAP_TESTS["LRUCache"]

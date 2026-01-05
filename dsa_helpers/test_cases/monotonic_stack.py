@@ -154,4 +154,11 @@ MONOTONIC_STACK_TESTS = {
             is_class_test=True,
         ),
     ],
+
+    "online_stock_span": [
+        TestCase("example", (([100, 80, 60, 70, 60, 75, 85],),), [1, 1, 1, 2, 1, 4, 6]),
+        TestCase("increasing", (([10, 20, 30, 40, 50],),), [1, 2, 3, 4, 5]),
+        TestCase("decreasing", (([50, 40, 30, 20, 10],),), [1, 1, 1, 1, 1]),
+        TestCase("all same", (([30, 30, 30, 30],),), [1, 2, 3, 4]),
+    ],
 }

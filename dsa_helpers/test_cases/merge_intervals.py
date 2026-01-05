@@ -88,4 +88,26 @@ MERGE_INTERVALS_TESTS = {
         TestCase("no overlap", (([[2, 1, 5], [3, 6, 8]], 4),), True),
         TestCase("same location", (([[3, 1, 5], [2, 1, 5]], 5),), True),
     ],
+
+    "interval_list_intersections": [
+        TestCase("basic", (([[0, 2], [5, 10], [13, 23], [24, 25]], [[1, 5], [8, 12], [15, 24], [25, 26]]),),
+                 [[1, 2], [5, 5], [8, 10], [15, 23], [24, 24], [25, 25]]),
+        TestCase("no intersection", (([[1, 2]], [[3, 4]]),), []),
+        TestCase("full overlap", (([[1, 5]], [[1, 5]]),), [[1, 5]]),
+        TestCase("one empty", (([], [[1, 2]]),), []),
+    ],
+
+    "minimum_platforms": [
+        TestCase("basic", (([900, 940, 950, 1100, 1500, 1800], [910, 1200, 1120, 1130, 1900, 2000]),), 3),
+        TestCase("no overlap", (([900, 1100], [930, 1130]),), 1),
+        TestCase("all overlap", (([900, 900, 900], [1000, 1000, 1000]),), 3),
+        TestCase("single train", (([900], [910]),), 1),
+    ],
+
+    "closest_numbers": [
+        TestCase("basic", (([5, 4, 3, 2],),), [[2, 3], [3, 4], [4, 5]]),
+        TestCase("single pair", (([1, 5],),), [[1, 5]]),
+        TestCase("multiple same diff", (([1, 2, 3, 4],),), [[1, 2], [2, 3], [3, 4]]),
+        TestCase("duplicates", (([1, 1, 2],),), [[1, 1]]),
+    ],
 }

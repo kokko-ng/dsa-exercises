@@ -99,4 +99,35 @@ GRAPH_TESTS = {
         TestCase("triangle", (([[1, 2], [2, 3], [1, 3]],),), [1, 3]),
         TestCase("last edge", (([[1, 2], [1, 3], [1, 4], [3, 4]],),), [3, 4]),
     ],
+
+    "alien_dictionary": [
+        TestCase("basic", ((["wrt", "wrf", "er", "ett", "rftt"],),), "wertf"),
+        TestCase("simple", ((["z", "x"],),), "zx"),
+        TestCase("invalid", ((["z", "x", "z"],),), ""),
+        TestCase("single word", ((["abc"],),), "abc"),
+    ],
+
+    "all_paths_from_source": [
+        TestCase("example 1", (([[1, 2], [3], [3], []],),), [[0, 1, 3], [0, 2, 3]], unordered_list_compare),
+        TestCase("single path", (([[1], [2], []],),), [[0, 1, 2]]),
+        TestCase("direct", (([[1], []],),), [[0, 1]]),
+    ],
+
+    "critical_connections": [
+        TestCase("basic", ((4, [[0, 1], [1, 2], [2, 0], [1, 3]]),), [[1, 3]], unordered_list_compare),
+        TestCase("no bridges", ((3, [[0, 1], [1, 2], [2, 0]]),), []),
+        TestCase("single edge", ((2, [[0, 1]]),), [[0, 1]], unordered_list_compare),
+    ],
+
+    "reconstruct_itinerary": [
+        TestCase("basic", (([["MUC", "LHR"], ["JFK", "MUC"], ["SFO", "SJC"], ["LHR", "SFO"]],),), ["JFK", "MUC", "LHR", "SFO", "SJC"]),
+        TestCase("multiple paths", (([["JFK", "SFO"], ["JFK", "ATL"], ["SFO", "ATL"], ["ATL", "JFK"], ["ATL", "SFO"]],),), ["JFK", "ATL", "JFK", "SFO", "ATL", "SFO"]),
+        TestCase("single", (([["JFK", "A"]],),), ["JFK", "A"]),
+    ],
+
+    "word_ladder_ii": [
+        TestCase("basic", (("hit", "cog", ["hot", "dot", "dog", "lot", "log", "cog"]),), [["hit", "hot", "dot", "dog", "cog"], ["hit", "hot", "lot", "log", "cog"]], unordered_list_compare),
+        TestCase("no path", (("hit", "cog", ["hot", "dot", "dog", "lot", "log"]),), []),
+        TestCase("direct", (("a", "c", ["a", "b", "c"]),), [["a", "c"]]),
+    ],
 }

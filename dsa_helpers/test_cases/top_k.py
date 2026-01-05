@@ -106,4 +106,18 @@ TOP_K_TESTS = {
         TestCase("k equals size", ((3, [1, 2, 3], [4, 5]),), [2, 3]),
         TestCase("all same", ((2, [5, 5], [5, 5]),), [5, 5]),
     ],
+
+    "top_k_frequent_words": [
+        TestCase("basic", ((["i", "love", "leetcode", "i", "love", "coding"], 2),), ["i", "love"]),
+        TestCase("tie by alpha", ((["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"], 4),), ["the", "is", "sunny", "day"]),
+        TestCase("single word", ((["hello"], 1),), ["hello"]),
+        TestCase("all same freq", ((["a", "b", "c"], 2),), ["a", "b"]),
+    ],
+
+    "sort_by_frequency": [
+        TestCase("basic", (([1, 1, 2, 2, 2, 3],),), [3, 1, 1, 2, 2, 2]),
+        TestCase("same frequency", (([2, 3, 1, 3, 2],),), [1, 2, 2, 3, 3]),
+        TestCase("all same", (([5, 5, 5],),), [5, 5, 5]),
+        TestCase("single", (([1],),), [1]),
+    ],
 }

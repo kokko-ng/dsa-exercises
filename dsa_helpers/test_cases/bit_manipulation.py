@@ -66,4 +66,12 @@ BIT_MANIPULATION_TESTS = {
         TestCase("zero", ((0, 5),), 5),
         TestCase("larger", ((100, 200),), 300),
     ],
+
+    "number_of_1_bits": [
+        TestCase("basic", ((11,),), 3),
+        TestCase("power of 2", ((128,),), 1),
+        TestCase("all ones", ((15,),), 4),
+        TestCase("zero", ((0,),), 0),
+        TestCase("large", ((2147483645,),), 30),
+    ],
 }

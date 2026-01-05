@@ -139,4 +139,12 @@ BINARY_SEARCH_TESTS = {
         TestCase("at start", (([1, 5, 10, 5, 1], 1),), 0),  # or 4
         TestCase("at end", (([1, 5, 10, 5, 2], 2),), 4),
     ],
+
+    "search_rotated_array": [
+        TestCase("found left", (([4, 5, 6, 7, 0, 1, 2], 0),), 4),
+        TestCase("found right", (([4, 5, 6, 7, 0, 1, 2], 5),), 1),
+        TestCase("not found", (([4, 5, 6, 7, 0, 1, 2], 3),), -1),
+        TestCase("not rotated", (([1, 2, 3, 4, 5], 3),), 2),
+        TestCase("single element", (([1], 1),), 0),
+    ],
 }
