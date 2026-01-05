@@ -1,0 +1,143 @@
+"""Test cases for Modified Binary Search problems (Category 11)."""
+
+from . import TestCase
+
+
+BINARY_SEARCH_TESTS = {
+    "binary_search": [
+        TestCase("found middle", (([-1, 0, 3, 5, 9, 12], 9),), 4),
+        TestCase("found first", (([-1, 0, 3, 5, 9, 12], -1),), 0),
+        TestCase("found last", (([-1, 0, 3, 5, 9, 12], 12),), 5),
+        TestCase("not found", (([-1, 0, 3, 5, 9, 12], 2),), -1),
+        TestCase("single element found", (([5], 5),), 0),
+        TestCase("single element not found", (([5], 3),), -1),
+        TestCase("two elements first", (([1, 3], 1),), 0),
+        TestCase("two elements second", (([1, 3], 3),), 1),
+        TestCase("negative numbers", (([-10, -5, -3, -1], -5),), 1),
+        TestCase("target smaller than all", (([2, 4, 6, 8], 1),), -1),
+        TestCase("target larger than all", (([2, 4, 6, 8], 10),), -1),
+        TestCase("empty array", (([], 5),), -1),
+        TestCase("performance", ((list(range(0, 2000000, 2)), 999998),), 499999, None, is_performance=True, max_time=0.1),
+    ],
+
+    "order_agnostic_search": [
+        TestCase("ascending found", (([1, 2, 3, 4, 5, 6, 7], 5),), 4),
+        TestCase("descending found", (([10, 6, 4], 10),), 0),
+        TestCase("not found", (([1, 2, 3, 4], 0),), -1),
+        TestCase("single ascending", (([5], 5),), 0),
+        TestCase("descending not found", (([10, 8, 6, 4, 2], 5),), -1),
+        TestCase("descending last", (([10, 8, 6, 4, 2], 2),), 4),
+        TestCase("descending middle", (([20, 15, 10, 5, 0], 10),), 2),
+        TestCase("ascending first", (([1, 5, 10, 15, 20], 1),), 0),
+        TestCase("two elements desc", (([5, 1], 5),), 0),
+    ],
+
+    "ceiling_of_number": [
+        TestCase("exact match", (([4, 6, 10], 6),), 1),
+        TestCase("ceiling", (([1, 3, 8, 10, 15], 12),), 4),
+        TestCase("smaller than all", (([4, 6, 10], 1),), 0),
+        TestCase("between elements", (([1, 3, 5, 7], 4),), 2),
+        TestCase("larger than all", (([1, 2, 3], 5),), -1),
+        TestCase("first element", (([1, 2, 3, 4], 0),), 0),
+        TestCase("at boundary", (([1, 3, 5, 7, 9], 5),), 2),
+        TestCase("single element ceiling", (([5], 3),), 0),
+    ],
+
+    "floor_of_number": [
+        TestCase("exact match", (([4, 6, 10], 6),), 1),
+        TestCase("floor", (([1, 3, 8, 10, 15], 12),), 3),
+        TestCase("larger than all", (([1, 3, 8, 10, 15], 20),), 4),
+        TestCase("between elements", (([1, 3, 5, 7], 4),), 1),
+        TestCase("smaller than all", (([2, 3, 4], 1),), -1),
+        TestCase("at first", (([1, 2, 3, 4], 1),), 0),
+        TestCase("at boundary", (([1, 3, 5, 7, 9], 5),), 2),
+        TestCase("single element floor", (([5], 7),), 0),
+    ],
+
+    "next_letter": [
+        TestCase("example 1", ((["c", "f", "j"], "a"),), "c"),
+        TestCase("example 2", ((["c", "f", "j"], "c"),), "f"),
+        TestCase("wrap around", ((["c", "f", "j"], "k"),), "c"),
+        TestCase("between letters", ((["c", "f", "j"], "d"),), "f"),
+        TestCase("before first", ((["c", "f", "j"], "b"),), "c"),
+        TestCase("exact middle", ((["a", "c", "f", "h"], "c"),), "f"),
+        TestCase("single letter wrap", ((["a"], "z"),), "a"),
+        TestCase("consecutive", ((["a", "b", "c"], "a"),), "b"),
+    ],
+
+    "number_range": [
+        TestCase("found", (([5, 7, 7, 8, 8, 10], 8),), [3, 4]),
+        TestCase("not found", (([5, 7, 7, 8, 8, 10], 6),), [-1, -1]),
+        TestCase("single", (([1], 1),), [0, 0]),
+        TestCase("all same", (([5, 5, 5, 5], 5),), [0, 3]),
+        TestCase("at start", (([1, 1, 2, 3], 1),), [0, 1]),
+        TestCase("at end", (([1, 2, 3, 3], 3),), [2, 3]),
+        TestCase("single occurrence", (([1, 2, 3, 4, 5], 3),), [2, 2]),
+        TestCase("empty", (([], 1),), [-1, -1]),
+        TestCase("many duplicates", (([1, 1, 1, 1, 1, 1, 1], 1),), [0, 6]),
+    ],
+
+    "search_in_rotated_array": [
+        TestCase("found left", (([4, 5, 6, 7, 0, 1, 2], 0),), 4),
+        TestCase("found right", (([4, 5, 6, 7, 0, 1, 2], 5),), 1),
+        TestCase("not found", (([4, 5, 6, 7, 0, 1, 2], 3),), -1),
+        TestCase("not rotated", (([1, 2, 3, 4, 5], 3),), 2),
+        TestCase("single element", (([1], 1),), 0),
+        TestCase("two elements", (([2, 1], 1),), 1),
+        TestCase("pivot at end", (([2, 3, 4, 5, 1], 1),), 4),
+        TestCase("target is pivot", (([6, 7, 1, 2, 3, 4, 5], 1),), 2),
+        TestCase("rotated by 1", (([7, 1, 2, 3, 4, 5, 6], 7),), 0),
+    ],
+
+    "rotation_count": [
+        TestCase("rotated", (([10, 15, 1, 3, 8],),), 2),
+        TestCase("not rotated", (([1, 2, 3, 4, 5],),), 0),
+        TestCase("fully rotated", (([4, 5, 7, 9, 10, -1, 2],),), 5),
+        TestCase("single element", (([5],),), 0),
+        TestCase("two elements", (([2, 1],),), 1),
+        TestCase("rotated once", (([5, 1, 2, 3, 4],),), 1),
+        TestCase("all same", (([3, 3, 3, 3],),), 0),
+        TestCase("minimum at start", (([1, 2, 3, 4],),), 0),
+    ],
+
+    "search_in_infinite_array": [
+        TestCase("found", (([4, 6, 8, 10, 12, 14, 16, 18, 20], 16),), 6),
+        TestCase("found at start", (([1, 2, 3, 4, 5], 1),), 0),
+        TestCase("not found", (([1, 2, 3, 4, 5], 10),), -1),
+        TestCase("found at end", (([1, 2, 3, 4, 5], 5),), 4),
+        TestCase("large gap", (([1, 2, 100, 200, 300], 200),), 3),
+        TestCase("single element", (([5], 5),), 0),
+        TestCase("in first chunk", (([1, 2, 3, 4, 5, 6, 7, 8], 3),), 2),
+    ],
+
+    "minimum_difference_element": [
+        TestCase("example 1", (([4, 6, 10], 7),), 6),
+        TestCase("example 2", (([4, 6, 10], 4),), 4),
+        TestCase("example 3", (([1, 3, 8, 10, 15], 12),), 10),
+        TestCase("exact match", (([1, 5, 10], 5),), 5),
+        TestCase("between two", (([1, 3, 8, 10, 15], 6),), 8),
+        TestCase("less than first", (([5, 10, 15], 2),), 5),
+        TestCase("greater than last", (([1, 5, 10], 12),), 10),
+        TestCase("equidistant", (([1, 5, 9], 7),), 5),  # or 9, either is valid
+    ],
+
+    "bitonic_array_maximum": [
+        TestCase("example 1", (([1, 3, 8, 12, 4, 2],),), 12),
+        TestCase("example 2", (([3, 8, 3, 1],),), 8),
+        TestCase("example 3", (([1, 3, 8, 12],),), 12),
+        TestCase("peak at start", (([10, 8, 6, 4],),), 10),
+        TestCase("peak in middle", (([1, 5, 10, 5, 1],),), 10),
+        TestCase("two elements ascending", (([1, 5],),), 5),
+        TestCase("two elements descending", (([5, 1],),), 5),
+        TestCase("long increasing", (([1, 2, 3, 4, 5, 6, 7],),), 7),
+    ],
+
+    "search_bitonic_array": [
+        TestCase("found ascending", (([1, 3, 8, 12, 4, 2], 8),), 2),
+        TestCase("found descending", (([1, 3, 8, 12, 4, 2], 4),), 4),
+        TestCase("found peak", (([1, 3, 8, 12, 4, 2], 12),), 3),
+        TestCase("not found", (([1, 3, 8, 12, 4, 2], 10),), -1),
+        TestCase("at start", (([1, 5, 10, 5, 1], 1),), 0),  # or 4
+        TestCase("at end", (([1, 5, 10, 5, 2], 2),), 4),
+    ],
+}

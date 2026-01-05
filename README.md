@@ -97,29 +97,14 @@ values = head.to_list()  # [1, 2, 3, 4, 5]
 ```
 dsa-exercises/
 ├── notebooks/          # Jupyter notebooks (one per category)
-├── tests/              # Hidden pytest tests
 ├── hints/              # Progressive hints in YAML
 ├── dsa_helpers/        # Helper package
-│   ├── checker.py      # check() function
+│   ├── checker.py      # check() function with inline tests
+│   ├── test_cases.py   # Test case definitions
+│   ├── comparators.py  # Result comparison functions
 │   ├── hints.py        # hint() function
 │   └── data_structures.py
 └── README.md
-```
-
-## Running Tests Directly
-
-```bash
-# Run all tests (excluding performance)
-pytest
-
-# Run tests for a specific category
-pytest tests/test_01_array_string/
-
-# Run with performance tests
-pytest -m performance
-
-# Run specific problem tests
-pytest tests/test_01_array_string/test_p01_two_sum.py -v
 ```
 
 ## Recommended Order
