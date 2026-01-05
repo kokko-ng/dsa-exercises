@@ -4,12 +4,30 @@ A comprehensive collection of 203 algorithm problems organized by pattern, with 
 
 ## Setup
 
+**Note:** On macOS and some Linux systems, you may need to use a virtual environment:
+
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Create and activate a virtual environment (recommended)
+python3 -m venv venv
+source venv/bin/activate  # On macOS/Linux
+# OR
+venv\Scripts\activate  # On Windows
 
 # Install the package in development mode
 pip install -e .
+
+# Start Jupyter
+jupyter notebook
+```
+
+If you don't need a virtual environment:
+
+```bash
+# Install directly (may require --user flag on some systems)
+pip install -e .
+
+# Start Jupyter
+jupyter notebook
 ```
 
 ## Usage

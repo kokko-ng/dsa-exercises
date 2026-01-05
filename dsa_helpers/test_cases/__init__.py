@@ -27,6 +27,7 @@ class TestCase:
     is_performance: bool = False
     max_time: Optional[float] = None
     check_modified_arg: Optional[int] = None  # Index of arg to check if function modifies in-place
+    is_class_test: bool = False  # True if testing a class with method calls
 
 
 # Import test cases from each category module
