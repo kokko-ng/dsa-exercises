@@ -74,7 +74,7 @@ TOP_K_TESTS = {
         TestCase("example 2", (([3, 4, 5, 6],),), 36),
         TestCase("single rope", (([5],),), 0),
         TestCase("two ropes", (([1, 2],),), 3),
-        TestCase("all same", (([4, 4, 4, 4],),), 40),
+        TestCase("all same", (([4, 4, 4, 4],),), 32),
         TestCase("sorted", (([1, 2, 3, 4, 5],),), 33),
     ],
     "maximum_distinct_elements": [
@@ -103,7 +103,7 @@ TOP_K_TESTS = {
         TestCase("k=1", ((1, [1, 2], [3, 4, 5]),), [3, 4, 5]),
         TestCase("single initial", ((1, [5], [1, 2, 3, 4]),), [5, 5, 5, 5]),
         TestCase("empty initial", ((2, [], [1, 2, 3, 4]),), [-1, 1, 2, 3]),
-        TestCase("k equals size", ((3, [1, 2, 3], [4, 5]),), [3, 4]),
+        TestCase("k equals size", ((3, [1, 2, 3], [4, 5]),), [2, 3]),
         TestCase("all same", ((2, [5, 5], [5, 5]),), [5, 5]),
     ],
 }
