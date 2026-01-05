@@ -18,7 +18,179 @@ try:
 except ImportError:
     HAS_IPYTHON = False
 
+from .data_structures import ListNode, TreeNode
 from .test_cases import TEST_CASES, TestCase
+
+
+# Functions that take linked list inputs (need conversion from list/dict to ListNode)
+LINKED_LIST_INPUT_FUNCS = {
+    "linked_list_cycle",
+    "linked_list_cycle_ii",
+    "middle_of_linked_list",
+    "palindrome_linked_list",
+    "reorder_list",
+    "reverse_linked_list",
+    "reverse_linked_list_ii",
+    "reverse_k_group",
+    "reverse_alternating_k_group",
+    "reverse_alternating_k",
+    "rotate_list",
+    "swap_pairs",
+    "reverse_between",
+    "odd_even_linked_list",
+    "split_linked_list",
+    "partition_list",
+    "remove_nth_from_end",
+    "merge_two_sorted_lists",
+    "merge_k_sorted_lists",
+}
+
+# Functions that return linked list values (need conversion from ListNode to list for comparison)
+LINKED_LIST_OUTPUT_FUNCS = {
+    "middle_of_linked_list",
+    "linked_list_cycle_ii",
+    "reorder_list",
+    "reverse_linked_list",
+    "reverse_linked_list_ii",
+    "reverse_k_group",
+    "reverse_alternating_k_group",
+    "reverse_alternating_k",
+    "rotate_list",
+    "swap_pairs",
+    "reverse_between",
+    "odd_even_linked_list",
+    "split_linked_list",
+    "partition_list",
+    "remove_nth_from_end",
+    "merge_two_sorted_lists",
+    "merge_k_sorted_lists",
+}
+
+# Tree functions that need input/output conversion
+TREE_INPUT_FUNCS = {
+    "level_order_traversal",
+    "reverse_level_order",
+    "zigzag_level_order",
+    "level_order_bottom",
+    "level_order_successor",
+    "binary_tree_right_side",
+    "average_of_levels",
+    "minimum_depth",
+    "maximum_depth",
+    "path_sum",
+    "all_paths_for_sum",
+    "sum_of_path_numbers",
+    "path_with_given_sequence",
+    "count_paths_for_sum",
+    "tree_diameter",
+    "path_with_maximum_sum",
+    "lowest_common_ancestor",
+    "serialize_deserialize",
+    "connect_level_order_siblings",
+    "connect_all_siblings",
+    "invert_binary_tree",
+    "validate_bst",
+    "kth_smallest_in_bst",
+}
+
+
+def _create_linked_list_with_cycle(values: list[int], pos: int) -> Optional[ListNode]:
+    """Create a linked list with an optional cycle at position pos."""
+    if not values:
+        return None
+    head = ListNode(values[0])
+    current = head
+    nodes = [head]
+    for val in values[1:]:
+        current.next = ListNode(val)
+        current = current.next
+        nodes.append(current)
+    if pos >= 0 and pos < len(nodes):
+        current.next = nodes[pos]
+    return head
+
+
+def _preprocess_linked_list_args(func_name: str, args: tuple) -> tuple:
+    """Convert raw list/dict data to ListNode objects for linked list functions."""
+    if func_name not in LINKED_LIST_INPUT_FUNCS:
+        return args
+
+    new_args = list(args)
+
+    if func_name in {"linked_list_cycle", "linked_list_cycle_ii"}:
+        # These take a dict with 'list' and 'pos' keys
+        if isinstance(args[0], dict) and "list" in args[0] and "pos" in args[0]:
+            data = args[0]
+            head = _create_linked_list_with_cycle(data["list"], data["pos"])
+            new_args[0] = head
+    elif func_name in {"merge_k_sorted_lists"}:
+        # Takes a list of lists, convert each to ListNode
+        if isinstance(args[0], list) and all(isinstance(x, list) for x in args[0]):
+            new_args[0] = [ListNode.from_list(lst) for lst in args[0]]
+    elif func_name in {"merge_two_sorted_lists"}:
+        # Takes two lists
+        if isinstance(args[0], list):
+            new_args[0] = ListNode.from_list(args[0])
+        if len(args) > 1 and isinstance(args[1], list):
+            new_args[1] = ListNode.from_list(args[1])
+    else:
+        # Most linked list functions take a single list as first argument
+        if isinstance(args[0], list):
+            new_args[0] = ListNode.from_list(args[0])
+
+    return tuple(new_args)
+
+
+def _postprocess_linked_list_result(func_name: str, result: Any) -> Any:
+    """Convert ListNode result back to comparable format."""
+    if func_name not in LINKED_LIST_OUTPUT_FUNCS:
+        return result
+
+    if func_name == "linked_list_cycle_ii":
+        # Returns the node value where cycle starts, or None
+        if result is None:
+            return None
+        if isinstance(result, ListNode):
+            return result.val
+        return result
+    elif func_name == "middle_of_linked_list":
+        # Returns the middle node value
+        if result is None:
+            return None
+        if isinstance(result, ListNode):
+            return result.val
+        return result
+    elif func_name == "split_linked_list":
+        # Returns a list of ListNodes (heads of each part)
+        if result is None:
+            return []
+        output = []
+        for head in result:
+            if head is None:
+                output.append([])
+            elif isinstance(head, ListNode):
+                output.append(head.to_list())
+            else:
+                output.append(head)
+        return output
+    elif isinstance(result, ListNode):
+        # Convert ListNode to list for comparison
+        return result.to_list()
+    elif result is None:
+        return []
+
+    return result
+
+
+def _preprocess_tree_args(func_name: str, args: tuple) -> tuple:
+    """Convert raw list data to TreeNode objects for tree functions."""
+    if func_name not in TREE_INPUT_FUNCS:
+        return args
+
+    new_args = list(args)
+    if isinstance(args[0], list):
+        new_args[0] = TreeNode.from_list(args[0])
+    return tuple(new_args)
 
 
 class TestResult:
@@ -45,11 +217,19 @@ class TestResult:
         self.args = args
 
 
-def _run_test(func: Callable[..., Any], test: TestCase) -> TestResult:
+def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> TestResult:
     """Run a single test case."""
     test_args = test.args[0]  # Capture the input arguments
+
+    # Preprocess arguments for linked list and tree functions
+    preprocessed_args = _preprocess_linked_list_args(func_name, test_args)
+    preprocessed_args = _preprocess_tree_args(func_name, preprocessed_args)
+
     # Make a copy for functions that modify in-place
-    test_args_copy = list(test_args) if test.check_modified_arg is not None else test_args
+    if test.check_modified_arg is not None:
+        test_args_copy = list(preprocessed_args)
+    else:
+        test_args_copy = preprocessed_args
 
     try:
         start = time.time()
@@ -75,6 +255,11 @@ def _run_test(func: Callable[..., Any], test: TestCase) -> TestResult:
         # For in-place modifications, check the modified argument instead of return value
         if test.check_modified_arg is not None:
             actual = test_args_copy[test.check_modified_arg]
+            # Postprocess linked list results for in-place modifications
+            actual = _postprocess_linked_list_result(func_name, actual)
+        else:
+            # Postprocess linked list results
+            actual = _postprocess_linked_list_result(func_name, actual)
 
         # Check result
         if test.comparator:
@@ -313,7 +498,7 @@ def check(
 
     results = []
     for test in tests:
-        result = _run_test(func_obj, test)
+        result = _run_test(func_obj, test, func_name)
         results.append(result)
 
         if verbose:
@@ -370,7 +555,7 @@ def check_all(
         else:
             tests = [t for t in all_tests if not t.is_performance]
 
-        test_results = [_run_test(func_obj, t) for t in tests]
+        test_results = [_run_test(func_obj, t, func_name) for t in tests]
         results[func_name] = all(r.passed for r in test_results)
 
     return results

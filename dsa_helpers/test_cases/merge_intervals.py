@@ -77,7 +77,11 @@ MERGE_INTERVALS_TESTS = {
     ],
 
     "employee_free_time": [
-        # Requires special handling for Interval class
+        TestCase("example 1", (([[[1, 2], [5, 6]], [[1, 3]], [[4, 10]]],),), [[3, 4]]),
+        TestCase("example 2", (([[[1, 3], [6, 7]], [[2, 4]], [[2, 5], [9, 12]]],),), [[5, 6], [7, 9]]),
+        TestCase("no free time", (([[[1, 10]], [[1, 10]]],),), []),
+        TestCase("single employee", (([[[1, 2], [5, 6]]],),), [[2, 5]]),
+        TestCase("consecutive", (([[[1, 2]], [[2, 3]], [[3, 4]]],),), []),
     ],
 
     "car_pooling": [

@@ -35,14 +35,30 @@ class ListNode:
         return " -> ".join(values)
 
     def __eq__(self, other: object) -> bool:
-        """Compare two linked lists."""
+        """Compare two linked lists by value (cycle-safe).
+
+        Note: For cycle detection problems, use 'is' to check object identity,
+        not '==' which compares list contents.
+        """
         if not isinstance(other, ListNode):
             return False
+        # For identity check (same object), return True
+        if self is other:
+            return True
+        # For value comparison, traverse with cycle detection
         a: Optional[ListNode] = self
         b: Optional[ListNode] = other
+        seen_a: set[int] = set()
+        seen_b: set[int] = set()
         while a and b:
             if a.val != b.val:
                 return False
+            if id(a) in seen_a or id(b) in seen_b:
+                # Cycle detected, compare by remaining structure
+                # If both have cycles at this point, consider them equal
+                return id(a) in seen_a and id(b) in seen_b
+            seen_a.add(id(a))
+            seen_b.add(id(b))
             a, b = a.next, b.next
         return a is None and b is None
 

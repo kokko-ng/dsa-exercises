@@ -27,13 +27,13 @@ TWO_HEAPS_TESTS = {
         TestCase("basic", (([[1, 2], [2, 3], [0, 1], [3, 4]],),), [1, 3, 0, -1]),
         TestCase("no next", (([[1, 4], [2, 3], [3, 4]],),), [-1, 2, -1]),
         TestCase("single", (([[1, 2]],),), [-1]),
-        TestCase("all same", (([[1, 2], [1, 2], [1, 2]],),), [0, 0, 0]),
+        TestCase("all same", (([[1, 2], [1, 2], [1, 2]],),), [-1, -1, -1]),
     ],
 
     "kth_smallest_in_sorted_matrix": [
         TestCase("basic", (([[1, 5, 9], [10, 11, 13], [12, 13, 15]], 8),), 13),
-        TestCase("first", ((([[1, 2], [1, 3]], 1),),), 1),
-        TestCase("last", ((([[1, 2], [3, 4]], 4),),), 4),
+        TestCase("first", (([[1, 2], [1, 3]], 1),), 1),
+        TestCase("last", (([[1, 2], [3, 4]], 4),), 4),
         TestCase("single", (([[1]], 1),), 1),
     ],
 
