@@ -5,20 +5,21 @@ Test cases are organized by category and combined into a single TEST_CASES regis
 """
 
 from dataclasses import dataclass
-from typing import Any, Callable, Optional, List
+from typing import Any, Callable, Optional
 
 from ..comparators import (
-    sorted_compare,
-    set_compare,
     nested_set_compare,
-    unordered_list_compare,
+    set_compare,
+    sorted_compare,
     topological_order_compare,
+    unordered_list_compare,
 )
 
 
 @dataclass
 class TestCase:
     """A single test case."""
+
     name: str
     args: tuple
     expected: Any
@@ -28,17 +29,17 @@ class TestCase:
 
 
 # Import test cases from each category module
-from .array_string import ARRAY_STRING_TESTS
-from .hash_map import HASH_MAP_TESTS
-from .merge_intervals import MERGE_INTERVALS_TESTS
-from .cyclic_sort import CYCLIC_SORT_TESTS
-from .binary_search import BINARY_SEARCH_TESTS
-from .top_k import TOP_K_TESTS
-from .graph import GRAPH_TESTS
-from .monotonic_stack import MONOTONIC_STACK_TESTS
+from .array_string import ARRAY_STRING_TESTS  # noqa: E402
+from .binary_search import BINARY_SEARCH_TESTS  # noqa: E402
+from .cyclic_sort import CYCLIC_SORT_TESTS  # noqa: E402
+from .graph import GRAPH_TESTS  # noqa: E402
+from .hash_map import HASH_MAP_TESTS  # noqa: E402
+from .merge_intervals import MERGE_INTERVALS_TESTS  # noqa: E402
+from .monotonic_stack import MONOTONIC_STACK_TESTS  # noqa: E402
+from .top_k import TOP_K_TESTS  # noqa: E402
 
 # Combine all test cases into a single registry
-TEST_CASES: dict[str, List[TestCase]] = {
+TEST_CASES: dict[str, list[TestCase]] = {
     **ARRAY_STRING_TESTS,
     **HASH_MAP_TESTS,
     **MERGE_INTERVALS_TESTS,
@@ -49,4 +50,13 @@ TEST_CASES: dict[str, List[TestCase]] = {
     **MONOTONIC_STACK_TESTS,
 }
 
-__all__ = ['TestCase', 'TEST_CASES']
+__all__ = [
+    "TestCase",
+    "TEST_CASES",
+    # Comparators re-exported for submodules
+    "sorted_compare",
+    "set_compare",
+    "nested_set_compare",
+    "unordered_list_compare",
+    "topological_order_compare",
+]

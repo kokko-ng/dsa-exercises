@@ -1,7 +1,6 @@
 """Test cases for Graph problems (Category 14)."""
 
-from . import TestCase, set_compare, unordered_list_compare, topological_order_compare
-
+from . import TestCase, set_compare, topological_order_compare, unordered_list_compare
 
 GRAPH_TESTS = {
     "number_of_islands": [

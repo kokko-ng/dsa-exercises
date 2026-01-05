@@ -2,7 +2,6 @@
 
 from . import TestCase, set_compare, unordered_list_compare
 
-
 TOP_K_TESTS = {
     "top_k_frequent": [
         TestCase("example 1", (([1, 1, 1, 2, 2, 3], 2),), [1, 2], set_compare),

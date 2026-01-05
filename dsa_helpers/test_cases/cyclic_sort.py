@@ -1,7 +1,6 @@
 """Test cases for Cyclic Sort problems (Category 06)."""
 
-from . import TestCase, sorted_compare, set_compare
-
+from . import TestCase, set_compare, sorted_compare
 
 CYCLIC_SORT_TESTS = {
     "cyclic_sort": [

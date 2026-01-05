@@ -5,12 +5,11 @@ This module provides a mechanism to register functions defined in Jupyter notebo
 so they can be accessed by the inline test runner.
 """
 
+import inspect
 import json
 import os
 import tempfile
-import inspect
-from typing import Optional, Callable, Any
-
+from typing import Any, Callable, Optional
 
 # Registry file location
 _REGISTRY_FILE = os.path.join(tempfile.gettempdir(), "dsa_func_registry.json")
@@ -20,9 +19,9 @@ def _load_registry() -> dict:
     """Load the function registry from disk."""
     try:
         if os.path.exists(_REGISTRY_FILE):
-            with open(_REGISTRY_FILE, 'r') as f:
+            with open(_REGISTRY_FILE) as f:
                 return json.load(f)
-    except (json.JSONDecodeError, IOError):
+    except (OSError, json.JSONDecodeError):
         pass
     return {}
 
@@ -32,7 +31,7 @@ def _save_registry(registry: dict) -> None:
     try:
         with open(_REGISTRY_FILE, 'w') as f:
             json.dump(registry, f)
-    except IOError:
+    except OSError:
         pass
 
 
@@ -97,8 +96,14 @@ def get(name: str) -> Optional[Callable]:
     # Add data structures to namespace
     try:
         from .data_structures import (
-            ListNode, TreeNode, DoublyListNode, GraphNode,
-            TrieNode, Trie, UnionFind, Interval
+            DoublyListNode,
+            GraphNode,
+            Interval,
+            ListNode,
+            TreeNode,
+            Trie,
+            TrieNode,
+            UnionFind,
         )
         global_ns.update({
             'ListNode': ListNode,
@@ -132,7 +137,7 @@ def clear(name: Optional[str] = None) -> None:
         try:
             if os.path.exists(_REGISTRY_FILE):
                 os.remove(_REGISTRY_FILE)
-        except IOError:
+        except OSError:
             pass
     else:
         registry = _load_registry()

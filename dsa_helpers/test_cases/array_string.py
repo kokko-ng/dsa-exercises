@@ -2,7 +2,6 @@
 
 from . import TestCase, sorted_compare
 
-
 ARRAY_STRING_TESTS = {
     "two_sum": [
         TestCase("simple case", (([2, 7, 11, 15], 9),), [0, 1], sorted_compare),

@@ -2,7 +2,6 @@
 
 from . import TestCase
 
-
 MONOTONIC_STACK_TESTS = {
     "next_greater_element": [
         TestCase("example 1", (([4, 1, 2], [1, 3, 4, 2]),), [-1, 3, -1]),

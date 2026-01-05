@@ -7,36 +7,38 @@ and displays formatted results in Jupyter notebooks. No pytest required.
 
 import re
 import time
-from typing import Callable, Union, Optional, List
+from typing import Callable, Optional, Union
 
 try:
-    from IPython.display import display, HTML
+    from IPython.display import HTML, display
     HAS_IPYTHON = True
 except ImportError:
     HAS_IPYTHON = False
 
-from .test_cases import TestCase, TEST_CASES
+from .test_cases import TEST_CASES, TestCase
 
 
 class TestResult:
     """Result of running a test case."""
-    __slots__ = ('name', 'passed', 'error_msg', 'actual', 'expected', 'elapsed')
+    __slots__ = ('name', 'passed', 'error_msg', 'actual', 'expected', 'elapsed', 'args')
 
     def __init__(self, name: str, passed: bool, error_msg: Optional[str] = None,
-                 actual=None, expected=None, elapsed: Optional[float] = None):
+                 actual=None, expected=None, elapsed: Optional[float] = None, args=None):
         self.name = name
         self.passed = passed
         self.error_msg = error_msg
         self.actual = actual
         self.expected = expected
         self.elapsed = elapsed
+        self.args = args
 
 
 def _run_test(func: Callable, test: TestCase) -> TestResult:
     """Run a single test case."""
+    test_args = test.args[0]  # Capture the input arguments
     try:
         start = time.time()
-        actual = func(*test.args[0])
+        actual = func(*test_args)
         elapsed = time.time() - start
 
         # Check result
@@ -56,11 +58,12 @@ def _run_test(func: Callable, test: TestCase) -> TestResult:
                 error_msg=f"Too slow: {elapsed:.2f}s (max: {test.max_time}s)",
                 actual=actual,
                 expected=test.expected,
-                elapsed=elapsed
+                elapsed=elapsed,
+                args=test_args
             )
 
         if passed:
-            return TestResult(name=test.name, passed=True, elapsed=elapsed)
+            return TestResult(name=test.name, passed=True, elapsed=elapsed, args=test_args)
         else:
             return TestResult(
                 name=test.name,
@@ -68,13 +71,15 @@ def _run_test(func: Callable, test: TestCase) -> TestResult:
                 error_msg="Wrong answer",
                 actual=actual,
                 expected=test.expected,
-                elapsed=elapsed
+                elapsed=elapsed,
+                args=test_args
             )
     except Exception as e:
         return TestResult(
             name=test.name,
             passed=False,
-            error_msg=f"{type(e).__name__}: {str(e)}"
+            error_msg=f"{type(e).__name__}: {str(e)}",
+            args=test_args
         )
 
 
@@ -93,7 +98,7 @@ def _display_html(html: str) -> None:
         print(text)
 
 
-def _display_results(func_name: str, results: List[TestResult], performance: bool) -> None:
+def _display_results(func_name: str, results: list[TestResult], performance: bool) -> None:
     """Format and display test results in notebook-friendly format."""
     passed_count = sum(1 for r in results if r.passed)
     total = len(results)
@@ -134,15 +139,54 @@ def _display_results(func_name: str, results: List[TestResult], performance: boo
         """
     else:
         failed = [r for r in results if not r.passed]
-        first_fail = failed[0]
 
-        error_details = f"Test: {first_fail.name}\n"
-        if first_fail.error_msg:
-            error_details += f"Error: {first_fail.error_msg}\n"
-        if first_fail.actual is not None:
-            error_details += f"Got:      {repr(first_fail.actual)}\n"
-        if first_fail.expected is not None:
-            error_details += f"Expected: {repr(first_fail.expected)}"
+        def format_failure(fail: TestResult, index: int = None) -> str:
+            """Format a single test failure with detailed information."""
+            lines = []
+            if index is not None:
+                lines.append(f"{'─' * 40}")
+                lines.append(f"FAILED TEST #{index + 1}: {fail.name}")
+            else:
+                lines.append(f"Test: {fail.name}")
+            lines.append("")
+
+            # Show input arguments - this is critical for debugging
+            if fail.args is not None:
+                lines.append("Input:")
+                if isinstance(fail.args, tuple) and len(fail.args) == 1:
+                    lines.append(f"  {repr(fail.args[0])}")
+                else:
+                    for i, arg in enumerate(fail.args):
+                        lines.append(f"  arg{i + 1}: {repr(arg)}")
+                lines.append("")
+
+            # Show error message
+            if fail.error_msg:
+                lines.append(f"Error: {fail.error_msg}")
+                lines.append("")
+
+            # Show actual vs expected
+            if fail.actual is not None or fail.expected is not None:
+                lines.append(f"Your output:     {repr(fail.actual)}")
+                lines.append(f"Expected output: {repr(fail.expected)}")
+
+            return "\n".join(lines)
+
+        # Show all failed tests (limit to 5 to avoid overwhelming output)
+        max_failures_to_show = 5
+        failures_to_show = failed[:max_failures_to_show]
+
+        if len(failed) == 1:
+            error_details = format_failure(failed[0])
+        else:
+            error_parts = []
+            for i, fail in enumerate(failures_to_show):
+                error_parts.append(format_failure(fail, i))
+
+            error_details = "\n\n".join(error_parts)
+
+            if len(failed) > max_failures_to_show:
+                error_details += f"\n\n{'─' * 40}\n... and {len(failed) - max_failures_to_show} more failed test(s)"
 
         error_details = error_details.replace('&', '&amp;')
         error_details = error_details.replace('<', '&lt;')
@@ -159,7 +203,7 @@ def _display_results(func_name: str, results: List[TestResult], performance: boo
             </div>
             <div style="margin-top: 10px; padding: 10px; background: #fff; border-radius: 4px;
                         font-family: monospace; font-size: 13px; white-space: pre-wrap;
-                        color: #333; max-height: 300px; overflow-y: auto;">
+                        color: #333; max-height: 400px; overflow-y: auto;">
 {error_details}
             </div>
             <div style="margin-top: 10px; color: #721c24; font-size: 13px;">
@@ -242,8 +286,14 @@ def check(function_or_name: Union[Callable, str], *,
                 print(f" ({result.elapsed*1000:.1f}ms)")
             else:
                 print()
-            if not result.passed and result.error_msg:
-                print(f"    Error: {result.error_msg}")
+            if not result.passed:
+                if result.args is not None:
+                    print(f"    Input: {repr(result.args)}")
+                if result.error_msg:
+                    print(f"    Error: {result.error_msg}")
+                if result.actual is not None or result.expected is not None:
+                    print(f"    Got:      {repr(result.actual)}")
+                    print(f"    Expected: {repr(result.expected)}")
 
     _display_results(func_name, results, performance)
 
@@ -287,6 +337,6 @@ def check_all(category: Optional[str] = None, *, performance: bool = False) -> d
     return results
 
 
-def list_available_functions() -> List[str]:
+def list_available_functions() -> list[str]:
     """Return a list of all functions that have test cases defined."""
     return sorted(TEST_CASES.keys())

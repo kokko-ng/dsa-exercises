@@ -1,7 +1,6 @@
 """Test cases for Hash Map problems (Category 02)."""
 
-from . import TestCase, sorted_compare, set_compare, nested_set_compare
-
+from . import TestCase, nested_set_compare, set_compare
 
 HASH_MAP_TESTS = {
     "group_anagrams": [

@@ -5,23 +5,24 @@ Provides the hint() function that displays progressive hints for problems,
 helping users learn without giving away the complete solution.
 """
 
-import yaml
-from pathlib import Path
 from collections import defaultdict
-from typing import Optional, Dict, List
+from pathlib import Path
+from typing import Optional
+
+import yaml
 
 try:
-    from IPython.display import display, HTML, Markdown
+    from IPython.display import HTML, Markdown, display
     HAS_IPYTHON = True
 except ImportError:
     HAS_IPYTHON = False
 
 
 # Track hint progress per session
-_hint_state: Dict[str, int] = defaultdict(int)
+_hint_state: dict[str, int] = defaultdict(int)
 
 # Cache for loaded hints
-_hints_cache: Optional[Dict[str, dict]] = None
+_hints_cache: Optional[dict[str, dict]] = None
 
 
 def _get_hints_dir() -> Path:
@@ -29,7 +30,7 @@ def _get_hints_dir() -> Path:
     return Path(__file__).parent.parent / "hints"
 
 
-def _load_all_hints() -> Dict[str, dict]:
+def _load_all_hints() -> dict[str, dict]:
     """Load all hints from YAML files."""
     global _hints_cache
     if _hints_cache is not None:
@@ -43,11 +44,11 @@ def _load_all_hints() -> Dict[str, dict]:
 
     for yaml_file in hints_dir.glob("*.yaml"):
         try:
-            with open(yaml_file, 'r', encoding='utf-8') as f:
+            with open(yaml_file, encoding='utf-8') as f:
                 data = yaml.safe_load(f)
                 if data:
                     _hints_cache.update(data)
-        except (yaml.YAMLError, IOError):
+        except (OSError, yaml.YAMLError):
             continue
 
     return _hints_cache
@@ -170,7 +171,7 @@ def hint(problem_name: str, *, level: Optional[int] = None, reset: bool = False)
         """
         _display_output(more_html)
     else:
-        final_html = f"""
+        final_html = """
         <div style="padding: 8px; background: #fff3cd; border-radius: 4px; margin-top: 10px;
                     font-size: 13px; color: #856404;">
             &#x1F914; Still stuck? Try breaking down the problem into smaller parts,
@@ -180,7 +181,7 @@ def hint(problem_name: str, *, level: Optional[int] = None, reset: bool = False)
         _display_output(final_html)
 
 
-def list_problems(category: Optional[str] = None) -> Dict[str, List[str]]:
+def list_problems(category: Optional[str] = None) -> dict[str, list[str]]:
     """
     List all available problems with hints.
 
@@ -191,7 +192,7 @@ def list_problems(category: Optional[str] = None) -> Dict[str, List[str]]:
         Dict mapping category names to list of problem names
     """
     hints_dir = _get_hints_dir()
-    problems: Dict[str, List[str]] = {}
+    problems: dict[str, list[str]] = {}
 
     if not hints_dir.exists():
         return problems
@@ -202,11 +203,11 @@ def list_problems(category: Optional[str] = None) -> Dict[str, List[str]]:
             continue
 
         try:
-            with open(yaml_file, 'r', encoding='utf-8') as f:
+            with open(yaml_file, encoding='utf-8') as f:
                 data = yaml.safe_load(f)
                 if data:
                     problems[category_name] = list(data.keys())
-        except (yaml.YAMLError, IOError):
+        except (OSError, yaml.YAMLError):
             continue
 
     return problems

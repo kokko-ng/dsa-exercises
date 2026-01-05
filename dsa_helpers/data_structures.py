@@ -11,7 +11,7 @@ Provides common data structures used across algorithm problems:
 - Interval: Interval representation
 """
 
-from typing import Optional, List, Any, Dict
+from typing import Optional
 
 
 class ListNode:
@@ -46,7 +46,7 @@ class ListNode:
         return a is None and b is None
 
     @classmethod
-    def from_list(cls, values: List[int]) -> Optional['ListNode']:
+    def from_list(cls, values: list[int]) -> Optional['ListNode']:
         """Create linked list from Python list."""
         if not values:
             return None
@@ -57,7 +57,7 @@ class ListNode:
             current = current.next
         return head
 
-    def to_list(self) -> List[int]:
+    def to_list(self) -> list[int]:
         """Convert linked list to Python list."""
         result = []
         node = self
@@ -89,7 +89,7 @@ class DoublyListNode:
         return " <-> ".join(values)
 
     @classmethod
-    def from_list(cls, values: List[int]) -> Optional['DoublyListNode']:
+    def from_list(cls, values: list[int]) -> Optional['DoublyListNode']:
         """Create doubly linked list from Python list."""
         if not values:
             return None
@@ -101,7 +101,7 @@ class DoublyListNode:
             current = new_node
         return head
 
-    def to_list(self) -> List[int]:
+    def to_list(self) -> list[int]:
         """Convert doubly linked list to Python list."""
         result = []
         node = self
@@ -137,7 +137,7 @@ class TreeNode:
                 self.right == other.right)
 
     @classmethod
-    def from_list(cls, values: List[Optional[int]]) -> Optional['TreeNode']:
+    def from_list(cls, values: list[Optional[int]]) -> Optional['TreeNode']:
         """Create tree from level-order list (LeetCode format).
 
         Example: [1, 2, 3, None, 4] creates:
@@ -166,7 +166,7 @@ class TreeNode:
             i += 1
         return root
 
-    def to_list(self) -> List[Optional[int]]:
+    def to_list(self) -> list[Optional[int]]:
         """Convert tree to level-order list."""
         result = []
         queue = [self]
@@ -195,7 +195,7 @@ class TreeNode:
 class GraphNode:
     """Graph node for adjacency list representation."""
 
-    def __init__(self, val: int = 0, neighbors: Optional[List['GraphNode']] = None):
+    def __init__(self, val: int = 0, neighbors: Optional[list['GraphNode']] = None):
         self.val = val
         self.neighbors = neighbors if neighbors is not None else []
 
@@ -204,7 +204,7 @@ class GraphNode:
         return f"GraphNode({self.val}, neighbors={neighbor_vals})"
 
     @classmethod
-    def from_adjacency_list(cls, adj_list: List[List[int]]) -> Optional['GraphNode']:
+    def from_adjacency_list(cls, adj_list: list[list[int]]) -> Optional['GraphNode']:
         """Create graph from adjacency list.
 
         adj_list[i] contains neighbors of node i (1-indexed in typical problems).
@@ -214,7 +214,7 @@ class GraphNode:
             return None
 
         # Create all nodes
-        nodes: Dict[int, GraphNode] = {}
+        nodes: dict[int, GraphNode] = {}
         for i in range(len(adj_list)):
             nodes[i + 1] = cls(i + 1)
 
@@ -229,7 +229,7 @@ class TrieNode:
     """Trie (prefix tree) node."""
 
     def __init__(self):
-        self.children: Dict[str, 'TrieNode'] = {}
+        self.children: dict[str, TrieNode] = {}
         self.is_end: bool = False
         self.word: Optional[str] = None
 
@@ -343,11 +343,11 @@ class Interval:
         )
 
     @classmethod
-    def from_list(cls, intervals: List[List[int]]) -> List['Interval']:
+    def from_list(cls, intervals: list[list[int]]) -> list['Interval']:
         """Convert list of lists to list of Intervals."""
         return [cls(i[0], i[1]) for i in intervals]
 
     @staticmethod
-    def to_list(intervals: List['Interval']) -> List[List[int]]:
+    def to_list(intervals: list['Interval']) -> list[list[int]]:
         """Convert list of Intervals to list of lists."""
         return [[i.start, i.end] for i in intervals]

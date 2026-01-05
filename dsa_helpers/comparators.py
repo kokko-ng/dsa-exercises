@@ -5,7 +5,7 @@ These comparators handle various output formats where order may not matter
 or special comparison logic is needed.
 """
 
-from typing import Any, List
+from typing import Any
 
 
 def sorted_compare(result: Any, expected: Any) -> bool:
@@ -32,7 +32,7 @@ def nested_set_compare(result: Any, expected: Any) -> bool:
     if not isinstance(result, list) or not isinstance(expected, list):
         return result == expected
 
-    def normalize(groups: List[List]) -> set:
+    def normalize(groups: list[list]) -> set:
         return set(tuple(sorted(group)) for group in groups)
 
     return normalize(result) == normalize(expected)

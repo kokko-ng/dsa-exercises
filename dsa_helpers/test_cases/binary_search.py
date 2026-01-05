@@ -2,7 +2,6 @@
 
 from . import TestCase
 
-
 BINARY_SEARCH_TESTS = {
     "binary_search": [
         TestCase("found middle", (([-1, 0, 3, 5, 9, 12], 9),), 4),

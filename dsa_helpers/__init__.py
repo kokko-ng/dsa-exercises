@@ -26,17 +26,17 @@ Data Structures:
 """
 
 from .checker import check, check_all, list_available_functions
-from .hints import hint, list_problems, show_problems, reset_all_hints, reload_hints
 from .data_structures import (
-    ListNode,
     DoublyListNode,
-    TreeNode,
     GraphNode,
-    TrieNode,
-    Trie,
-    UnionFind,
     Interval,
+    ListNode,
+    TreeNode,
+    Trie,
+    TrieNode,
+    UnionFind,
 )
+from .hints import hint, list_problems, reload_hints, reset_all_hints, show_problems
 
 __all__ = [
     # Functions
