@@ -25,7 +25,7 @@ Data Structures:
     Interval: Interval representation
 """
 
-from .checker import check, check_all
+from .checker import check, check_all, list_available_functions
 from .hints import hint, list_problems, show_problems, reset_all_hints, reload_hints
 from .data_structures import (
     ListNode,
@@ -42,6 +42,7 @@ __all__ = [
     # Functions
     'check',
     'check_all',
+    'list_available_functions',
     'hint',
     'list_problems',
     'show_problems',

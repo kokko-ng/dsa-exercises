@@ -1,8 +1,8 @@
 """
-Function registry for passing user implementations from notebooks to pytest.
+Function registry for storing user implementations from notebooks.
 
 This module provides a mechanism to register functions defined in Jupyter notebooks
-so they can be accessed by the test suite.
+so they can be accessed by the inline test runner.
 """
 
 import json
