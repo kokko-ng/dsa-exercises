@@ -12,6 +12,7 @@ from typing import Any, Callable, Optional, Union
 try:
     from IPython import get_ipython  # type: ignore[attr-defined]
     from IPython.display import HTML, display
+
     # Check if we're actually in an IPython/Jupyter environment
     HAS_IPYTHON = get_ipython() is not None  # type: ignore[no-untyped-call]
 except ImportError:
@@ -22,10 +23,19 @@ from .test_cases import TEST_CASES, TestCase
 
 class TestResult:
     """Result of running a test case."""
-    __slots__ = ('name', 'passed', 'error_msg', 'actual', 'expected', 'elapsed', 'args')
 
-    def __init__(self, name: str, passed: bool, error_msg: Optional[str] = None,
-                 actual: Any = None, expected: Any = None, elapsed: Optional[float] = None, args: Any = None) -> None:
+    __slots__ = ("name", "passed", "error_msg", "actual", "expected", "elapsed", "args")
+
+    def __init__(
+        self,
+        name: str,
+        passed: bool,
+        error_msg: Optional[str] = None,
+        actual: Any = None,
+        expected: Any = None,
+        elapsed: Optional[float] = None,
+        args: Any = None,
+    ) -> None:
         self.name = name
         self.passed = passed
         self.error_msg = error_msg
@@ -43,7 +53,23 @@ def _run_test(func: Callable[..., Any], test: TestCase) -> TestResult:
 
     try:
         start = time.time()
-        actual = func(*test_args_copy)
+
+        # Handle class-based tests
+        if test.is_class_test:
+            # For class tests: args[0] = (init_args, method_names, method_args)
+            init_args, method_names, method_args = test_args
+
+            # Instantiate the class
+            instance = func(*init_args)
+
+            # Execute method calls and collect results
+            actual = []
+            for method_name, method_arg in zip(method_names, method_args):
+                result = getattr(instance, method_name)(*method_arg)
+                actual.append(result)
+        else:
+            actual = func(*test_args_copy)
+
         elapsed = time.time() - start
 
         # For in-place modifications, check the modified argument instead of return value
@@ -68,7 +94,7 @@ def _run_test(func: Callable[..., Any], test: TestCase) -> TestResult:
                 actual=actual,
                 expected=test.expected,
                 elapsed=elapsed,
-                args=test_args
+                args=test_args,
             )
 
         if passed:
@@ -81,14 +107,11 @@ def _run_test(func: Callable[..., Any], test: TestCase) -> TestResult:
                 actual=actual,
                 expected=test.expected,
                 elapsed=elapsed,
-                args=test_args
+                args=test_args,
             )
     except Exception as e:
         return TestResult(
-            name=test.name,
-            passed=False,
-            error_msg=f"{type(e).__name__}: {str(e)}",
-            args=test_args
+            name=test.name, passed=False, error_msg=f"{type(e).__name__}: {str(e)}", args=test_args
         )
 
 
@@ -97,13 +120,13 @@ def _display_html(html: str) -> None:
     if HAS_IPYTHON:
         display(HTML(html))  # type: ignore[no-untyped-call]
     else:
-        text = re.sub(r'<[^>]+>', '', html)
-        text = text.replace('&#x2705;', '[PASS]')
-        text = text.replace('&#x274C;', '[FAIL]')
-        text = text.replace('&#x1F4A1;', '[TIP]')
-        text = text.replace('&#x1F680;', '[PERF]')
-        text = text.replace('&#x26A0;', '[WARN]')
-        text = text.replace('&nbsp;', ' ')
+        text = re.sub(r"<[^>]+>", "", html)
+        text = text.replace("&#x2705;", "[PASS]")
+        text = text.replace("&#x274C;", "[FAIL]")
+        text = text.replace("&#x1F4A1;", "[TIP]")
+        text = text.replace("&#x1F680;", "[PERF]")
+        text = text.replace("&#x26A0;", "[WARN]")
+        text = text.replace("&nbsp;", " ")
         print(text)
 
 
@@ -197,9 +220,9 @@ def _display_results(func_name: str, results: list[TestResult], performance: boo
             if len(failed) > max_failures_to_show:
                 error_details += f"\n\n{'─' * 40}\n... and {len(failed) - max_failures_to_show} more failed test(s)"
 
-        error_details = error_details.replace('&', '&amp;')
-        error_details = error_details.replace('<', '&lt;')
-        error_details = error_details.replace('>', '&gt;')
+        error_details = error_details.replace("&", "&amp;")
+        error_details = error_details.replace("<", "&lt;")
+        error_details = error_details.replace(">", "&gt;")
 
         html = f"""
         <div style="padding: 15px; background: #f8d7da; border-left: 4px solid #dc3545;
@@ -224,9 +247,12 @@ def _display_results(func_name: str, results: list[TestResult], performance: boo
     _display_html(html)
 
 
-def check(function_or_name: Union[Callable[..., Any], str], *,
-          verbose: bool = False,
-          performance: bool = False) -> bool:
+def check(
+    function_or_name: Union[Callable[..., Any], str],
+    *,
+    verbose: bool = False,
+    performance: bool = False,
+) -> bool:
     """
     Run tests for a given function and display results in the notebook.
 
@@ -253,6 +279,7 @@ def check(function_or_name: Union[Callable[..., Any], str], *,
 
     if func_obj is None:
         from . import _function_registry
+
         func_obj = _function_registry.get(func_name)
         if func_obj is None:
             html = f"""
@@ -265,6 +292,7 @@ def check(function_or_name: Union[Callable[..., Any], str], *,
             return False
     else:
         from . import _function_registry
+
         _function_registry.register(func_name, func_obj)
 
     if func_name not in TEST_CASES:
@@ -292,7 +320,7 @@ def check(function_or_name: Union[Callable[..., Any], str], *,
             status = "✓" if result.passed else "✗"
             print(f"  {status} {test.name}", end="")
             if result.elapsed:
-                print(f" ({result.elapsed*1000:.1f}ms)")
+                print(f" ({result.elapsed * 1000:.1f}ms)")
             else:
                 print()
             if not result.passed:
@@ -309,7 +337,9 @@ def check(function_or_name: Union[Callable[..., Any], str], *,
     return all(r.passed for r in results)
 
 
-def check_all(category: Optional[str] = None, *, performance: bool = False) -> dict[str, Optional[bool]]:
+def check_all(
+    category: Optional[str] = None, *, performance: bool = False
+) -> dict[str, Optional[bool]]:
     """
     Run tests for all functions, optionally filtered by category.
 

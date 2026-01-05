@@ -4,20 +4,48 @@ from . import TestCase, nested_set_compare, set_compare
 
 HASH_MAP_TESTS = {
     "group_anagrams": [
-        TestCase("example", ((["eat", "tea", "tan", "ate", "nat", "bat"],),),
-                 [["bat"], ["nat", "tan"], ["ate", "eat", "tea"]], nested_set_compare),
+        TestCase(
+            "example",
+            ((["eat", "tea", "tan", "ate", "nat", "bat"],),),
+            [["bat"], ["nat", "tan"], ["ate", "eat", "tea"]],
+            nested_set_compare,
+        ),
         TestCase("empty string", (([""],),), [[""]], nested_set_compare),
         TestCase("single char", ((["a"],),), [["a"]], nested_set_compare),
-        TestCase("no anagrams", ((["abc", "def", "ghi"],),), [["abc"], ["def"], ["ghi"]], nested_set_compare),
-        TestCase("all anagrams", ((["abc", "bca", "cab", "acb"],),), [["abc", "acb", "bca", "cab"]], nested_set_compare),
+        TestCase(
+            "no anagrams",
+            ((["abc", "def", "ghi"],),),
+            [["abc"], ["def"], ["ghi"]],
+            nested_set_compare,
+        ),
+        TestCase(
+            "all anagrams",
+            ((["abc", "bca", "cab", "acb"],),),
+            [["abc", "acb", "bca", "cab"]],
+            nested_set_compare,
+        ),
         TestCase("multiple empty", ((["", ""],),), [["", ""]], nested_set_compare),
-        TestCase("same letters diff counts", ((["aab", "aba", "baa", "ab"],),),
-                 [["aab", "aba", "baa"], ["ab"]], nested_set_compare),
-        TestCase("single word per group", ((["abc", "def", "ghi", "jkl"],),),
-                 [["abc"], ["def"], ["ghi"], ["jkl"]], nested_set_compare),
-        TestCase("performance", ((["abc", "bca", "cab"] * 1000 + ["xyz", "zyx"] * 500,),), None, None, is_performance=True, max_time=1.0),
+        TestCase(
+            "same letters diff counts",
+            ((["aab", "aba", "baa", "ab"],),),
+            [["aab", "aba", "baa"], ["ab"]],
+            nested_set_compare,
+        ),
+        TestCase(
+            "single word per group",
+            ((["abc", "def", "ghi", "jkl"],),),
+            [["abc"], ["def"], ["ghi"], ["jkl"]],
+            nested_set_compare,
+        ),
+        TestCase(
+            "performance",
+            ((["abc", "bca", "cab"] * 1000 + ["xyz", "zyx"] * 500,),),
+            None,
+            None,
+            is_performance=True,
+            max_time=1.0,
+        ),
     ],
-
     "two_sum_ii": [
         TestCase("example 1", (([2, 7, 11, 15], 9),), [1, 2]),
         TestCase("example 2", (([2, 3, 4], 6),), [1, 3]),
@@ -28,7 +56,6 @@ HASH_MAP_TESTS = {
         TestCase("large gap", (([1, 2, 3, 50, 100], 103),), [3, 5]),
         TestCase("adjacent", (([1, 2, 3, 4, 5], 3),), [1, 2]),
     ],
-
     "contains_duplicate": [
         TestCase("has duplicate", (([1, 2, 3, 1],),), True),
         TestCase("no duplicate", (([1, 2, 3, 4],),), False),
@@ -40,7 +67,6 @@ HASH_MAP_TESTS = {
         TestCase("negative numbers", (([-1, -2, -3, -1],),), True),
         TestCase("large array no dup", ((list(range(10000)),),), False),
     ],
-
     "isomorphic_strings": [
         TestCase("egg add", (("egg", "add"),), True),
         TestCase("foo bar", (("foo", "bar"),), False),
@@ -52,7 +78,6 @@ HASH_MAP_TESTS = {
         TestCase("same strings", (("abc", "abc"),), True),
         TestCase("ab aa", (("ab", "aa"),), False),
     ],
-
     "word_pattern": [
         TestCase("match", (("abba", "dog cat cat dog"),), True),
         TestCase("no match", (("abba", "dog cat cat fish"),), False),
@@ -63,7 +88,6 @@ HASH_MAP_TESTS = {
         TestCase("same word", (("ab", "dog dog"),), False),
         TestCase("long pattern", (("abcabc", "one two three one two three"),), True),
     ],
-
     "happy_number": [
         TestCase("19 is happy", ((19,),), True),
         TestCase("2 is not happy", ((2,),), False),
@@ -75,7 +99,6 @@ HASH_MAP_TESTS = {
         TestCase("13 is happy", ((13,),), True),
         TestCase("20 is not happy", ((20,),), False),
     ],
-
     "first_unique_character": [
         TestCase("leetcode", (("leetcode",),), 0),
         TestCase("loveleetcode", (("loveleetcode",),), 2),
@@ -87,7 +110,6 @@ HASH_MAP_TESTS = {
         TestCase("first unique", (("abc",),), 0),
         TestCase("empty", (("",),), -1),
     ],
-
     "intersection_of_two_arrays": [
         TestCase("example 1", (([1, 2, 2, 1], [2, 2]),), [2], set_compare),
         TestCase("example 2", (([4, 9, 5], [9, 4, 9, 8, 4]),), [4, 9], set_compare),
@@ -98,7 +120,6 @@ HASH_MAP_TESTS = {
         TestCase("complete overlap", (([1, 1, 1], [1]),), [1], set_compare),
         TestCase("negative numbers", (([-1, -2, -3], [-2, -3, -4]),), [-2, -3], set_compare),
     ],
-
     "longest_consecutive_sequence": [
         TestCase("example 1", (([100, 4, 200, 1, 3, 2],),), 4),
         TestCase("example 2", (([0, 3, 7, 2, 5, 8, 4, 6, 0, 1],),), 9),
@@ -110,7 +131,6 @@ HASH_MAP_TESTS = {
         TestCase("scattered", (([1, 100, 2, 200, 3, 300],),), 3),
         TestCase("all same", (([5, 5, 5, 5],),), 1),
     ],
-
     "subarray_sum_equals_k": [
         TestCase("example 1", (([1, 1, 1], 2),), 2),
         TestCase("example 2", (([1, 2, 3], 3),), 2),
@@ -122,7 +142,6 @@ HASH_MAP_TESTS = {
         TestCase("large k", (([1, 2, 3, 4, 5], 15),), 1),
         TestCase("cumulative", (([3, 4, 7, 2, -3, 1, 4, 2], 7),), 4),
     ],
-
     "four_sum_ii": [
         TestCase("example 1", (([1, 2], [-2, -1], [-1, 2], [0, 2]),), 2),
         TestCase("all zeros", (([0], [0], [0], [0]),), 1),
@@ -131,8 +150,42 @@ HASH_MAP_TESTS = {
         TestCase("single elements", (([1], [-1], [0], [0]),), 1),
         TestCase("negative only", (([-1, -1], [-1], [1, 1], [1]),), 4),
     ],
-
-    "lru_cache": [
-        # LRU cache requires special handling - leaving placeholder
+    "LRUCache": [
+        TestCase(
+            "example 1",
+            (((2,), ["put", "put", "get", "put", "get", "put", "get", "get", "get"], [(1, 1), (2, 2), (1,), (3, 3), (2,), (4, 4), (1,), (3,), (4,)]),),
+            [None, None, 1, None, -1, None, -1, 3, 4],
+            is_class_test=True,
+        ),
+        TestCase(
+            "single capacity",
+            (((1,), ["put", "put", "get", "get"], [(1, 1), (2, 2), (1,), (2,)]),),
+            [None, None, -1, 2],
+            is_class_test=True,
+        ),
+        TestCase(
+            "update existing key",
+            (((2,), ["put", "put", "get", "put", "get", "get"], [(1, 1), (2, 2), (1,), (1, 10), (1,), (2,)]),),
+            [None, None, 1, None, 10, 2],
+            is_class_test=True,
+        ),
+        TestCase(
+            "get non-existent",
+            (((2,), ["get", "put", "get"], [(1,), (1, 1), (1,)]),),
+            [-1, None, 1],
+            is_class_test=True,
+        ),
+        TestCase(
+            "eviction order",
+            (((2,), ["put", "put", "get", "get", "put", "get", "get"], [(1, 1), (2, 2), (1,), (2,), (3, 3), (1,), (3,)]),),
+            [None, None, 1, 2, None, -1, 3],
+            is_class_test=True,
+        ),
+        TestCase(
+            "get updates order",
+            (((2,), ["put", "put", "get", "put", "get", "get"], [(1, 1), (2, 2), (1,), (3, 3), (2,), (1,)]),),
+            [None, None, 1, None, -1, 1],
+            is_class_test=True,
+        ),
     ],
 }
