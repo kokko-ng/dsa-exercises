@@ -7,13 +7,13 @@ and displays formatted results in Jupyter notebooks. No pytest required.
 
 import re
 import time
-from typing import Callable, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 try:
-    from IPython import get_ipython
+    from IPython import get_ipython  # type: ignore[attr-defined]
     from IPython.display import HTML, display
     # Check if we're actually in an IPython/Jupyter environment
-    HAS_IPYTHON = get_ipython() is not None
+    HAS_IPYTHON = get_ipython() is not None  # type: ignore[no-untyped-call]
 except ImportError:
     HAS_IPYTHON = False
 
@@ -25,7 +25,7 @@ class TestResult:
     __slots__ = ('name', 'passed', 'error_msg', 'actual', 'expected', 'elapsed', 'args')
 
     def __init__(self, name: str, passed: bool, error_msg: Optional[str] = None,
-                 actual=None, expected=None, elapsed: Optional[float] = None, args=None):
+                 actual: Any = None, expected: Any = None, elapsed: Optional[float] = None, args: Any = None) -> None:
         self.name = name
         self.passed = passed
         self.error_msg = error_msg
@@ -35,7 +35,7 @@ class TestResult:
         self.args = args
 
 
-def _run_test(func: Callable, test: TestCase) -> TestResult:
+def _run_test(func: Callable[..., Any], test: TestCase) -> TestResult:
     """Run a single test case."""
     test_args = test.args[0]  # Capture the input arguments
     # Make a copy for functions that modify in-place
@@ -95,7 +95,7 @@ def _run_test(func: Callable, test: TestCase) -> TestResult:
 def _display_html(html: str) -> None:
     """Display HTML in notebook or print for terminal."""
     if HAS_IPYTHON:
-        display(HTML(html))
+        display(HTML(html))  # type: ignore[no-untyped-call]
     else:
         text = re.sub(r'<[^>]+>', '', html)
         text = text.replace('&#x2705;', '[PASS]')
@@ -149,7 +149,7 @@ def _display_results(func_name: str, results: list[TestResult], performance: boo
     else:
         failed = [r for r in results if not r.passed]
 
-        def format_failure(fail: TestResult, index: int = None) -> str:
+        def format_failure(fail: TestResult, index: Optional[int] = None) -> str:
             """Format a single test failure with detailed information."""
             lines = []
             if index is not None:
@@ -224,7 +224,7 @@ def _display_results(func_name: str, results: list[TestResult], performance: boo
     _display_html(html)
 
 
-def check(function_or_name: Union[Callable, str], *,
+def check(function_or_name: Union[Callable[..., Any], str], *,
           verbose: bool = False,
           performance: bool = False) -> bool:
     """
@@ -309,7 +309,7 @@ def check(function_or_name: Union[Callable, str], *,
     return all(r.passed for r in results)
 
 
-def check_all(category: Optional[str] = None, *, performance: bool = False) -> dict:
+def check_all(category: Optional[str] = None, *, performance: bool = False) -> dict[str, Optional[bool]]:
     """
     Run tests for all functions, optionally filtered by category.
 
@@ -322,7 +322,7 @@ def check_all(category: Optional[str] = None, *, performance: bool = False) -> d
     """
     from . import _function_registry
 
-    results = {}
+    results: dict[str, Optional[bool]] = {}
 
     for func_name in TEST_CASES:
         if category and category not in func_name:

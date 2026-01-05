@@ -21,7 +21,7 @@ class TestCase:
     """A single test case."""
 
     name: str
-    args: tuple
+    args: tuple[tuple[Any, ...], ...]
     expected: Any
     comparator: Optional[Callable[[Any, Any], bool]] = None
     is_performance: bool = False

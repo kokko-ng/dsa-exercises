@@ -15,18 +15,19 @@ from typing import Any, Callable, Optional
 _REGISTRY_FILE = os.path.join(tempfile.gettempdir(), "dsa_func_registry.json")
 
 
-def _load_registry() -> dict:
+def _load_registry() -> dict[str, Any]:
     """Load the function registry from disk."""
     try:
         if os.path.exists(_REGISTRY_FILE):
             with open(_REGISTRY_FILE) as f:
-                return json.load(f)
+                data: dict[str, Any] = json.load(f)
+                return data
     except (OSError, json.JSONDecodeError):
         pass
     return {}
 
 
-def _save_registry(registry: dict) -> None:
+def _save_registry(registry: dict[str, Any]) -> None:
     """Save the function registry to disk."""
     try:
         with open(_REGISTRY_FILE, 'w') as f:
@@ -35,7 +36,7 @@ def _save_registry(registry: dict) -> None:
         pass
 
 
-def register(name: str, func: Callable) -> None:
+def register(name: str, func: Callable[..., Any]) -> None:
     """
     Register a function for testing.
 
@@ -61,7 +62,7 @@ def register(name: str, func: Callable) -> None:
     _save_registry(registry)
 
 
-def get(name: str) -> Optional[Callable]:
+def get(name: str) -> Optional[Callable[..., Any]]:
     """
     Retrieve a registered function by name.
 
@@ -84,8 +85,8 @@ def get(name: str) -> Optional[Callable]:
 
     # Reconstruct function from source
     # Create a namespace with common imports
-    local_ns: dict = {}
-    global_ns = {
+    local_ns: dict[str, Any] = {}
+    global_ns: dict[str, Any] = {
         '__builtins__': __builtins__,
         'Optional': Optional,
         'List': list,
@@ -146,7 +147,7 @@ def clear(name: Optional[str] = None) -> None:
             _save_registry(registry)
 
 
-def list_registered() -> list:
+def list_registered() -> list[str]:
     """List all registered function names."""
     registry = _load_registry()
     return list(registry.keys())

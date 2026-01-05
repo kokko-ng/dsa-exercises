@@ -7,7 +7,7 @@ helping users learn without giving away the complete solution.
 
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import yaml
 
@@ -22,7 +22,7 @@ except ImportError:
 _hint_state: dict[str, int] = defaultdict(int)
 
 # Cache for loaded hints
-_hints_cache: Optional[dict[str, dict]] = None
+_hints_cache: Optional[dict[str, dict[str, Any]]] = None
 
 
 def _get_hints_dir() -> Path:
@@ -30,7 +30,7 @@ def _get_hints_dir() -> Path:
     return Path(__file__).parent.parent / "hints"
 
 
-def _load_all_hints() -> dict[str, dict]:
+def _load_all_hints() -> dict[str, dict[str, Any]]:
     """Load all hints from YAML files."""
     global _hints_cache
     if _hints_cache is not None:
@@ -57,9 +57,9 @@ def _load_all_hints() -> dict[str, dict]:
 def _display_output(html: str, markdown: Optional[str] = None) -> None:
     """Display output in notebook or terminal."""
     if HAS_IPYTHON:
-        display(HTML(html))
+        display(HTML(html))  # type: ignore[no-untyped-call]
         if markdown:
-            display(Markdown(markdown))
+            display(Markdown(markdown))  # type: ignore[no-untyped-call]
     else:
         # Strip HTML for terminal
         import re

@@ -6,7 +6,7 @@ HASH_MAP_TESTS = {
     "group_anagrams": [
         TestCase("example", ((["eat", "tea", "tan", "ate", "nat", "bat"],),),
                  [["bat"], ["nat", "tan"], ["ate", "eat", "tea"]], nested_set_compare),
-        TestCase("empty string", (([""]),), [[""]], nested_set_compare),
+        TestCase("empty string", (([""],),), [[""]], nested_set_compare),
         TestCase("single char", ((["a"],),), [["a"]], nested_set_compare),
         TestCase("no anagrams", ((["abc", "def", "ghi"],),), [["abc"], ["def"], ["ghi"]], nested_set_compare),
         TestCase("all anagrams", ((["abc", "bca", "cab", "acb"],),), [["abc", "acb", "bca", "cab"]], nested_set_compare),

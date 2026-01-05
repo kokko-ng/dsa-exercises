@@ -24,7 +24,7 @@ class ListNode:
     def __repr__(self) -> str:
         """String representation showing the list."""
         values = []
-        node = self
+        node: Optional[ListNode] = self
         seen = set()
         while node and id(node) not in seen:
             values.append(str(node.val))
@@ -38,7 +38,8 @@ class ListNode:
         """Compare two linked lists."""
         if not isinstance(other, ListNode):
             return False
-        a, b = self, other
+        a: Optional[ListNode] = self
+        b: Optional[ListNode] = other
         while a and b:
             if a.val != b.val:
                 return False
@@ -60,7 +61,7 @@ class ListNode:
     def to_list(self) -> list[int]:
         """Convert linked list to Python list."""
         result = []
-        node = self
+        node: Optional[ListNode] = self
         seen = set()
         while node and id(node) not in seen:
             result.append(node.val)
@@ -80,7 +81,7 @@ class DoublyListNode:
 
     def __repr__(self) -> str:
         values = []
-        node = self
+        node: Optional[DoublyListNode] = self
         seen = set()
         while node and id(node) not in seen:
             values.append(str(node.val))
@@ -104,7 +105,7 @@ class DoublyListNode:
     def to_list(self) -> list[int]:
         """Convert doubly linked list to Python list."""
         result = []
-        node = self
+        node: Optional[DoublyListNode] = self
         seen = set()
         while node and id(node) not in seen:
             result.append(node.val)
@@ -149,27 +150,32 @@ class TreeNode:
         """
         if not values or values[0] is None:
             return None
+        assert values[0] is not None  # for type checker
         root = cls(values[0])
-        queue = [root]
+        queue: list[TreeNode] = [root]
         i = 1
         while queue and i < len(values):
             node = queue.pop(0)
             # Left child
             if i < len(values) and values[i] is not None:
-                node.left = cls(values[i])
+                left_val = values[i]
+                assert left_val is not None  # for type checker
+                node.left = cls(left_val)
                 queue.append(node.left)
             i += 1
             # Right child
             if i < len(values) and values[i] is not None:
-                node.right = cls(values[i])
+                right_val = values[i]
+                assert right_val is not None  # for type checker
+                node.right = cls(right_val)
                 queue.append(node.right)
             i += 1
         return root
 
     def to_list(self) -> list[Optional[int]]:
         """Convert tree to level-order list."""
-        result = []
-        queue = [self]
+        result: list[Optional[int]] = []
+        queue: list[Optional[TreeNode]] = [self]
         while queue:
             node = queue.pop(0)
             if node:
@@ -228,7 +234,7 @@ class GraphNode:
 class TrieNode:
     """Trie (prefix tree) node."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.children: dict[str, TrieNode] = {}
         self.is_end: bool = False
         self.word: Optional[str] = None
@@ -240,7 +246,7 @@ class TrieNode:
 class Trie:
     """Complete Trie implementation for reference."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.root = TrieNode()
 
     def insert(self, word: str) -> None:
@@ -324,7 +330,7 @@ class Interval:
         if isinstance(other, Interval):
             return self.start == other.start and self.end == other.end
         if isinstance(other, (list, tuple)) and len(other) == 2:
-            return self.start == other[0] and self.end == other[1]
+            return bool(self.start == other[0] and self.end == other[1])
         return False
 
     def __lt__(self, other: 'Interval') -> bool:
