@@ -41,6 +41,7 @@ LINKED_LIST_INPUT_FUNCS = {
     "remove_nth_from_end",
     "merge_two_sorted_lists",
     "merge_k_sorted_lists",
+    "flatten_multilevel_list",
 }
 
 # Functions that return linked list values (need conversion from ListNode to list for comparison)
@@ -62,6 +63,7 @@ LINKED_LIST_OUTPUT_FUNCS = {
     "remove_nth_from_end",
     "merge_two_sorted_lists",
     "merge_k_sorted_lists",
+    "flatten_multilevel_list",
 }
 
 # Tree functions that need input/output conversion
@@ -108,6 +110,60 @@ def _create_linked_list_with_cycle(values: list[int], pos: int) -> Optional[List
     return head
 
 
+class _MultilevelNode:
+    """Node for multilevel linked list (used in flatten_multilevel_list tests)."""
+
+    def __init__(
+        self,
+        val: int = 0,
+        next: Optional["_MultilevelNode"] = None,
+        child: Optional["_MultilevelNode"] = None,
+    ):
+        self.val = val
+        self.next = next
+        self.child = child
+
+
+def _create_multilevel_list(data: dict) -> Optional[_MultilevelNode]:
+    """Create a multilevel linked list from test data format."""
+    values = data.get("list", [])
+    child_at = data.get("child_at", -1)
+    child_values = data.get("child", [])
+
+    if not values:
+        return None
+
+    # Create main list
+    head = _MultilevelNode(values[0])
+    current = head
+    nodes = [head]
+    for val in values[1:]:
+        current.next = _MultilevelNode(val)
+        current = current.next
+        nodes.append(current)
+
+    # Attach child list if specified
+    if child_at >= 0 and child_at < len(nodes) and child_values:
+        child_head = _MultilevelNode(child_values[0])
+        child_current = child_head
+        for val in child_values[1:]:
+            child_current.next = _MultilevelNode(val)
+            child_current = child_current.next
+        nodes[child_at].child = child_head
+
+    return head
+
+
+def _multilevel_list_to_list(head: Optional[_MultilevelNode]) -> list[int]:
+    """Convert a flattened multilevel list back to a Python list."""
+    result = []
+    current = head
+    while current:
+        result.append(current.val)
+        current = current.next
+    return result
+
+
 def _preprocess_linked_list_args(func_name: str, args: tuple) -> tuple:
     """Convert raw list/dict data to ListNode objects for linked list functions."""
     if func_name not in LINKED_LIST_INPUT_FUNCS:
@@ -131,6 +187,10 @@ def _preprocess_linked_list_args(func_name: str, args: tuple) -> tuple:
             new_args[0] = ListNode.from_list(args[0])
         if len(args) > 1 and isinstance(args[1], list):
             new_args[1] = ListNode.from_list(args[1])
+    elif func_name == "flatten_multilevel_list":
+        # Takes a dict with 'list', 'child_at', 'child' keys
+        if isinstance(args[0], dict) and "list" in args[0]:
+            new_args[0] = _create_multilevel_list(args[0])
     else:
         # Most linked list functions take a single list as first argument
         if isinstance(args[0], list):
@@ -162,7 +222,7 @@ def _postprocess_linked_list_result(func_name: str, result: Any) -> Any:
         # Returns a list of ListNodes (heads of each part)
         if result is None:
             return []
-        output = []
+        output: list[Any] = []
         for head in result:
             if head is None:
                 output.append([])
@@ -171,6 +231,17 @@ def _postprocess_linked_list_result(func_name: str, result: Any) -> Any:
             else:
                 output.append(head)
         return output
+    elif func_name == "flatten_multilevel_list":
+        # Returns a flattened multilevel list (convert to list of values)
+        if result is None:
+            return []
+        # Handle both _MultilevelNode and user-defined Node classes
+        values = []
+        current = result
+        while current:
+            values.append(current.val)
+            current = current.next
+        return values
     elif isinstance(result, ListNode):
         # Convert ListNode to list for comparison
         return result.to_list()
@@ -225,7 +296,7 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
 
     # Make a copy for functions that modify in-place
     if test.check_modified_arg is not None:
-        test_args_copy = list(preprocessed_args)
+        test_args_copy: list[Any] | tuple[Any, ...] = list(preprocessed_args)
     else:
         test_args_copy = preprocessed_args
 
