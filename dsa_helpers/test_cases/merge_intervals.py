@@ -2,7 +2,7 @@
 
 from . import TestCase
 
-MERGE_INTERVALS_TESTS = {
+MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
     "merge_intervals": [
         TestCase(
             "overlapping", (([[1, 3], [2, 6], [8, 10], [15, 18]],),), [[1, 6], [8, 10], [15, 18]]

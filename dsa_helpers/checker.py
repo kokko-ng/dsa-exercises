@@ -4,6 +4,7 @@ Provides the check() function that runs inline tests for user implementations
 and displays formatted results in Jupyter notebooks. No pytest required.
 """
 
+import inspect
 import re
 import time
 from typing import Any, Callable, Optional, Union
@@ -371,9 +372,10 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
                 init_args, method_names, method_args = test_args
 
             # Get the class and instantiate it
-            # For class tests, the function returns the class (not an instance)
-            cls = func() if callable(func) else func
-            instance = cls(*init_args) if callable(cls) else cls
+            # For class tests, func may be a class directly or a factory function
+            # Use inspect.isclass to distinguish classes from callable factories
+            cls = func if inspect.isclass(func) else func()
+            instance = cls(*init_args)
 
             # Execute method calls and collect results
             actual = []
