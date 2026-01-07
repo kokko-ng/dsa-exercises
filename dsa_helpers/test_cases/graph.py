@@ -35,7 +35,7 @@ GRAPH_TESTS = {
         TestCase("cycle", ((2, [[1, 0], [0, 1]]),), []),
         TestCase("single", ((1, []),), [0]),
         TestCase("chain", ((4, [[1, 0], [2, 1], [3, 2]]),), [0, 1, 2, 3]),
-        TestCase("complex valid", ((6, [[1, 0], [2, 0], [3, 1], [3, 2], [4, 3], [5, 3]]),), None, topological_order_compare),
+        TestCase("complex valid", ((6, [[1, 0], [2, 0], [3, 1], [3, 2], [4, 3], [5, 3]]),), [0, 1, 2, 3, 4, 5], topological_order_compare),
     ],
 
     "clone_graph": [
@@ -49,7 +49,7 @@ GRAPH_TESTS = {
         TestCase("row", (([[1, 2, 3]],),), [[0, 0], [0, 1], [0, 2]], unordered_list_compare),
         TestCase("column", (([[1], [2], [3]],),), [[0, 0], [1, 0], [2, 0]], unordered_list_compare),
         TestCase("all same", (([[5, 5], [5, 5]],),), [[0, 0], [0, 1], [1, 0], [1, 1]], unordered_list_compare),
-        TestCase("descending", (([[3, 2, 1], [2, 1, 0], [1, 0, 0]],),), [[0, 0]], unordered_list_compare),
+        TestCase("descending", (([[3, 2, 1], [2, 1, 0], [1, 0, 0]],),), [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]], unordered_list_compare),
     ],
 
     "word_ladder": [
@@ -57,7 +57,7 @@ GRAPH_TESTS = {
         TestCase("no path", (("hit", "cog", ["hot", "dot", "dog", "lot", "log"]),), 0),
         TestCase("direct", (("a", "c", ["a", "b", "c"]),), 2),
         TestCase("same word", (("hit", "hit", ["hit"]),), 1),
-        TestCase("longer path", (("qa", "sq", ["si", "go", "se", "cm", "so", "ph", "os", "sq"]),), 5),
+        TestCase("longer path", (("go", "sq", ["si", "go", "se", "cm", "so", "ph", "os", "sq"]),), 3),
     ],
 
     "network_delay_time": [
@@ -104,7 +104,7 @@ GRAPH_TESTS = {
         TestCase("basic", ((["wrt", "wrf", "er", "ett", "rftt"],),), "wertf"),
         TestCase("simple", ((["z", "x"],),), "zx"),
         TestCase("invalid", ((["z", "x", "z"],),), ""),
-        TestCase("single word", ((["abc"],),), "abc"),
+        TestCase("single word", ((["abc"],),), "abc", set_compare),
     ],
 
     "all_paths_from_source": [

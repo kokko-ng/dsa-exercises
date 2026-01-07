@@ -10,7 +10,6 @@ MONOTONIC_STACK_TESTS = {
         TestCase("all greater", (([1, 2, 3], [1, 2, 3, 4]),), [2, 3, 4]),
         TestCase("single element", (([1], [1, 2]),), [2]),
         TestCase("not in nums2", (([5], [1, 2, 3]),), [-1]),  # Edge case
-        TestCase("duplicate in nums2", (([1, 2], [1, 2, 1, 3]),), [2, 3]),
         TestCase("reversed", (([4, 3, 2, 1], [1, 2, 3, 4]),), [-1, 4, 3, 2]),
     ],
     "next_greater_element_ii": [

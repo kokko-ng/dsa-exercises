@@ -18,6 +18,8 @@ def sorted_compare(result: Any, expected: Any) -> bool:
 
 def set_compare(result: Any, expected: Any) -> bool:
     """Compare as sets (for problems where order doesn't matter)."""
+    if isinstance(result, str) and isinstance(expected, str):
+        return bool(set(result) == set(expected))
     if isinstance(result, list) and isinstance(expected, list):
         if not result and not expected:
             return True

@@ -78,7 +78,7 @@ TREE_TESTS = {
 
     "path_with_given_sequence": [
         TestCase("exists", (([1, 7, 9, None, None, 2, 9], [1, 9, 9]),), True),
-        TestCase("not exists", (([1, 0, 1, 1, 0, 0, 1], [1, 1, 0]),), False),
+        TestCase("not exists", (([1, 0, 1, 1, 0, 0, 1], [1, 0, 1, 1]),), False),
         TestCase("single", (([1], [1]),), True),
     ],
 
