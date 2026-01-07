@@ -1,5 +1,4 @@
-"""
-Test checker for DSA exercises.
+"""Test checker for DSA exercises.
 
 Provides the check() function that runs inline tests for user implementations
 and displays formatted results in Jupyter notebooks. No pytest required.
@@ -20,7 +19,6 @@ except ImportError:
 
 from .data_structures import ListNode, TreeNode
 from .test_cases import TEST_CASES, TestCase
-
 
 # Functions that take linked list inputs (need conversion from list/dict to ListNode)
 LINKED_LIST_INPUT_FUNCS = {
@@ -237,7 +235,19 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
         # Handle class-based tests
         if test.is_class_test:
             # For class tests: args[0] = (init_args, method_names, method_args)
-            init_args, method_names, method_args = test_args
+            # Or a dict with 'ops' and 'vals' keys (alternative format)
+            if (
+                isinstance(test_args, tuple)
+                and len(test_args) == 1
+                and isinstance(test_args[0], dict)
+            ):
+                # Dict format: {"ops": [...], "vals": [...]}
+                data = test_args[0]
+                init_args = ()
+                method_names = data["ops"]
+                method_args = [[v] if v is not None else [] for v in data["vals"]]
+            else:
+                init_args, method_names, method_args = test_args
 
             # Instantiate the class
             instance = func(*init_args)
@@ -438,8 +448,7 @@ def check(
     verbose: bool = False,
     performance: bool = False,
 ) -> bool:
-    """
-    Run tests for a given function and display results in the notebook.
+    """Run tests for a given function and display results in the notebook.
 
     Args:
         function_or_name: Either a function object or string function name
@@ -525,8 +534,7 @@ def check(
 def check_all(
     category: Optional[str] = None, *, performance: bool = False
 ) -> dict[str, Optional[bool]]:
-    """
-    Run tests for all functions, optionally filtered by category.
+    """Run tests for all functions, optionally filtered by category.
 
     Args:
         category: Function name prefix to filter (e.g., "two_sum")
