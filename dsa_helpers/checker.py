@@ -262,6 +262,56 @@ def _preprocess_tree_args(func_name: str, args: tuple) -> tuple:
     return tuple(new_args)
 
 
+# Tree functions that need output conversion
+TREE_OUTPUT_FUNCS = {
+    "level_order_successor",
+    "connect_level_order_siblings",
+    "connect_all_siblings",
+}
+
+
+def _postprocess_tree_result(func_name: str, result: Any) -> Any:
+    """Convert TreeNode result back to comparable format."""
+    if func_name not in TREE_OUTPUT_FUNCS:
+        return result
+
+    if func_name == "level_order_successor":
+        # Returns the node value, or None
+        if result is None:
+            return None
+        if isinstance(result, TreeNode):
+            return result.val
+        return result
+    elif func_name in {"connect_level_order_siblings", "connect_all_siblings"}:
+        # Returns the root node with next pointers set
+        # Convert to format: [[level1_vals, None], [level2_vals, None], ...]
+        if result is None:
+            return []
+
+        output = []
+        level_start = result
+        while level_start:
+            level = []
+            curr = level_start
+            next_level_start = None
+            # Traverse all nodes at this level using next pointers
+            while curr:
+                level.append(curr.val)
+                # Find the first child of the next level
+                if next_level_start is None:
+                    if curr.left:
+                        next_level_start = curr.left
+                    elif curr.right:
+                        next_level_start = curr.right
+                curr = curr.next
+            level.append(None)  # Mark end of level
+            output.append(level)
+            level_start = next_level_start
+        return output
+
+    return result
+
+
 class TestResult:
     """Result of running a test case."""
 
@@ -320,8 +370,10 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
             else:
                 init_args, method_names, method_args = test_args
 
-            # Instantiate the class
-            instance = func(*init_args)
+            # Get the class and instantiate it
+            # For class tests, the function returns the class (not an instance)
+            cls = func() if callable(func) else func
+            instance = cls(*init_args) if callable(cls) else cls
 
             # Execute method calls and collect results
             actual = []
@@ -339,8 +391,9 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
             # Postprocess linked list results for in-place modifications
             actual = _postprocess_linked_list_result(func_name, actual)
         else:
-            # Postprocess linked list results
+            # Postprocess linked list and tree results
             actual = _postprocess_linked_list_result(func_name, actual)
+            actual = _postprocess_tree_result(func_name, actual)
 
         # Check result
         if test.comparator:

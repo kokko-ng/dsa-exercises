@@ -1,5 +1,4 @@
-"""
-Data structure helpers for DSA exercises.
+"""Data structure helpers for DSA exercises.
 
 Provides common data structures used across algorithm problems:
 - ListNode: Singly linked list
@@ -17,7 +16,7 @@ from typing import Optional
 class ListNode:
     """Singly linked list node."""
 
-    def __init__(self, val: int = 0, next: Optional['ListNode'] = None):
+    def __init__(self, val: int = 0, next: Optional["ListNode"] = None):
         self.val = val
         self.next = next
 
@@ -63,7 +62,7 @@ class ListNode:
         return a is None and b is None
 
     @classmethod
-    def from_list(cls, values: list[int]) -> Optional['ListNode']:
+    def from_list(cls, values: list[int]) -> Optional["ListNode"]:
         """Create linked list from Python list."""
         if not values:
             return None
@@ -89,13 +88,18 @@ class ListNode:
 class DoublyListNode:
     """Doubly linked list node."""
 
-    def __init__(self, val: int = 0, prev: Optional['DoublyListNode'] = None,
-                 next: Optional['DoublyListNode'] = None):
+    def __init__(
+        self,
+        val: int = 0,
+        prev: Optional["DoublyListNode"] = None,
+        next: Optional["DoublyListNode"] = None,
+    ):
         self.val = val
         self.prev = prev
         self.next = next
 
     def __repr__(self) -> str:
+        """String representation showing the list."""
         values = []
         node: Optional[DoublyListNode] = self
         seen = set()
@@ -106,7 +110,7 @@ class DoublyListNode:
         return " <-> ".join(values)
 
     @classmethod
-    def from_list(cls, values: list[int]) -> Optional['DoublyListNode']:
+    def from_list(cls, values: list[int]) -> Optional["DoublyListNode"]:
         """Create doubly linked list from Python list."""
         if not values:
             return None
@@ -133,11 +137,17 @@ class DoublyListNode:
 class TreeNode:
     """Binary tree node."""
 
-    def __init__(self, val: int = 0, left: Optional['TreeNode'] = None,
-                 right: Optional['TreeNode'] = None):
+    def __init__(
+        self,
+        val: int = 0,
+        left: Optional["TreeNode"] = None,
+        right: Optional["TreeNode"] = None,
+        next: Optional["TreeNode"] = None,
+    ):
         self.val = val
         self.left = left
         self.right = right
+        self.next = next  # Used for level-order sibling connection problems
 
     def __repr__(self) -> str:
         """Simple string representation."""
@@ -149,12 +159,10 @@ class TreeNode:
             return False
         if not isinstance(other, TreeNode):
             return False
-        return (self.val == other.val and
-                self.left == other.left and
-                self.right == other.right)
+        return self.val == other.val and self.left == other.left and self.right == other.right
 
     @classmethod
-    def from_list(cls, values: list[Optional[int]]) -> Optional['TreeNode']:
+    def from_list(cls, values: list[Optional[int]]) -> Optional["TreeNode"]:
         """Create tree from level-order list (LeetCode format).
 
         Example: [1, 2, 3, None, 4] creates:
@@ -217,16 +225,17 @@ class TreeNode:
 class GraphNode:
     """Graph node for adjacency list representation."""
 
-    def __init__(self, val: int = 0, neighbors: Optional[list['GraphNode']] = None):
+    def __init__(self, val: int = 0, neighbors: Optional[list["GraphNode"]] = None):
         self.val = val
         self.neighbors = neighbors if neighbors is not None else []
 
     def __repr__(self) -> str:
+        """String representation showing node and neighbors."""
         neighbor_vals = [n.val for n in self.neighbors]
         return f"GraphNode({self.val}, neighbors={neighbor_vals})"
 
     @classmethod
-    def from_adjacency_list(cls, adj_list: list[list[int]]) -> Optional['GraphNode']:
+    def from_adjacency_list(cls, adj_list: list[list[int]]) -> Optional["GraphNode"]:
         """Create graph from adjacency list.
 
         adj_list[i] contains neighbors of node i (1-indexed in typical problems).
@@ -256,6 +265,7 @@ class TrieNode:
         self.word: Optional[str] = None
 
     def __repr__(self) -> str:
+        """String representation showing children keys and end status."""
         return f"TrieNode(children={list(self.children.keys())}, is_end={self.is_end})"
 
 
@@ -340,36 +350,35 @@ class Interval:
         self.end = end
 
     def __repr__(self) -> str:
+        """String representation in [start, end] format."""
         return f"[{self.start}, {self.end}]"
 
     def __eq__(self, other: object) -> bool:
+        """Compare interval with another Interval, list, or tuple."""
         if isinstance(other, Interval):
             return self.start == other.start and self.end == other.end
         if isinstance(other, (list, tuple)) and len(other) == 2:
             return bool(self.start == other[0] and self.end == other[1])
         return False
 
-    def __lt__(self, other: 'Interval') -> bool:
+    def __lt__(self, other: "Interval") -> bool:
         """For sorting by start time."""
         return self.start < other.start
 
-    def overlaps(self, other: 'Interval') -> bool:
+    def overlaps(self, other: "Interval") -> bool:
         """Check if this interval overlaps with another."""
         return self.start <= other.end and other.start <= self.end
 
-    def merge(self, other: 'Interval') -> 'Interval':
+    def merge(self, other: "Interval") -> "Interval":
         """Merge two overlapping intervals."""
-        return Interval(
-            min(self.start, other.start),
-            max(self.end, other.end)
-        )
+        return Interval(min(self.start, other.start), max(self.end, other.end))
 
     @classmethod
-    def from_list(cls, intervals: list[list[int]]) -> list['Interval']:
+    def from_list(cls, intervals: list[list[int]]) -> list["Interval"]:
         """Convert list of lists to list of Intervals."""
         return [cls(i[0], i[1]) for i in intervals]
 
     @staticmethod
-    def to_list(intervals: list['Interval']) -> list[list[int]]:
+    def to_list(intervals: list["Interval"]) -> list[list[int]]:
         """Convert list of Intervals to list of lists."""
         return [[i.start, i.end] for i in intervals]

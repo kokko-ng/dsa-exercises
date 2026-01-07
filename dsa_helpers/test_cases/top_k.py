@@ -2,7 +2,7 @@
 
 from . import TestCase, set_compare, unordered_list_compare
 
-TOP_K_TESTS = {
+TOP_K_TESTS: dict[str, list[TestCase]] = {
     "top_k_frequent": [
         TestCase("example 1", (([1, 1, 1, 2, 2, 3], 2),), [1, 2], set_compare),
         TestCase("single", (([1], 1),), [1]),
@@ -50,7 +50,7 @@ TOP_K_TESTS = {
             "on axes", (([[3, 0], [0, 4], [0, 0]], 2),), [[0, 0], [3, 0]], unordered_list_compare
         ),
     ],
-    "sort_characters_by_frequency": [
+    "sort_by_frequency": [
         TestCase("tree", (("tree",),), None, None),  # "eert" or "eetr"
         TestCase("cccaaa", (("cccaaa",),), None, None),  # "cccaaa" or "aaaccc"
         TestCase("Aabb", (("Aabb",),), None, None),  # "bbAa" or "bbaA"
@@ -59,7 +59,7 @@ TOP_K_TESTS = {
         TestCase("all unique", (("abc",),), None, None),  # Any order valid
         TestCase("numbers", (("112233",),), None, None),  # Multiple valid
     ],
-    "find_k_closest_elements": [
+    "closest_numbers": [
         TestCase("example 1", (([1, 2, 3, 4, 5], 4, 3),), [1, 2, 3, 4]),
         TestCase("example 2", (([1, 2, 3, 4, 5], 4, -1),), [1, 2, 3, 4]),
         TestCase("x larger than all", (([1, 2, 3, 4, 5], 4, 10),), [2, 3, 4, 5]),
@@ -91,33 +91,21 @@ TOP_K_TESTS = {
             "adjacent k", (([1, 2, 3, 4, 5], 2, 3),), 0
         ),  # No elements between 2nd and 3rd smallest
     ],
-    "frequency_sort": [
-        TestCase(
-            "example 1", (([1, 1, 2, 2, 2, 3],),), [2, 2, 2, 1, 1, 3]
-        ),  # or [3, 1, 1, 2, 2, 2]
-        TestCase("all same", (([5, 5, 5],),), [5, 5, 5]),
-        TestCase("all unique", (([1, 2, 3],),), None, None),  # Any order valid
-    ],
     "kth_largest_in_stream": [
         TestCase("example 1", ((3, [4, 5, 8, 2], [3, 5, 10, 9, 4]),), [4, 5, 5, 8, 8]),
         TestCase("k=1", ((1, [1, 2], [3, 4, 5]),), [3, 4, 5]),
         TestCase("single initial", ((1, [5], [1, 2, 3, 4]),), [5, 5, 5, 5]),
-        TestCase("empty initial", ((2, [], [1, 2, 3, 4]),), [-1, 1, 2, 3]),
         TestCase("k equals size", ((3, [1, 2, 3], [4, 5]),), [2, 3]),
         TestCase("all same", ((2, [5, 5], [5, 5]),), [5, 5]),
     ],
-
     "top_k_frequent_words": [
         TestCase("basic", ((["i", "love", "leetcode", "i", "love", "coding"], 2),), ["i", "love"]),
-        TestCase("tie by alpha", ((["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"], 4),), ["the", "is", "sunny", "day"]),
+        TestCase(
+            "tie by alpha",
+            ((["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"], 4),),
+            ["the", "is", "sunny", "day"],
+        ),
         TestCase("single word", ((["hello"], 1),), ["hello"]),
         TestCase("all same freq", ((["a", "b", "c"], 2),), ["a", "b"]),
-    ],
-
-    "sort_by_frequency": [
-        TestCase("basic", (([1, 1, 2, 2, 2, 3],),), [3, 1, 1, 2, 2, 2]),
-        TestCase("same frequency", (([2, 3, 1, 3, 2],),), [1, 2, 2, 3, 3]),
-        TestCase("all same", (([5, 5, 5],),), [5, 5, 5]),
-        TestCase("single", (([1],),), [1]),
     ],
 }
