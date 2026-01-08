@@ -548,6 +548,9 @@ path_with_given_sequence:
     content: |
       ```python
       def path_with_given_sequence(root, sequence):
+          if not root or not sequence:
+              return False  # No path exists in empty tree, or empty sequence can't match
+
           def dfs(node, index):
               if not node:
                   return False
@@ -563,9 +566,6 @@ path_with_given_sequence:
               # Continue matching in subtrees
               return dfs(node.left, index + 1) or dfs(node.right, index + 1)
 
-          if not root:
-              return len(sequence) == 0
-
           return dfs(root, 0)
       ```
 
@@ -575,7 +575,7 @@ path_with_given_sequence:
       - Sequence longer than any path: Return False
       - Sequence matches non-leaf path: Return False
       - Empty sequence with non-empty tree: Return False
-      - Both empty: Return True
+      - Empty tree (regardless of sequence): Return False (no root-to-leaf path exists)
 
 count_paths_for_sum:
   level_1:

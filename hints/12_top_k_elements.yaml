@@ -349,71 +349,80 @@ maximum_distinct_elements:
   level_1:
     title: "Remove Duplicates First"
     content: |
-      Strategy:
-      1. Count frequencies
-      2. Use K removals to eliminate duplicates first (freq > 1)
-      3. If K remains, we must remove distinct elements
+      Strategy to maximize distinct elements:
+      1. Count frequencies of each element
+      2. Use k removals to eliminate duplicates first (reduce freq to 1)
+      3. If k removals remain after eliminating duplicates, remove entire distinct elements
+
+      Priority: Remove duplicates from elements with the LOWEST excess duplicates first,
+      because it costs fewer removals to make that element "distinct" (freq=1).
 
   level_2:
-    title: "Greedy with Min Heap"
+    title: "Min Heap Approach"
     content: |
-      Priority: Remove duplicates starting with elements having most duplicates.
-
-      Actually, we should remove elements with LOWEST frequency first!
-      - Removing one of freq=5 saves us 4 removals
-      - Removing one of freq=2 saves us 1 removal
+      Use a min heap to process elements by their duplicate count (freq - 1):
 
       ```python
       from collections import Counter
       import heapq
 
+      if not nums:
+          return 0
+
       count = Counter(nums)
-      # Min heap of frequencies
-      heap = list(count.values())
-      heapq.heapify(heap)
+      distinct = len(count)
 
-      remaining_k = k
-      while heap and remaining_k > 0:
-          freq = heapq.heappop(heap)
-          if remaining_k >= freq:
-              remaining_k -= freq  # Remove all of this element
+      # Min heap of (excess_count) for elements with duplicates
+      # excess = freq - 1 (number of copies to remove to make freq=1)
+      excess_heap = [freq - 1 for freq in count.values() if freq > 1]
+      heapq.heapify(excess_heap)
+
+      remaining = k
+
+      # First, try to eliminate all duplicates
+      while excess_heap and remaining > 0:
+          excess = heapq.heappop(excess_heap)
+          if remaining >= excess:
+              remaining -= excess  # Successfully reduced to freq=1
           else:
-              heapq.heappush(heap, freq - remaining_k)
-              remaining_k = 0
+              # Can't fully reduce this element
+              remaining = 0
 
-      return len(heap)
+      # If k remains after removing duplicates, must remove distinct elements
+      return max(0, distinct - remaining)
       ```
 
   level_3:
-    title: "Corrected Approach"
+    title: "Complete Solution"
     content: |
-      Actually need to:
-      1. Count frequencies
-      2. Remove excess duplicates first (reduce freq to 1)
-      3. If k remains, remove distinct elements
-
       ```python
       from collections import Counter
       import heapq
 
-      count = Counter(nums)
-      duplicates = [(freq - 1, num) for num, freq in count.items() if freq > 1]
-      heapq.heapify(duplicates)
-      distinct = len(count)
+      def maximum_distinct_elements(nums, k):
+          if not nums:
+              return 0
 
-      remaining = k
-      # First, reduce duplicates
-      for num, freq in count.items():
-          excess = freq - 1
-          if remaining >= excess:
-              remaining -= excess
-          else:
-              remaining = 0
-              break
+          count = Counter(nums)
+          distinct = len(count)
 
-      # Then, if k remains, remove distinct elements
-      return max(0, distinct - remaining)
+          # Create min heap of excess duplicates (freq - 1)
+          excess_list = sorted([freq - 1 for freq in count.values() if freq > 1])
+
+          remaining = k
+
+          # Remove duplicates starting with smallest excess
+          for excess in excess_list:
+              if remaining >= excess:
+                  remaining -= excess
+              else:
+                  break
+
+          # If k remains, must remove distinct elements
+          return max(0, distinct - remaining)
       ```
+
+      Time: O(n log n) for sorting, Space: O(n) for frequency count
 
 sum_of_elements:
   level_1:

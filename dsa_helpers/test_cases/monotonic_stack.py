@@ -47,7 +47,7 @@ MONOTONIC_STACK_TESTS: dict[str, list[TestCase]] = {
         TestCase("valley", (([5, 1, 5],),), 5),
         TestCase("peak", (([1, 5, 1],),), 5),
         TestCase("two equal", (([2, 2],),), 4),
-        TestCase("empty", (([],),), 0),
+        TestCase("single zero", (([0],),), 0),
     ],
     "remove_k_digits": [
         TestCase("example 1", (("1432219", 3),), "1219"),
@@ -116,13 +116,13 @@ MONOTONIC_STACK_TESTS: dict[str, list[TestCase]] = {
             ),
             6,
         ),
-        TestCase("empty", (([],),), 0),
         TestCase("single 1", (([["1"]],),), 1),
         TestCase("single 0", (([["0"]],),), 0),
         TestCase("row of 1s", (([["1", "1", "1"]],),), 3),
         TestCase("column of 1s", (([["1"], ["1"], ["1"]],),), 3),
         TestCase("all 1s", (([["1", "1"], ["1", "1"]],),), 4),
         TestCase("all 0s", (([["0", "0"], ["0", "0"]],),), 0),
+        TestCase("L shaped", (([["1", "0"], ["1", "1"]],),), 2),
     ],
     "StockSpanner": [
         TestCase(

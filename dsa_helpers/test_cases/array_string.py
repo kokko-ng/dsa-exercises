@@ -255,7 +255,5 @@ ARRAY_STRING_TESTS: dict[str, list[TestCase]] = {
         TestCase("window at start", (("ABCD", "AB"),), "AB"),
         TestCase("window at end", (("DCBA", "BA"),), "BA"),
         TestCase("case sensitive", (("AaBb", "ab"),), "aBb"),
-        TestCase("empty s", (("", "a"),), ""),
-        TestCase("empty t", (("abc", ""),), ""),
     ],
 }

@@ -182,6 +182,7 @@ BACKTRACKING_TESTS: dict[str, list[TestCase]] = {
         TestCase("word too long", (([["A", "B"], ["C", "D"]], "ABCDE"),), False),
         TestCase("snake path", (([["A", "B", "C"], ["F", "E", "D"]], "ABCDEF"),), True),
         TestCase("all same letters match", (([["A", "A"], ["A", "A"]], "AAAA"),), True),
+        TestCase("cannot reuse cell", (([["A", "B"], ["C", "D"]], "ABA"),), False),
     ],
     "word_search_ii": [
         TestCase(

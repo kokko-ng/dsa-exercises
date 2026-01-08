@@ -70,5 +70,7 @@ K_WAY_MERGE_TESTS: dict[str, list[TestCase]] = {
         TestCase("negative numbers", (([-3, -1, 0], [-2, 1, 2]),), -0.5),
         TestCase("both empty with one", (([], [2]),), 2.0),
         TestCase("different sizes", (([1, 2], [3, 4, 5, 6]),), 3.5),
+        TestCase("single element", (([2], []),), 2.0),
+        TestCase("with duplicates", (([1, 1, 3], [2, 2]),), 2.0),
     ],
 }

@@ -174,6 +174,7 @@ GRAPH_TESTS: dict[str, list[TestCase]] = {
         TestCase("example 2", (([[1, 2], [2, 3], [3, 4], [1, 4], [1, 5]],),), [1, 4]),
         TestCase("triangle", (([[1, 2], [2, 3], [1, 3]],),), [1, 3]),
         TestCase("last edge", (([[1, 2], [1, 3], [1, 4], [3, 4]],),), [3, 4]),
+        TestCase("line with cycle", (([[1, 2], [2, 3], [3, 1]],),), [3, 1]),
     ],
     "alien_dictionary": [
         TestCase("basic", ((["wrt", "wrf", "er", "ett", "rftt"],),), "wertf"),

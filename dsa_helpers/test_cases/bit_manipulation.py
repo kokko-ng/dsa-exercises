@@ -84,6 +84,7 @@ BIT_MANIPULATION_TESTS: dict[str, list[TestCase]] = {
         TestCase("both zero", ((0, 0),), 0),
         TestCase("negative and positive", ((-5, 10),), 5),
         TestCase("boundary positive", ((999, 1),), 1000),
+        TestCase("negative larger magnitude", ((-10, 3),), -7),
     ],
     "number_of_1_bits": [
         TestCase("basic", ((11,),), 3),

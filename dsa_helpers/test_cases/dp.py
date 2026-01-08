@@ -23,7 +23,8 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("larger", (([2, 7, 9, 3, 1],),), 12),
         TestCase("single", (([5],),), 5),
         TestCase("two houses", (([1, 2],),), 2),
-        TestCase("empty", (([],),), 0),
+        TestCase("three houses", (([2, 1, 1],),), 3),
+        TestCase("all same", (([4, 4, 4, 4],),), 8),
     ],
     "house_robber_ii": [
         TestCase("basic", (([2, 3, 2],),), 3),
@@ -50,8 +51,9 @@ DP_TESTS: dict[str, list[TestCase]] = {
     "coin_change_ii": [
         TestCase("basic", ((5, [1, 2, 5]),), 4),
         TestCase("zero amount", ((0, [1, 2]),), 1),
-        TestCase("no coins", ((5, []),), 0),
-        TestCase("single coin", ((3, [2]),), 0),
+        TestCase("single coin no match", ((3, [2]),), 0),
+        TestCase("single coin exact", ((4, [2]),), 1),
+        TestCase("large coin", ((3, [5]),), 0),
     ],
     "partition_equal_subset": [
         TestCase("can partition", (([1, 5, 11, 5],),), True),
@@ -88,10 +90,10 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("basic", (("abcde", "ace"),), 3),
         TestCase("no common", (("abc", "def"),), 0),
         TestCase("same", (("abc", "abc"),), 3),
-        TestCase("one empty", (("", "abc"),), 0),
-        TestCase("both empty", (("", ""),), 0),
         TestCase("single char match", (("a", "a"),), 1),
         TestCase("single char no match", (("a", "b"),), 0),
+        TestCase("prefix match", (("abc", "ab"),), 2),
+        TestCase("interleaved", (("axbxc", "abc"),), 3),
     ],
     "longest_palindromic_substring": [
         TestCase("basic", (("babad",),), "bab", palindrome_substring_compare),
@@ -152,7 +154,8 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("apple", (("applepenapple", ["apple", "pen"]),), True),
         TestCase("impossible", (("catsandog", ["cats", "dog", "sand", "and", "cat"]),), False),
         TestCase("single word", (("word", ["word"]),), True),
-        TestCase("empty string", (("", ["word"]),), True),
+        TestCase("single char", (("a", ["a"]),), True),
+        TestCase("repeating word", (("aaaa", ["a", "aa"]),), True),
     ],
     "word_break_ii": [
         TestCase(

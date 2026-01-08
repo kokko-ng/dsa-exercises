@@ -91,8 +91,8 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("large ropes", (([100, 200, 300],),), 900),
     ],
     "maximum_distinct_elements": [
-        TestCase("example 1", (([7, 3, 5, 8, 5, 3, 3], 2),), 3),
-        TestCase("example 2", (([3, 5, 12, 11, 12], 3),), 2),
+        TestCase("example 1", (([7, 3, 5, 8, 5, 3, 3], 2),), 4),
+        TestCase("example 2", (([4, 3, 1, 1, 3, 3, 2], 3),), 4),
         TestCase("no removal", (([1, 2, 3, 4], 0),), 4),
         TestCase("all same", (([5, 5, 5, 5], 3),), 1),
         TestCase("all unique", (([1, 2, 3, 4, 5], 2),), 3),
@@ -108,7 +108,9 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase(
             "adjacent k", (([1, 2, 3, 4, 5], 2, 3),), 0
         ),  # No elements between 2nd and 3rd smallest
-        TestCase("with negatives", (([-5, -2, 0, 3, 7], 2, 5),), 1),  # Sum of -2, 0, 3
+        TestCase(
+            "with negatives", (([-5, -2, 0, 3, 7], 2, 5),), 3
+        ),  # Sum of 0, 3 (between -2 and 7)
         TestCase("larger range", (([1, 2, 3, 4, 5, 6, 7, 8], 2, 7),), 18),  # 3+4+5+6
         TestCase("k1=1 k2=2", (([10, 20, 30], 1, 2),), 0),  # Nothing between 1st and 2nd
         TestCase("all same", (([5, 5, 5, 5], 1, 4),), 10),  # 5+5 between

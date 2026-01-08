@@ -46,7 +46,7 @@ TREE_TESTS: dict[str, list[TestCase]] = {
         TestCase("single node", (([1],),), 1),
         TestCase("empty", (([],),), 0),
         TestCase("unbalanced", (([1, 2, 3, 4],),), 2),
-        TestCase("right skewed", (([1, 2, None, None, 3],),), 2),
+        TestCase("right skewed", (([1, 2, None, None, 3],),), 3),
         TestCase("negative values", (([-1, -2, -3],),), 2),
     ],
     "maximum_depth": [
