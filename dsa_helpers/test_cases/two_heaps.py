@@ -36,6 +36,32 @@ TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
             [None, None, None, 2.0],
             is_class_test=True,
         ),
+        TestCase(
+            "negative numbers",
+            (
+                (
+                    {
+                        "ops": ["add_num", "add_num", "find_median", "add_num", "find_median"],
+                        "vals": [-1, -5, None, -3, None],
+                    },
+                ),
+            ),
+            [None, None, -3.0, None, -3.0],
+            is_class_test=True,
+        ),
+        TestCase(
+            "duplicates",
+            (
+                (
+                    {
+                        "ops": ["add_num", "add_num", "add_num", "find_median"],
+                        "vals": [5, 5, 5, None],
+                    },
+                ),
+            ),
+            [None, None, None, 5.0],
+            is_class_test=True,
+        ),
     ],
     "sliding_window_median": [
         TestCase("basic", (([1, 3, -1, -3, 5, 3, 6, 7], 3),), [1.0, -1.0, -1.0, 3.0, 5.0, 6.0]),

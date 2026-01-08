@@ -2,7 +2,7 @@
 
 from . import TestCase
 
-TREE_TESTS = {
+TREE_TESTS: dict[str, list[TestCase]] = {
     "level_order_traversal": [
         TestCase("complete tree", (([3, 9, 20, None, None, 15, 7],),), [[3], [9, 20], [15, 7]]),
         TestCase("single node", (([1],),), [[1]]),
@@ -82,6 +82,8 @@ TREE_TESTS = {
         TestCase("no path", (([1, 2, 3], 10),), []),
         TestCase("empty tree", (([], 0),), []),
         TestCase("single node match", (([5], 5),), [[5]]),
+        TestCase("single node no match", (([5], 10),), []),
+        TestCase("negative sum path", (([-2, -3, -1], -5),), [[-2, -3]]),
     ],
     "sum_of_path_numbers": [
         TestCase("simple", (([1, 2, 3],),), 25),
@@ -105,6 +107,7 @@ TREE_TESTS = {
         TestCase("multiple paths", (([10, 5, -3, 3, 2, None, 11, 3, -2, None, 1], 8),), 3),
         TestCase("simple", (([5, 4, 8, 11, None, 13, 4, 7, 2, None, None, 5, 1], 22),), 3),
         TestCase("single node", (([1], 1),), 1),
+        TestCase("single node no match", (([5], 1),), 0),
         TestCase("empty tree", (([], 0),), 0),
         TestCase("no matching paths", (([1, 2, 3], 100),), 0),
         TestCase("zero target", (([0, 0, 0], 0),), 6),

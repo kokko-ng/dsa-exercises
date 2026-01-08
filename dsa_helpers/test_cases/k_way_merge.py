@@ -2,13 +2,15 @@
 
 from . import TestCase
 
-K_WAY_MERGE_TESTS = {
+K_WAY_MERGE_TESTS: dict[str, list[TestCase]] = {
     "merge_k_sorted_lists": [
         TestCase("basic", (([[1, 4, 5], [1, 3, 4], [2, 6]],),), [1, 1, 2, 3, 4, 4, 5, 6]),
         TestCase("single list", (([[1, 2, 3]],),), [1, 2, 3]),
         TestCase("empty lists", (([[], [1], []],),), [1]),
         TestCase("all empty", (([],),), []),
         TestCase("single elements", (([[1], [0]],),), [0, 1]),
+        TestCase("with negative numbers", (([[-5, -2, 0], [-3, 1, 4]],),), [-5, -3, -2, 0, 1, 4]),
+        TestCase("list of empty lists", (([[]],),), []),
     ],
     "kth_smallest_in_m_sorted": [
         TestCase("basic", (([[2, 6, 8], [3, 6, 7], [1, 3, 4]], 5),), 4),
@@ -32,6 +34,7 @@ K_WAY_MERGE_TESTS = {
         TestCase("2x2", (([[1, 2], [3, 4]], 3),), 3),
         TestCase("negative numbers", (([[-5]], 1),), -5),
         TestCase("last element", (([[1, 2], [3, 4]], 4),), 4),
+        TestCase("with duplicates", (([[1, 2, 2], [2, 3, 3], [3, 3, 4]], 7),), 3),
     ],
     "find_k_pairs_smallest_sums": [
         TestCase("basic", (([1, 7, 11], [2, 4, 6], 3),), [[1, 2], [1, 4], [1, 6]]),
@@ -39,6 +42,7 @@ K_WAY_MERGE_TESTS = {
         TestCase("k=1", (([1, 2], [3], 1),), [[1, 3]]),
         TestCase("negative numbers", (([-2, -1, 0], [-3, 1, 2], 2),), [[-2, -3], [-1, -3]]),
         TestCase("k larger than pairs", (([1], [2], 5),), [[1, 2]]),
+        TestCase("single element arrays", (([1], [1], 1),), [[1, 1]]),
     ],
     "merge_k_sorted_arrays": [
         TestCase("basic", (([[1, 4, 5], [1, 3, 4], [2, 6]],),), [1, 1, 2, 3, 4, 4, 5, 6]),

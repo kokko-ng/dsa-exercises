@@ -2,7 +2,7 @@
 
 from . import TestCase, sorted_compare
 
-BIT_MANIPULATION_TESTS = {
+BIT_MANIPULATION_TESTS: dict[str, list[TestCase]] = {
     "single_number": [
         TestCase("basic", (([2, 2, 1],),), 1),
         TestCase("larger", (([4, 1, 2, 1, 2],),), 4),
@@ -10,6 +10,7 @@ BIT_MANIPULATION_TESTS = {
         TestCase("negative", (([-1, -1, 2],),), 2),
         TestCase("zero is single", (([0, 1, 1],),), 0),
         TestCase("large numbers", (([1000000, 1000000, 999999],),), 999999),
+        TestCase("negative single", (([-5, 3, 3],),), -5),
     ],
     "single_number_ii": [
         TestCase("basic", (([2, 2, 3, 2],),), 3),
@@ -49,6 +50,8 @@ BIT_MANIPULATION_TESTS = {
         TestCase("negative", ((-2,),), False),
         TestCase("large power", ((1073741824,),), True),  # 2^30
         TestCase("large not power", ((1073741825,),), False),  # 2^30 + 1
+        TestCase("power of 2 is 2", ((2,),), True),
+        TestCase("negative power of 2", ((-16,),), False),
     ],
     "bitwise_and_range": [
         TestCase("basic", ((5, 7),), 4),

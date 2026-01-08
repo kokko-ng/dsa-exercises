@@ -2,7 +2,7 @@
 
 from . import TestCase, nested_set_compare, sorted_compare
 
-SUBSETS_TESTS = {
+SUBSETS_TESTS: dict[str, list[TestCase]] = {
     "subsets": [
         TestCase(
             "basic",
@@ -40,6 +40,12 @@ SUBSETS_TESTS = {
             "negative with dups",
             (([-1, -1, 0],),),
             [[], [-1], [-1, -1], [-1, 0], [-1, -1, 0], [0]],
+            nested_set_compare,
+        ),
+        TestCase(
+            "multiple groups of dups",
+            (([1, 1, 2, 2],),),
+            [[], [1], [1, 1], [1, 2], [1, 1, 2], [1, 2, 2], [1, 1, 2, 2], [2], [2, 2]],
             nested_set_compare,
         ),
     ],

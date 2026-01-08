@@ -2,7 +2,7 @@
 
 from . import TestCase
 
-MONOTONIC_STACK_TESTS = {
+MONOTONIC_STACK_TESTS: dict[str, list[TestCase]] = {
     "next_greater_element": [
         TestCase("example 1", (([4, 1, 2], [1, 3, 4, 2]),), [-1, 3, -1]),
         TestCase("example 2", (([2, 4], [1, 2, 3, 4]),), [3, -1]),
@@ -80,6 +80,7 @@ MONOTONIC_STACK_TESTS = {
         TestCase(
             "with duplicates", (([1, 2, 1],),), 7
         ),  # [1]=1, [2]=2, [1]=1, [1,2]=1, [2,1]=1, [1,2,1]=1 -> 7
+        TestCase("two same elements", (([1, 1],),), 3),  # [1]=1, [1]=1, [1,1]=1 -> 3
     ],
     "shortest_unsorted_subarray": [
         TestCase("example 1", (([2, 6, 4, 8, 10, 9, 15],),), 5),

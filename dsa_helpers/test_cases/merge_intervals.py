@@ -66,6 +66,7 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("same time", (([[1, 5], [1, 5], [1, 5]],),), 3),
         TestCase("cascading", (([[0, 5], [1, 6], [2, 7], [3, 8]],),), 4),
         TestCase("single", (([[1, 10]],),), 1),
+        TestCase("partial overlap", (([[1, 5], [2, 3]],),), 2),
     ],
     "non_overlapping_intervals": [
         TestCase("example 1", (([[1, 2], [2, 3], [3, 4], [1, 3]],),), 1),
@@ -94,6 +95,7 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("same location", (([[3, 1, 5], [2, 1, 5]], 5),), True),
         TestCase("exact capacity", (([[2, 1, 5], [2, 3, 7]], 4),), True),
         TestCase("drop before pickup", (([[2, 1, 5], [3, 5, 7]], 3),), True),
+        TestCase("multiple trips same segment", (([[1, 0, 3], [1, 1, 4], [1, 2, 5]], 2),), False),
     ],
     "interval_list_intersections": [
         TestCase(

@@ -2,7 +2,7 @@
 
 from . import TestCase
 
-BINARY_SEARCH_TESTS = {
+BINARY_SEARCH_TESTS: dict[str, list[TestCase]] = {
     "binary_search": [
         TestCase("found middle", (([-1, 0, 3, 5, 9, 12], 9),), 4),
         TestCase("found first", (([-1, 0, 3, 5, 9, 12], -1),), 0),
@@ -125,19 +125,22 @@ BINARY_SEARCH_TESTS = {
         TestCase("example 3", (([1, 3, 8, 12],),), 12),
         TestCase("peak at start", (([10, 8, 6, 4],),), 10),
         TestCase("peak in middle", (([1, 5, 10, 5, 1],),), 10),
-        TestCase("two elements ascending", (([1, 5],),), 5),
-        TestCase("two elements descending", (([5, 1],),), 5),
+        TestCase("three elements ascending", (([1, 3, 5],),), 5),
+        TestCase("three elements descending", (([5, 3, 1],),), 5),
         TestCase("long increasing", (([1, 2, 3, 4, 5, 6, 7],),), 7),
+        TestCase("peak at second", (([1, 10, 5],),), 10),
     ],
     "search_bitonic_array": [
         TestCase("found ascending", (([1, 3, 8, 12, 4, 2], 8),), 2),
         TestCase("found descending", (([1, 3, 8, 12, 4, 2], 4),), 4),
         TestCase("found peak", (([1, 3, 8, 12, 4, 2], 12),), 3),
         TestCase("not found", (([1, 3, 8, 12, 4, 2], 10),), -1),
-        TestCase("at start", (([1, 5, 10, 5, 1], 1),), 0),  # or 4
+        TestCase("at start", (([1, 5, 10, 5, 2], 1),), 0),
         TestCase("at end", (([1, 5, 10, 5, 2], 2),), 4),
-        TestCase("only increasing", (([1, 2, 3, 4, 5], 6),), -1),  # searching for non-existent
+        TestCase("only increasing", (([1, 2, 3, 4, 5], 6),), -1),
         TestCase("only decreasing target", (([5, 4, 3, 2, 1], 3),), 2),
+        TestCase("target smaller than all", (([3, 5, 10, 8, 4], 1),), -1),
+        TestCase("target larger than all", (([3, 5, 10, 8, 4], 15),), -1),
     ],
     "search_rotated_array": [
         TestCase("found left", (([4, 5, 6, 7, 0, 1, 2], 0),), 4),

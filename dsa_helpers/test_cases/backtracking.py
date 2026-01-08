@@ -2,7 +2,7 @@
 
 from . import TestCase, nested_set_compare
 
-BACKTRACKING_TESTS = {
+BACKTRACKING_TESTS: dict[str, list[TestCase]] = {
     "combination_sum": [
         TestCase("basic", (([2, 3, 6, 7], 7),), [[2, 2, 3], [7]], nested_set_compare),
         TestCase(
@@ -100,6 +100,9 @@ BACKTRACKING_TESTS = {
         TestCase("n=1", ((1,),), [["Q"]]),
         TestCase("n=2 no solution", ((2,),), []),
         TestCase("n=3 no solution", ((3,),), []),
+        TestCase(
+            "n=5 has solutions", ((5,),), 10, lambda result, expected: len(result) == expected
+        ),
     ],
     "sudoku_solver": [
         TestCase(
@@ -182,6 +185,27 @@ BACKTRACKING_TESTS = {
         ),
         TestCase("n=1", ((1,),), ["()"]),
         TestCase("n=2", ((2,),), ["(())", "()()"], nested_set_compare),
+        TestCase(
+            "n=4",
+            ((4,),),
+            [
+                "(((())))",
+                "((()()))",
+                "((())())",
+                "((()))()",
+                "(()(()))",
+                "(()()())",
+                "(()())()",
+                "(())(())",
+                "(())()()",
+                "()((()))",
+                "()(()())",
+                "()(())()",
+                "()()(())",
+                "()()()()",
+            ],
+            nested_set_compare,
+        ),
     ],
     "restore_ip_addresses": [
         TestCase(

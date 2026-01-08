@@ -2,7 +2,7 @@
 
 from . import TestCase, sorted_compare
 
-ARRAY_STRING_TESTS = {
+ARRAY_STRING_TESTS: dict[str, list[TestCase]] = {
     "two_sum": [
         TestCase("simple case", (([2, 7, 11, 15], 9),), [0, 1], sorted_compare),
         TestCase("middle elements", (([3, 2, 4], 6),), [1, 2], sorted_compare),
@@ -16,6 +16,7 @@ ARRAY_STRING_TESTS = {
         TestCase("target at end", (([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 19),), [8, 9], sorted_compare),
         TestCase("negative target", (([5, -10, 3, -6], -16),), [1, 3], sorted_compare),
         TestCase("first and last", (([1, 9, 2, 3, 4, 5, 6, 7, 8], 10),), [0, 1], sorted_compare),
+        TestCase("minimum two elements", (([1, 2], 3),), [0, 1], sorted_compare),
         TestCase(
             "performance",
             ((list(range(100000)), 199997),),
@@ -205,6 +206,7 @@ ARRAY_STRING_TESTS = {
         TestCase("all ones", (([1, 1, 1, 1],),), [1, 1, 1, 1]),
         TestCase("single zero", (([1, 2, 0, 4],),), [0, 0, 8, 0]),
         TestCase("large values", (([10, 20, 30],),), [600, 300, 200]),
+        TestCase("mixed positive and negative", (([-2, 3, -4, 5],),), [-60, 40, -30, 24]),
     ],
     "container_with_most_water": [
         TestCase("example 1", (([1, 8, 6, 2, 5, 4, 8, 3, 7],),), 49),
@@ -217,6 +219,7 @@ ARRAY_STRING_TESTS = {
         TestCase("short middle", (([5, 1, 5],),), 10),
         TestCase("zero heights", (([0, 0],),), 0),
         TestCase("one zero", (([0, 5],),), 0),
+        TestCase("asymmetric heights", (([3, 9],),), 3),
     ],
     "trapping_rain_water": [
         TestCase("example 1", (([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1],),), 6),

@@ -117,8 +117,8 @@ dsa-exercises/
 ├── notebooks/          # Jupyter notebooks (one per category)
 ├── hints/              # Progressive hints in YAML
 ├── dsa_helpers/        # Helper package
-│   ├── checker.py      # check() function with inline tests
-│   ├── test_cases.py   # Test case definitions
+│   ├── checker.py      # check() function
+│   ├── test_cases/     # Test case definitions (one file per category)
 │   ├── comparators.py  # Result comparison functions
 │   ├── hints.py        # hint() function
 │   └── data_structures.py

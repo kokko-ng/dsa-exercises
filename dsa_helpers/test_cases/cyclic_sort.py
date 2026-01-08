@@ -2,7 +2,7 @@
 
 from . import TestCase, set_compare, sorted_compare
 
-CYCLIC_SORT_TESTS = {
+CYCLIC_SORT_TESTS: dict[str, list[TestCase]] = {
     "cyclic_sort": [
         TestCase("unsorted", (([3, 1, 5, 4, 2],),), [1, 2, 3, 4, 5], check_modified_arg=0),
         TestCase("reverse", (([5, 4, 3, 2, 1],),), [1, 2, 3, 4, 5], check_modified_arg=0),
@@ -55,6 +55,7 @@ CYCLIC_SORT_TESTS = {
         TestCase("two pairs", (([1, 2, 1, 2],),), [1, 2], set_compare),
         TestCase("scattered", (([3, 1, 2, 5, 3, 2],),), [2, 3], set_compare),
         TestCase("at boundaries", (([1, 2, 3, 4, 1, 4],),), [1, 4], set_compare),
+        TestCase("single element no dup", (([1],),), []),
     ],
     "find_corrupt_pair": [
         TestCase("example 1", (([3, 1, 2, 5, 2],),), [2, 4], sorted_compare),

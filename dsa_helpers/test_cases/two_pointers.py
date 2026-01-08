@@ -2,7 +2,7 @@
 
 from . import TestCase, nested_set_compare
 
-TWO_POINTERS_TESTS = {
+TWO_POINTERS_TESTS: dict[str, list[TestCase]] = {
     "remove_element": [
         TestCase("remove 3s", (([3, 2, 2, 3], 3),), 2),
         TestCase("remove 2s", (([0, 1, 2, 2, 3, 0, 4, 2], 2),), 5),
@@ -65,6 +65,7 @@ TWO_POINTERS_TESTS = {
         TestCase("all same 2", (([2, 2, 2],),), [2, 2, 2], check_modified_arg=0),
         TestCase("two colors", (([1, 0, 1, 0],),), [0, 0, 1, 1], check_modified_arg=0),
         TestCase("single element", (([1],),), [1], check_modified_arg=0),
+        TestCase("no ones", (([2, 0, 2, 0],),), [0, 0, 2, 2], check_modified_arg=0),
     ],
     "backspace_string_compare": [
         TestCase("equal after backspace", (("ab#c", "ad#c"),), True),
@@ -97,6 +98,7 @@ TWO_POINTERS_TESTS = {
         TestCase("last element", ((5, [1, 2, 3, 5]),), 1),
         TestCase("exact sum", ((6, [1, 2, 3]),), 3),
         TestCase("larger than all", ((100, [1, 2, 3, 4, 5]),), 0),
+        TestCase("single element array", ((3, [3]),), 1),
     ],
     "longest_repeating_character_replacement": [
         TestCase("example 1", (("ABAB", 2),), 4),

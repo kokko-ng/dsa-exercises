@@ -2,13 +2,14 @@
 
 from . import TestCase, nested_set_compare, palindrome_substring_compare
 
-DP_TESTS = {
+DP_TESTS: dict[str, list[TestCase]] = {
     "climbing_stairs": [
         TestCase("n=2", ((2,),), 2),
         TestCase("n=3", ((3,),), 3),
         TestCase("n=1", ((1,),), 1),
         TestCase("n=5", ((5,),), 8),
         TestCase("n=10", ((10,),), 89),
+        TestCase("n=4", ((4,),), 5),
     ],
     "fibonacci": [
         TestCase("f(2)", ((2,),), 1),
@@ -76,12 +77,18 @@ DP_TESTS = {
         TestCase("single", (([5],),), 1),
         TestCase("with duplicates", (([1, 3, 3, 4, 5],),), 4),
         TestCase("negative numbers", (([-3, -2, -1, 0, 1],),), 5),
+        TestCase("all same", (([7, 7, 7, 7],),), 1),
+        TestCase("two elements increasing", (([1, 2],),), 2),
+        TestCase("two elements decreasing", (([2, 1],),), 1),
     ],
     "longest_common_subsequence": [
         TestCase("basic", (("abcde", "ace"),), 3),
         TestCase("no common", (("abc", "def"),), 0),
         TestCase("same", (("abc", "abc"),), 3),
         TestCase("one empty", (("", "abc"),), 0),
+        TestCase("both empty", (("", ""),), 0),
+        TestCase("single char match", (("a", "a"),), 1),
+        TestCase("single char no match", (("a", "b"),), 0),
     ],
     "longest_palindromic_substring": [
         TestCase("basic", (("babad",),), "bab", palindrome_substring_compare),
@@ -107,6 +114,8 @@ DP_TESTS = {
         TestCase("3x2", ((3, 2),), 3),
         TestCase("1x1", ((1, 1),), 1),
         TestCase("2x2", ((2, 2),), 2),
+        TestCase("1xn single row", ((1, 5),), 1),
+        TestCase("mx1 single column", ((5, 1),), 1),
     ],
     "unique_paths_ii": [
         TestCase("with obstacle", (([[0, 0, 0], [0, 1, 0], [0, 0, 0]],),), 2),
@@ -129,6 +138,9 @@ DP_TESTS = {
         TestCase("single", (("1",),), 1),
         TestCase("contains zero", (("10",),), 1),
         TestCase("double digits", (("27",),), 1),
+        TestCase("multiple zeros", (("1010",),), 1),
+        TestCase("all ones", (("111",),), 3),
+        TestCase("single zero", (("0",),), 0),
     ],
     "word_break": [
         TestCase("basic", (("leetcode", ["leet", "code"]),), True),

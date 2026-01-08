@@ -2,7 +2,7 @@
 
 from . import TestCase, nested_set_compare, set_compare
 
-HASH_MAP_TESTS = {
+HASH_MAP_TESTS: dict[str, list[TestCase]] = {
     "group_anagrams": [
         TestCase(
             "example",
@@ -66,6 +66,7 @@ HASH_MAP_TESTS = {
         TestCase("two different", (([1, 2],),), False),
         TestCase("negative numbers", (([-1, -2, -3, -1],),), True),
         TestCase("large array no dup", ((list(range(10000)),),), False),
+        TestCase("boundary values", (([-1000000000, 1000000000, -1000000000],),), True),
     ],
     "isomorphic_strings": [
         TestCase("egg add", (("egg", "add"),), True),
@@ -130,6 +131,8 @@ HASH_MAP_TESTS = {
         TestCase("negative numbers", (([-2, -1, 0, 1],),), 4),
         TestCase("scattered", (([1, 100, 2, 200, 3, 300],),), 3),
         TestCase("all same", (([5, 5, 5, 5],),), 1),
+        TestCase("two elements consecutive", (([1, 2],),), 2),
+        TestCase("two elements non-consecutive", (([1, 3],),), 1),
     ],
     "subarray_sum_equals_k": [
         TestCase("example 1", (([1, 1, 1], 2),), 2),

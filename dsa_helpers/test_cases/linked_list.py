@@ -2,7 +2,7 @@
 
 from . import TestCase
 
-LINKED_LIST_TESTS = {
+LINKED_LIST_TESTS: dict[str, list[TestCase]] = {
     "reverse_linked_list": [
         TestCase("simple", (([1, 2, 3, 4, 5],),), [5, 4, 3, 2, 1]),
         TestCase("two nodes", (([1, 2],),), [2, 1]),
@@ -26,7 +26,7 @@ LINKED_LIST_TESTS = {
         TestCase("k=len", (([1, 2, 3], 3),), [3, 2, 1]),
         TestCase("single", (([1], 1),), [1]),
         TestCase("negative values", (([-3, -2, -1, 0, 1, 2], 2),), [-2, -3, 0, -1, 2, 1]),
-        TestCase("k greater than len", (([1, 2], 3),), [1, 2]),
+        TestCase("remainder nodes", (([1, 2, 3, 4, 5, 6, 7], 3),), [3, 2, 1, 6, 5, 4, 7]),
     ],
     "reverse_alternating_k": [
         TestCase("k=2", (([1, 2, 3, 4, 5, 6, 7, 8], 2),), [2, 1, 3, 4, 6, 5, 7, 8]),
@@ -103,6 +103,26 @@ LINKED_LIST_TESTS = {
             "child at start",
             (({"list": [1, 2, 3], "child_at": 0, "child": [4, 5]},),),
             [1, 4, 5, 2, 3],
+        ),
+        TestCase(
+            "nested child",
+            (
+                (
+                    {
+                        "list": [1, 2, 3],
+                        "child_at": 0,
+                        "child": [4, 5],
+                        "nested_child_at": 0,
+                        "nested_child": [6, 7],
+                    },
+                ),
+            ),
+            [1, 4, 6, 7, 5, 2, 3],
+        ),
+        TestCase(
+            "child at end",
+            (({"list": [1, 2, 3], "child_at": 2, "child": [4, 5]},),),
+            [1, 2, 3, 4, 5],
         ),
     ],
 }

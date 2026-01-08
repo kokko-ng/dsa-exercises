@@ -2,7 +2,7 @@
 
 from . import TestCase, set_compare, topological_order_compare, unordered_list_compare
 
-GRAPH_TESTS = {
+GRAPH_TESTS: dict[str, list[TestCase]] = {
     "number_of_islands": [
         TestCase(
             "single island",
@@ -115,6 +115,8 @@ GRAPH_TESTS = {
         TestCase(
             "longer path", (("go", "sq", ["si", "go", "se", "cm", "so", "ph", "os", "sq"]),), 3
         ),
+        TestCase("single char", (("a", "c", ["a", "b", "c"]),), 2),
+        TestCase("direct transform", (("ab", "ac", ["ac"]),), 2),
     ],
     "network_delay_time": [
         TestCase("example 1", (([[2, 1, 1], [2, 3, 1], [3, 4, 1]], 4, 2),), 2),
@@ -134,6 +136,8 @@ GRAPH_TESTS = {
         TestCase("no stops", ((3, [[0, 1, 100], [1, 2, 100], [0, 2, 500]], 0, 2, 0),), 500),
         TestCase("unreachable", ((3, [[0, 1, 100]], 0, 2, 1),), -1),
         TestCase("direct flight", ((2, [[0, 1, 100]], 0, 1, 0),), 100),
+        TestCase("k larger than needed", ((3, [[0, 1, 100], [1, 2, 100]], 0, 2, 5),), 200),
+        TestCase("same src and dst", ((2, [[0, 1, 100]], 0, 0, 0),), 0),
     ],
     "minimum_height_trees": [
         TestCase("example 1", ((4, [[1, 0], [1, 2], [1, 3]]),), [1]),

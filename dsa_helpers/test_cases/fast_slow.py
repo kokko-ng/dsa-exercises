@@ -2,7 +2,7 @@
 
 from . import TestCase
 
-FAST_SLOW_TESTS = {
+FAST_SLOW_TESTS: dict[str, list[TestCase]] = {
     "linked_list_cycle": [
         TestCase("cycle at pos 1", (({"list": [3, 2, 0, -4], "pos": 1},),), True),
         TestCase("cycle at pos 0", (({"list": [1, 2], "pos": 0},),), True),
@@ -70,6 +70,7 @@ FAST_SLOW_TESTS = {
         TestCase("single element", (([1],),), False),
         TestCase("wrap around forward", (([3, 1, 2],),), True),
         TestCase("wrap around backward", (([-3, -1, -2],),), True),
+        TestCase("two elements valid cycle", (([1, 1],),), True),
     ],
     "find_duplicate_number": [
         TestCase("dup at end", (([1, 3, 4, 2, 2],),), 2),

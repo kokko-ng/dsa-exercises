@@ -92,6 +92,8 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("remove all", (([1, 2, 3], 3),), 0),
         TestCase("single element", (([5], 0),), 1),
         TestCase("k larger than duplicates", (([1, 1, 2, 2, 3], 4),), 1),
+        TestCase("remove exact duplicates", (([1, 1, 2, 2, 3, 3], 3),), 3),
+        TestCase("empty", (([], 0),), 0),
     ],
     "sum_of_elements": [
         TestCase("example 1", (([1, 3, 12, 5, 15, 11], 3, 6),), 23),
