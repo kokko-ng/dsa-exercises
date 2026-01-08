@@ -13,6 +13,12 @@ SUBSETS_TESTS = {
         TestCase("single", (([0],),), [[], [0]], nested_set_compare),
         TestCase("empty", (([],),), [[]], nested_set_compare),
         TestCase("two elements", (([1, 2],),), [[], [1], [2], [1, 2]], nested_set_compare),
+        TestCase(
+            "negative numbers",
+            (([-2, -1, 0],),),
+            [[], [-2], [-1], [-2, -1], [0], [-2, 0], [-1, 0], [-2, -1, 0]],
+            nested_set_compare,
+        ),
     ],
     "subsets_with_duplicates": [
         TestCase(
@@ -23,6 +29,19 @@ SUBSETS_TESTS = {
         ),
         TestCase("all same", (([1, 1],),), [[], [1], [1, 1]], nested_set_compare),
         TestCase("no dups", (([1, 2],),), [[], [1], [2], [1, 2]], nested_set_compare),
+        TestCase("single", (([5],),), [[], [5]], nested_set_compare),
+        TestCase(
+            "three duplicates",
+            (([1, 1, 1],),),
+            [[], [1], [1, 1], [1, 1, 1]],
+            nested_set_compare,
+        ),
+        TestCase(
+            "negative with dups",
+            (([-1, -1, 0],),),
+            [[], [-1], [-1, -1], [-1, 0], [-1, -1, 0], [0]],
+            nested_set_compare,
+        ),
     ],
     "permutations": [
         TestCase(
@@ -33,6 +52,12 @@ SUBSETS_TESTS = {
         ),
         TestCase("single", (([1],),), [[1]], nested_set_compare),
         TestCase("two elements", (([1, 2],),), [[1, 2], [2, 1]], nested_set_compare),
+        TestCase(
+            "negative numbers",
+            (([-1, 0, 1],),),
+            [[-1, 0, 1], [-1, 1, 0], [0, -1, 1], [0, 1, -1], [1, -1, 0], [1, 0, -1]],
+            nested_set_compare,
+        ),
     ],
     "permutations_with_duplicates": [
         TestCase(
@@ -40,6 +65,8 @@ SUBSETS_TESTS = {
         ),
         TestCase("all same", (([1, 1],),), [[1, 1]], nested_set_compare),
         TestCase("no dups", (([1, 2],),), [[1, 2], [2, 1]], nested_set_compare),
+        TestCase("single", (([5],),), [[5]], nested_set_compare),
+        TestCase("three same", (([2, 2, 2],),), [[2, 2, 2]], nested_set_compare),
     ],
     "string_permutations_by_changing_case": [
         TestCase("letters", (("a1b2",),), ["a1b2", "a1B2", "A1b2", "A1B2"], nested_set_compare),
@@ -84,21 +111,31 @@ SUBSETS_TESTS = {
             nested_set_compare,
         ),
         TestCase("single", (("a",),), ["a", "1"], nested_set_compare),
+        TestCase(
+            "two letters",
+            (("ab",),),
+            ["ab", "1b", "a1", "2"],
+            nested_set_compare,
+        ),
     ],
     "evaluate_expression": [
         TestCase("simple", (("2-1-1",),), [0, 2], sorted_compare),
         TestCase("multiply", (("2*3-4*5",),), [-34, -14, -10, -10, 10], sorted_compare),
         TestCase("single", (("5",),), [5]),
+        TestCase("addition", (("1+2+3",),), [6, 6], sorted_compare),
+        TestCase("add and subtract", (("2+3-1",),), [0, 4], sorted_compare),
     ],
     "structurally_unique_bst": [
-        TestCase("n=3", ((3,),), 5, lambda actual, expected: len(actual) == expected),
         TestCase("n=1", ((1,),), 1, lambda actual, expected: len(actual) == expected),
+        TestCase("n=2", ((2,),), 2, lambda actual, expected: len(actual) == expected),
+        TestCase("n=3", ((3,),), 5, lambda actual, expected: len(actual) == expected),
         TestCase("n=4", ((4,),), 14, lambda actual, expected: len(actual) == expected),
     ],
     "count_unique_bst": [
-        TestCase("n=3", ((3,),), 5),
         TestCase("n=1", ((1,),), 1),
-        TestCase("n=5", ((5,),), 42),
+        TestCase("n=2", ((2,),), 2),
+        TestCase("n=3", ((3,),), 5),
         TestCase("n=4", ((4,),), 14),
+        TestCase("n=5", ((5,),), 42),
     ],
 }

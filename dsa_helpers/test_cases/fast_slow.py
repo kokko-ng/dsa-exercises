@@ -13,7 +13,6 @@ FAST_SLOW_TESTS = {
         TestCase("cycle to self", (({"list": [1], "pos": 0},),), True),
         TestCase("cycle at end", (({"list": [1, 2, 3, 4], "pos": 3},),), True),
     ],
-
     "linked_list_cycle_ii": [
         TestCase("cycle at pos 1", (({"list": [3, 2, 0, -4], "pos": 1},),), 2),
         TestCase("cycle at pos 0", (({"list": [1, 2], "pos": 0},),), 1),
@@ -23,7 +22,6 @@ FAST_SLOW_TESTS = {
         TestCase("cycle at middle", (({"list": [1, 2, 3, 4, 5], "pos": 2},),), 3),
         TestCase("long list no cycle", (({"list": [1, 2, 3, 4, 5], "pos": -1},),), None),
     ],
-
     "happy_number_fast_slow": [
         TestCase("happy 19", ((19,),), True),
         TestCase("not happy 2", ((2,),), False),
@@ -34,7 +32,6 @@ FAST_SLOW_TESTS = {
         TestCase("not happy 116", ((116,),), False),
         TestCase("happy 1000", ((1000,),), True),
     ],
-
     "middle_of_linked_list": [
         TestCase("odd length", (([1, 2, 3, 4, 5],),), 3),
         TestCase("even length", (([1, 2, 3, 4, 5, 6],),), 4),
@@ -44,7 +41,6 @@ FAST_SLOW_TESTS = {
         TestCase("four nodes", (([1, 2, 3, 4],),), 3),
         TestCase("long odd", (([1, 2, 3, 4, 5, 6, 7],),), 4),
     ],
-
     "palindrome_linked_list": [
         TestCase("palindrome even", (([1, 2, 2, 1],),), True),
         TestCase("not palindrome", (([1, 2],),), False),
@@ -55,7 +51,6 @@ FAST_SLOW_TESTS = {
         TestCase("almost palindrome", (([1, 2, 3, 2, 2],),), False),
         TestCase("long palindrome", (([1, 2, 3, 2, 1],),), True),
     ],
-
     "reorder_list": [
         TestCase("four nodes", (([1, 2, 3, 4],),), [1, 4, 2, 3], check_modified_arg=0),
         TestCase("five nodes", (([1, 2, 3, 4, 5],),), [1, 5, 2, 4, 3], check_modified_arg=0),
@@ -64,7 +59,6 @@ FAST_SLOW_TESTS = {
         TestCase("three nodes", (([1, 2, 3],),), [1, 3, 2], check_modified_arg=0),
         TestCase("six nodes", (([1, 2, 3, 4, 5, 6],),), [1, 6, 2, 5, 3, 4], check_modified_arg=0),
     ],
-
     "circular_array_loop": [
         TestCase("has cycle", (([2, -1, 1, 2, 2],),), True),
         TestCase("single element cycle", (([-1, 2],),), False),
@@ -74,8 +68,9 @@ FAST_SLOW_TESTS = {
         TestCase("no valid cycle", (([1, -1, 1, -1],),), False),
         TestCase("large cycle", (([2, 2, 2, 2, 2, 2],),), True),
         TestCase("single element", (([1],),), False),
+        TestCase("wrap around forward", (([3, 1, 2],),), True),
+        TestCase("wrap around backward", (([-3, -1, -2],),), True),
     ],
-
     "find_duplicate_number": [
         TestCase("dup at end", (([1, 3, 4, 2, 2],),), 2),
         TestCase("dup in middle", (([3, 1, 3, 4, 2],),), 3),

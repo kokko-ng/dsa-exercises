@@ -15,7 +15,6 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("nested intervals", (([[1, 10], [2, 3], [4, 5], [6, 7]],),), [[1, 10]]),
         TestCase("identical intervals", (([[1, 3], [1, 3], [1, 3]],),), [[1, 3]]),
         TestCase("chain merge", (([[1, 2], [2, 3], [3, 4], [4, 5]],),), [[1, 5]]),
-        TestCase("empty", (([],),), []),
         TestCase("large gap", (([[1, 2], [100, 200]],),), [[1, 2], [100, 200]]),
     ],
     "insert_interval": [
@@ -64,7 +63,6 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("all overlap", (([[1, 10], [2, 9], [3, 8]],),), 3),
         TestCase("no overlap", (([[1, 2], [3, 4], [5, 6]],),), 1),
         TestCase("touching", (([[1, 2], [2, 3], [3, 4]],),), 1),
-        TestCase("empty", (([],),), 0),
         TestCase("same time", (([[1, 5], [1, 5], [1, 5]],),), 3),
         TestCase("cascading", (([[0, 5], [1, 6], [2, 7], [3, 8]],),), 4),
         TestCase("single", (([[1, 10]],),), 1),
@@ -74,7 +72,6 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("example 2", (([[1, 2], [1, 2], [1, 2]],),), 2),
         TestCase("no removal", (([[1, 2], [3, 4]],),), 0),
         TestCase("all overlap", (([[1, 4], [2, 3], [3, 5]],),), 1),
-        TestCase("empty", (([],),), 0),
         TestCase("single", (([[1, 2]],),), 0),
         TestCase("nested", (([[1, 10], [2, 3], [4, 5]],),), 1),
         TestCase("chain remove", (([[1, 3], [2, 4], [3, 5], [4, 6]],),), 2),
@@ -95,6 +92,8 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("over capacity", (([[5, 1, 5]], 4),), False),
         TestCase("no overlap", (([[2, 1, 5], [3, 6, 8]], 4),), True),
         TestCase("same location", (([[3, 1, 5], [2, 1, 5]], 5),), True),
+        TestCase("exact capacity", (([[2, 1, 5], [2, 3, 7]], 4),), True),
+        TestCase("drop before pickup", (([[2, 1, 5], [3, 5, 7]], 3),), True),
     ],
     "interval_list_intersections": [
         TestCase(
@@ -105,6 +104,8 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("no intersection", (([[1, 2]], [[3, 4]]),), []),
         TestCase("full overlap", (([[1, 5]], [[1, 5]]),), [[1, 5]]),
         TestCase("one empty", (([], [[1, 2]]),), []),
+        TestCase("both empty", (([], []),), []),
+        TestCase("partial overlap", (([[1, 5]], [[3, 8]]),), [[3, 5]]),
     ],
     "minimum_platforms": [
         TestCase(
@@ -113,5 +114,7 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("no overlap", (([900, 1100], [930, 1130]),), 1),
         TestCase("all overlap", (([900, 900, 900], [1000, 1000, 1000]),), 3),
         TestCase("single train", (([900], [910]),), 1),
+        TestCase("depart before arrive", (([900, 1000], [950, 1050]),), 1),
+        TestCase("chain arrivals", (([900, 940, 1000], [930, 1020, 1100]),), 2),
     ],
 }

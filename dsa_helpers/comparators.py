@@ -1,5 +1,4 @@
-"""
-Comparison functions for test result validation.
+"""Comparison functions for test result validation.
 
 These comparators handle various output formats where order may not matter
 or special comparison logic is needed.
@@ -50,8 +49,8 @@ def unordered_list_compare(result: Any, expected: Any) -> bool:
 
 
 def topological_order_compare(result: Any, expected: Any) -> bool:
-    """
-    Compare topological orderings - valid if all dependencies respected.
+    """Compare topological orderings - valid if all dependencies respected.
+
     For course_schedule_ii style problems where multiple valid orderings exist.
     """
     if not isinstance(result, list) or not isinstance(expected, list):
@@ -60,3 +59,56 @@ def topological_order_compare(result: Any, expected: Any) -> bool:
         return False
     # Check that result contains same elements
     return bool(set(result) == set(expected))
+
+
+def palindrome_substring_compare(result: Any, expected: Any) -> bool:
+    """Compare palindrome substring results.
+
+    Result is valid if it's a palindrome, has the same length as expected,
+    and is a substring of the input (which we can't check here).
+    """
+    if not isinstance(result, str) or not isinstance(expected, str):
+        return bool(result == expected)
+    if len(result) != len(expected):
+        return False
+    # Check if result is a palindrome
+    return result == result[::-1]
+
+
+def frequency_sort_compare(result: Any, expected_input: str) -> bool:
+    """Compare frequency-sorted strings.
+
+    Validates that result is correctly sorted by character frequency (descending).
+    Characters with same frequency can be in any order among themselves.
+    """
+    if not isinstance(result, str):
+        return False
+    if len(result) != len(expected_input):
+        return False
+    if sorted(result) != sorted(expected_input):
+        return False
+
+    # Build frequency map from result
+    from collections import Counter
+
+    input_freq = Counter(expected_input)
+
+    # Track frequencies as we traverse result
+    prev_freq = float("inf")
+    i = 0
+    while i < len(result):
+        char = result[i]
+        freq = input_freq[char]
+        # Count consecutive occurrences of this char
+        count = 0
+        while i < len(result) and result[i] == char:
+            count += 1
+            i += 1
+        # All occurrences must be together
+        if count != freq:
+            return False
+        # Frequency must be <= previous (descending order)
+        if freq > prev_freq:
+            return False
+        prev_freq = freq
+    return True

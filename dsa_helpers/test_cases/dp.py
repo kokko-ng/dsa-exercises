@@ -1,6 +1,6 @@
 """Test cases for Dynamic Programming problems (Category 15)."""
 
-from . import TestCase, nested_set_compare
+from . import TestCase, nested_set_compare, palindrome_substring_compare
 
 DP_TESTS = {
     "climbing_stairs": [
@@ -10,7 +10,6 @@ DP_TESTS = {
         TestCase("n=5", ((5,),), 8),
         TestCase("n=10", ((10,),), 89),
     ],
-
     "fibonacci": [
         TestCase("f(2)", ((2,),), 1),
         TestCase("f(3)", ((3,),), 2),
@@ -18,7 +17,6 @@ DP_TESTS = {
         TestCase("f(1)", ((1,),), 1),
         TestCase("f(10)", ((10,),), 55),
     ],
-
     "house_robber": [
         TestCase("basic", (([1, 2, 3, 1],),), 4),
         TestCase("larger", (([2, 7, 9, 3, 1],),), 12),
@@ -26,149 +24,171 @@ DP_TESTS = {
         TestCase("two houses", (([1, 2],),), 2),
         TestCase("empty", (([],),), 0),
     ],
-
     "house_robber_ii": [
         TestCase("basic", (([2, 3, 2],),), 3),
         TestCase("larger", (([1, 2, 3, 1],),), 4),
         TestCase("single", (([5],),), 5),
         TestCase("two houses", (([1, 2],),), 2),
+        TestCase("three houses", (([1, 2, 3],),), 3),
     ],
-
     "min_cost_climbing_stairs": [
         TestCase("basic", (([10, 15, 20],),), 15),
         TestCase("longer", (([1, 100, 1, 1, 1, 100, 1, 1, 100, 1],),), 6),
         TestCase("two steps", (([1, 2],),), 1),
+        TestCase("all zeros", (([0, 0, 0, 0],),), 0),
     ],
-
     "coin_change": [
         TestCase("basic", (([1, 2, 5], 11),), 3),
         TestCase("impossible", (([2], 3),), -1),
         TestCase("zero amount", (([1], 0),), 0),
         TestCase("single coin", (([1], 2),), 2),
         TestCase("exact coin", (([2], 4),), 2),
+        TestCase("large coin", (([100], 1),), -1),
     ],
-
     "coin_change_ii": [
         TestCase("basic", ((5, [1, 2, 5]),), 4),
         TestCase("zero amount", ((0, [1, 2]),), 1),
         TestCase("no coins", ((5, []),), 0),
         TestCase("single coin", ((3, [2]),), 0),
     ],
-
     "partition_equal_subset": [
         TestCase("can partition", (([1, 5, 11, 5],),), True),
         TestCase("cannot partition", (([1, 2, 3, 5],),), False),
         TestCase("single element", (([1],),), False),
         TestCase("two equal", (([1, 1],),), True),
     ],
-
     "target_sum": [
         TestCase("basic", (([1, 1, 1, 1, 1], 3),), 5),
         TestCase("single", (([1], 1),), 1),
         TestCase("impossible", (([1], 2),), 0),
         TestCase("zeros", (([0, 0, 1], 1),), 4),
     ],
-
     "minimum_subset_sum_difference": [
         TestCase("basic", (([1, 6, 11, 5],),), 1),
         TestCase("single", (([3],),), 3),
         TestCase("equal", (([1, 2, 3],),), 0),
         TestCase("large diff", (([1, 100],),), 99),
     ],
-
     "longest_increasing_subsequence": [
         TestCase("basic", (([10, 9, 2, 5, 3, 7, 101, 18],),), 4),
         TestCase("all increasing", (([1, 2, 3, 4],),), 4),
         TestCase("all decreasing", (([4, 3, 2, 1],),), 1),
         TestCase("single", (([5],),), 1),
+        TestCase("with duplicates", (([1, 3, 3, 4, 5],),), 4),
+        TestCase("negative numbers", (([-3, -2, -1, 0, 1],),), 5),
     ],
-
     "longest_common_subsequence": [
         TestCase("basic", (("abcde", "ace"),), 3),
         TestCase("no common", (("abc", "def"),), 0),
         TestCase("same", (("abc", "abc"),), 3),
         TestCase("one empty", (("", "abc"),), 0),
     ],
-
     "longest_palindromic_substring": [
-        TestCase("basic", (("babad",),), "bab"),
+        TestCase("basic", (("babad",),), "bab", palindrome_substring_compare),
         TestCase("even", (("cbbd",),), "bb"),
         TestCase("single", (("a",),), "a"),
         TestCase("all same", (("aaaa",),), "aaaa"),
     ],
-
     "palindromic_substrings": [
         TestCase("basic", (("abc",),), 3),
         TestCase("aaa", (("aaa",),), 6),
         TestCase("single", (("a",),), 1),
     ],
-
     "edit_distance": [
         TestCase("basic", (("horse", "ros"),), 3),
         TestCase("longer", (("intention", "execution"),), 5),
         TestCase("same", (("abc", "abc"),), 0),
         TestCase("one empty", (("", "abc"),), 3),
+        TestCase("both empty", (("", ""),), 0),
+        TestCase("single char", (("a", "b"),), 1),
     ],
-
     "unique_paths": [
         TestCase("3x7", ((3, 7),), 28),
         TestCase("3x2", ((3, 2),), 3),
         TestCase("1x1", ((1, 1),), 1),
         TestCase("2x2", ((2, 2),), 2),
     ],
-
     "unique_paths_ii": [
         TestCase("with obstacle", (([[0, 0, 0], [0, 1, 0], [0, 0, 0]],),), 2),
         TestCase("blocked", (([[0, 1], [0, 0]],),), 1),
         TestCase("start blocked", (([[1]],),), 0),
+        TestCase("end blocked", (([[0, 0], [0, 1]],),), 0),
+        TestCase("no obstacles", (([[0, 0], [0, 0]],),), 2),
     ],
-
     "minimum_path_sum": [
         TestCase("basic", (([[1, 3, 1], [1, 5, 1], [4, 2, 1]],),), 7),
         TestCase("single", (([[5]],),), 5),
         TestCase("row", (([[1, 2, 3]],),), 6),
+        TestCase("column", (([[1], [2], [3]],),), 6),
+        TestCase("zeros", (([[0, 0], [0, 0]],),), 0),
     ],
-
     "decode_ways": [
         TestCase("basic", (("12",),), 2),
         TestCase("longer", (("226",),), 3),
         TestCase("zero", (("06",),), 0),
         TestCase("single", (("1",),), 1),
+        TestCase("contains zero", (("10",),), 1),
+        TestCase("double digits", (("27",),), 1),
     ],
-
     "word_break": [
         TestCase("basic", (("leetcode", ["leet", "code"]),), True),
         TestCase("apple", (("applepenapple", ["apple", "pen"]),), True),
         TestCase("impossible", (("catsandog", ["cats", "dog", "sand", "and", "cat"]),), False),
+        TestCase("single word", (("word", ["word"]),), True),
+        TestCase("empty string", (("", ["word"]),), True),
     ],
-
     "word_break_ii": [
-        TestCase("basic", (("catsanddog", ["cat", "cats", "and", "sand", "dog"]),), ["cats and dog", "cat sand dog"], nested_set_compare),
-        TestCase("pineapple", (("pineapplepenapple", ["apple", "pen", "applepen", "pine", "pineapple"]),), ["pine apple pen apple", "pineapple pen apple", "pine applepen apple"], nested_set_compare),
+        TestCase(
+            "basic",
+            (("catsanddog", ["cat", "cats", "and", "sand", "dog"]),),
+            ["cats and dog", "cat sand dog"],
+            nested_set_compare,
+        ),
+        TestCase(
+            "pineapple",
+            (("pineapplepenapple", ["apple", "pen", "applepen", "pine", "pineapple"]),),
+            ["pine apple pen apple", "pineapple pen apple", "pine applepen apple"],
+            nested_set_compare,
+        ),
+        TestCase("no solution", (("cats", ["cat", "dog"]),), []),
     ],
-
     "longest_string_chain": [
         TestCase("basic", ((["a", "b", "ba", "bca", "bda", "bdca"],),), 4),
         TestCase("single", ((["abcd"],),), 1),
         TestCase("no chain", ((["a", "bc"],),), 1),
     ],
-
     "maximal_square": [
-        TestCase("basic", (([["1", "0", "1", "0", "0"], ["1", "0", "1", "1", "1"], ["1", "1", "1", "1", "1"], ["1", "0", "0", "1", "0"]],),), 4),
+        TestCase(
+            "basic",
+            (
+                (
+                    [
+                        ["1", "0", "1", "0", "0"],
+                        ["1", "0", "1", "1", "1"],
+                        ["1", "1", "1", "1", "1"],
+                        ["1", "0", "0", "1", "0"],
+                    ],
+                ),
+            ),
+            4,
+        ),
         TestCase("all ones", (([["1", "1"], ["1", "1"]],),), 4),
         TestCase("no ones", (([["0"]],),), 0),
+        TestCase("single one", (([["1"]],),), 1),
+        TestCase("row of ones", (([["1", "1", "1"]],),), 1),
     ],
-
     "burst_balloons": [
         TestCase("basic", (([3, 1, 5, 8],),), 167),
         TestCase("single", (([5],),), 5),
         TestCase("two", (([1, 5],),), 10),
     ],
-
     "regular_expression_matching": [
         TestCase("no special", (("aa", "a"),), False),
         TestCase("star", (("aa", "a*"),), True),
         TestCase("dot star", (("ab", ".*"),), True),
         TestCase("complex", (("aab", "c*a*b"),), True),
+        TestCase("empty pattern", (("a", ""),), False),
+        TestCase("match with dot", (("ab", "a."),), True),
+        TestCase("star matches zero", (("ab", "a*b"),), True),
     ],
 }

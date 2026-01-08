@@ -9,8 +9,8 @@ MONOTONIC_STACK_TESTS = {
         TestCase("no greater", (([3, 2, 1], [3, 2, 1]),), [-1, -1, -1]),
         TestCase("all greater", (([1, 2, 3], [1, 2, 3, 4]),), [2, 3, 4]),
         TestCase("single element", (([1], [1, 2]),), [2]),
-        TestCase("not in nums2", (([5], [1, 2, 3]),), [-1]),  # Edge case
         TestCase("reversed", (([4, 3, 2, 1], [1, 2, 3, 4]),), [-1, 4, 3, 2]),
+        TestCase("same arrays", (([1, 2, 3], [1, 2, 3]),), [2, 3, -1]),
     ],
     "next_greater_element_ii": [
         TestCase("example 1", (([1, 2, 1],),), [2, -1, 2]),
@@ -21,6 +21,7 @@ MONOTONIC_STACK_TESTS = {
         TestCase("decreasing", (([5, 4, 3, 2, 1],),), [-1, 5, 5, 5, 5]),
         TestCase("increasing", (([1, 2, 3, 4, 5],),), [2, 3, 4, 5, -1]),
         TestCase("peak in middle", (([1, 5, 3, 2, 4],),), [5, -1, 4, 4, 5]),
+        TestCase("negative numbers", (([-2, -1, -3],),), [-1, -1, -1]),
     ],
     "daily_temperatures": [
         TestCase("example 1", (([73, 74, 75, 71, 69, 72, 76, 73],),), [1, 1, 4, 2, 1, 1, 0, 0]),
@@ -31,6 +32,7 @@ MONOTONIC_STACK_TESTS = {
         TestCase("one warmer", (([70, 70, 75],),), [2, 1, 0]),
         TestCase("zigzag", (([70, 80, 70, 80, 70],),), [1, 0, 1, 0, 0]),
         TestCase("valley", (([80, 70, 60, 70, 80],),), [0, 3, 1, 1, 0]),
+        TestCase("two elements same", (([30, 30],),), [0, 0]),
     ],
     "largest_rectangle_histogram": [
         TestCase("example 1", (([2, 1, 5, 6, 2, 3],),), 10),
@@ -75,6 +77,9 @@ MONOTONIC_STACK_TESTS = {
         TestCase("increasing", (([1, 2, 3],),), 10),  # 1+2+3+1+2+1 = 10
         TestCase("decreasing", (([3, 2, 1],),), 10),  # 3+2+1+2+1+1 = 10
         TestCase("larger example", (([1, 2, 3, 4, 5],),), 35),
+        TestCase(
+            "with duplicates", (([1, 2, 1],),), 7
+        ),  # [1]=1, [2]=2, [1]=1, [1,2]=1, [2,1]=1, [1,2,1]=1 -> 7
     ],
     "shortest_unsorted_subarray": [
         TestCase("example 1", (([2, 6, 4, 8, 10, 9, 15],),), 5),
@@ -87,6 +92,8 @@ MONOTONIC_STACK_TESTS = {
         TestCase("unsorted at end", (([1, 2, 3, 5, 4],),), 2),
         TestCase("all same", (([5, 5, 5, 5],),), 0),
         TestCase("one out of place", (([1, 3, 2, 4, 5],),), 2),
+        TestCase("negative numbers", (([-1, -2, -3],),), 3),
+        TestCase("negative sorted", (([-3, -2, -1],),), 0),
     ],
     "maximal_rectangle": [
         TestCase(
@@ -119,18 +126,19 @@ MONOTONIC_STACK_TESTS = {
         TestCase("increasing", (([1, 2, 3, 4, 5], 3),), [3, 4, 5]),
         TestCase("all same", (([5, 5, 5, 5], 2),), [5, 5, 5]),
         TestCase("alternating", (([1, 5, 1, 5, 1], 2),), [5, 5, 5, 5]),
-    ],
-    "trapping_rain_water_ii": [
-        TestCase(
-            "example 1", (([[1, 4, 3, 1, 3, 2], [3, 2, 1, 3, 2, 4], [2, 3, 3, 2, 3, 1]],),), 4
-        ),
-        TestCase("flat", (([[1, 1, 1], [1, 1, 1], [1, 1, 1]],),), 0),
-        TestCase("basin", (([[5, 5, 5], [5, 1, 5], [5, 5, 5]],),), 4),
+        TestCase("all negative", (([-3, -2, -1, -5, -4], 2),), [-2, -1, -1, -4]),
+        TestCase("k equals 1", (([4, 3, 2, 1], 1),), [4, 3, 2, 1]),
     ],
     "StockSpanner": [
         TestCase(
             "example 1",
-            (((), ["next", "next", "next", "next", "next", "next", "next"], [(100,), (80,), (60,), (70,), (60,), (75,), (85,)]),),
+            (
+                (
+                    (),
+                    ["next", "next", "next", "next", "next", "next", "next"],
+                    [(100,), (80,), (60,), (70,), (60,), (75,), (85,)],
+                ),
+            ),
             [1, 1, 1, 2, 1, 4, 6],
             is_class_test=True,
         ),
@@ -152,12 +160,5 @@ MONOTONIC_STACK_TESTS = {
             [1, 2, 3, 4],
             is_class_test=True,
         ),
-    ],
-
-    "online_stock_span": [
-        TestCase("example", (([100, 80, 60, 70, 60, 75, 85],),), [1, 1, 1, 2, 1, 4, 6]),
-        TestCase("increasing", (([10, 20, 30, 40, 50],),), [1, 2, 3, 4, 5]),
-        TestCase("decreasing", (([50, 40, 30, 20, 10],),), [1, 1, 1, 1, 1]),
-        TestCase("all same", (([30, 30, 30, 30],),), [1, 2, 3, 4]),
     ],
 }

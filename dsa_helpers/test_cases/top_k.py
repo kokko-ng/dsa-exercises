@@ -1,6 +1,6 @@
 """Test cases for Top K Elements problems (Category 12)."""
 
-from . import TestCase, set_compare, unordered_list_compare
+from . import TestCase, frequency_sort_compare, set_compare, unordered_list_compare
 
 TOP_K_TESTS: dict[str, list[TestCase]] = {
     "top_k_frequent": [
@@ -51,13 +51,14 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         ),
     ],
     "sort_by_frequency": [
-        TestCase("tree", (("tree",),), None, None),  # "eert" or "eetr"
-        TestCase("cccaaa", (("cccaaa",),), None, None),  # "cccaaa" or "aaaccc"
-        TestCase("Aabb", (("Aabb",),), None, None),  # "bbAa" or "bbaA"
+        TestCase("tree", (("tree",),), "tree", frequency_sort_compare),
+        TestCase("cccaaa", (("cccaaa",),), "cccaaa", frequency_sort_compare),
+        TestCase("Aabb", (("Aabb",),), "Aabb", frequency_sort_compare),
         TestCase("single char", (("a",),), "a"),
         TestCase("all same", (("aaaa",),), "aaaa"),
-        TestCase("all unique", (("abc",),), None, None),  # Any order valid
-        TestCase("numbers", (("112233",),), None, None),  # Multiple valid
+        TestCase("all unique", (("abc",),), "abc", frequency_sort_compare),
+        TestCase("numbers", (("112233",),), "112233", frequency_sort_compare),
+        TestCase("mixed case", (("AaBbCc",),), "AaBbCc", frequency_sort_compare),
     ],
     "closest_numbers": [
         TestCase("example 1", (([1, 2, 3, 4, 5], 4, 3),), [1, 2, 3, 4]),
@@ -68,6 +69,7 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("single element", (([5], 1, 5),), [5]),
         TestCase("x is element", (([1, 3, 5, 7, 9], 3, 5),), [3, 5, 7]),
         TestCase("between elements", (([1, 2, 4, 5], 2, 3),), [2, 4]),
+        TestCase("with negatives", (([-3, -1, 0, 2, 4], 3, 0),), [-1, 0, 2]),
     ],
     "connect_ropes": [
         TestCase("example 1", (([1, 3, 11, 5],),), 33),
@@ -76,6 +78,8 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("two ropes", (([1, 2],),), 3),
         TestCase("all same", (([4, 4, 4, 4],),), 32),
         TestCase("sorted", (([1, 2, 3, 4, 5],),), 33),
+        TestCase("descending", (([5, 4, 3, 2, 1],),), 33),
+        TestCase("three ropes", (([2, 3, 4],),), 14),  # 2+3=5 (cost 5), 5+4=9 (cost 9), total 14
     ],
     "maximum_distinct_elements": [
         TestCase("example 1", (([7, 3, 5, 8, 5, 3, 3], 2),), 3),
@@ -83,6 +87,9 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("no removal", (([1, 2, 3, 4], 0),), 4),
         TestCase("all same", (([5, 5, 5, 5], 3),), 1),
         TestCase("all unique", (([1, 2, 3, 4, 5], 2),), 3),
+        TestCase("remove all", (([1, 2, 3], 3),), 0),
+        TestCase("single element", (([5], 0),), 1),
+        TestCase("k larger than duplicates", (([1, 1, 2, 2, 3], 4),), 1),
     ],
     "sum_of_elements": [
         TestCase("example 1", (([1, 3, 12, 5, 15, 11], 3, 6),), 23),
@@ -90,6 +97,8 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase(
             "adjacent k", (([1, 2, 3, 4, 5], 2, 3),), 0
         ),  # No elements between 2nd and 3rd smallest
+        TestCase("with negatives", (([-5, -2, 0, 3, 7], 2, 5),), 1),  # Sum of -2, 0, 3
+        TestCase("larger range", (([1, 2, 3, 4, 5, 6, 7, 8], 2, 7),), 18),  # 3+4+5+6
     ],
     "kth_largest_in_stream": [
         TestCase("example 1", ((3, [4, 5, 8, 2], [3, 5, 10, 9, 4]),), [4, 5, 5, 8, 8]),
@@ -97,6 +106,7 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("single initial", ((1, [5], [1, 2, 3, 4]),), [5, 5, 5, 5]),
         TestCase("k equals size", ((3, [1, 2, 3], [4, 5]),), [2, 3]),
         TestCase("all same", ((2, [5, 5], [5, 5]),), [5, 5]),
+        TestCase("with negatives", ((2, [-3, -1, 0], [1, 2]),), [0, 1]),
     ],
     "top_k_frequent_words": [
         TestCase("basic", ((["i", "love", "leetcode", "i", "love", "coding"], 2),), ["i", "love"]),
@@ -107,5 +117,6 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         ),
         TestCase("single word", ((["hello"], 1),), ["hello"]),
         TestCase("all same freq", ((["a", "b", "c"], 2),), ["a", "b"]),
+        TestCase("k equals unique", ((["apple", "banana", "apple"], 2),), ["apple", "banana"]),
     ],
 }

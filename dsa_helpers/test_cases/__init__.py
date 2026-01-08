@@ -1,5 +1,4 @@
-"""
-Test case definitions for all DSA exercises.
+"""Test case definitions for all DSA exercises.
 
 Test cases are organized by category and combined into a single TEST_CASES registry.
 """
@@ -8,7 +7,9 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 from ..comparators import (
+    frequency_sort_compare,
     nested_set_compare,
+    palindrome_substring_compare,
     set_compare,
     sorted_compare,
     topological_order_compare,
@@ -76,6 +77,8 @@ __all__ = [
     "TestCase",
     "TEST_CASES",
     # Comparators re-exported for submodules
+    "frequency_sort_compare",
+    "palindrome_substring_compare",
     "sorted_compare",
     "set_compare",
     "nested_set_compare",

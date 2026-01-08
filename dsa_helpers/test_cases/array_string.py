@@ -10,13 +10,21 @@ ARRAY_STRING_TESTS = {
         TestCase("negative numbers", (([-1, -2, -3, -4, -5], -8),), [2, 4], sorted_compare),
         TestCase("mixed signs", (([-3, 4, 3, 90], 0),), [0, 2], sorted_compare),
         TestCase("zeros", (([0, 4, 3, 0], 0),), [0, 3], sorted_compare),
-        TestCase("large numbers", (([1000000000, 2, 1000000000], 2000000000),), [0, 2], sorted_compare),
+        TestCase(
+            "large numbers", (([1000000000, 2, 1000000000], 2000000000),), [0, 2], sorted_compare
+        ),
         TestCase("target at end", (([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 19),), [8, 9], sorted_compare),
         TestCase("negative target", (([5, -10, 3, -6], -16),), [1, 3], sorted_compare),
         TestCase("first and last", (([1, 9, 2, 3, 4, 5, 6, 7, 8], 10),), [0, 1], sorted_compare),
-        TestCase("performance", ((list(range(100000)), 199997),), [99998, 99999], sorted_compare, is_performance=True, max_time=1.0),
+        TestCase(
+            "performance",
+            ((list(range(100000)), 199997),),
+            [99998, 99999],
+            sorted_compare,
+            is_performance=True,
+            max_time=1.0,
+        ),
     ],
-
     "valid_anagram": [
         TestCase("simple anagram", (("anagram", "nagaram"),), True),
         TestCase("not anagram", (("rat", "car"),), False),
@@ -28,10 +36,19 @@ ARRAY_STRING_TESTS = {
         TestCase("repeated chars", (("aabb", "abab"),), True),
         TestCase("same letters diff count", (("aab", "abb"),), False),
         TestCase("unicode chars", (("日本語", "語日本"),), True),
-        TestCase("long anagram", (("abcdefghijklmnopqrstuvwxyz" * 10, "zyxwvutsrqponmlkjihgfedcba" * 10),), True),
-        TestCase("performance", (("abcdefghij" * 5000, "jihgfedcba" * 5000),), True, is_performance=True, max_time=1.0),
+        TestCase(
+            "long anagram",
+            (("abcdefghijklmnopqrstuvwxyz" * 10, "zyxwvutsrqponmlkjihgfedcba" * 10),),
+            True,
+        ),
+        TestCase(
+            "performance",
+            (("abcdefghij" * 5000, "jihgfedcba" * 5000),),
+            True,
+            is_performance=True,
+            max_time=1.0,
+        ),
     ],
-
     "valid_palindrome": [
         TestCase("classic palindrome", (("A man, a plan, a canal: Panama",),), True),
         TestCase("not palindrome", (("race a car",),), False),
@@ -46,18 +63,36 @@ ARRAY_STRING_TESTS = {
         TestCase("with colons", (("Was it a car or a cat I saw?",),), True),
         TestCase("empty string", (("",),), True),
     ],
-
     "reverse_string": [
-        TestCase("simple", ((["h", "e", "l", "l", "o"],),), ["o", "l", "l", "e", "h"], check_modified_arg=0),
-        TestCase("even length", ((["H", "a", "n", "n", "a", "h"],),), ["h", "a", "n", "n", "a", "H"], check_modified_arg=0),
+        TestCase(
+            "simple",
+            ((["h", "e", "l", "l", "o"],),),
+            ["o", "l", "l", "e", "h"],
+            check_modified_arg=0,
+        ),
+        TestCase(
+            "even length",
+            ((["H", "a", "n", "n", "a", "h"],),),
+            ["h", "a", "n", "n", "a", "H"],
+            check_modified_arg=0,
+        ),
         TestCase("single char", ((["a"],),), ["a"], check_modified_arg=0),
         TestCase("two chars", ((["a", "b"],),), ["b", "a"], check_modified_arg=0),
         TestCase("empty", (([],),), [], check_modified_arg=0),
-        TestCase("palindrome", ((["r", "a", "c", "e", "c", "a", "r"],),), ["r", "a", "c", "e", "c", "a", "r"], check_modified_arg=0),
-        TestCase("numbers as chars", ((["1", "2", "3", "4"],),), ["4", "3", "2", "1"], check_modified_arg=0),
+        TestCase(
+            "palindrome",
+            ((["r", "a", "c", "e", "c", "a", "r"],),),
+            ["r", "a", "c", "e", "c", "a", "r"],
+            check_modified_arg=0,
+        ),
+        TestCase(
+            "numbers as chars",
+            ((["1", "2", "3", "4"],),),
+            ["4", "3", "2", "1"],
+            check_modified_arg=0,
+        ),
         TestCase("special chars", ((["@", "#", "$"],),), ["$", "#", "@"], check_modified_arg=0),
     ],
-
     "longest_common_prefix": [
         TestCase("common prefix", ((["flower", "flow", "flight"],),), "fl"),
         TestCase("no common prefix", ((["dog", "racecar", "car"],),), ""),
@@ -70,7 +105,6 @@ ARRAY_STRING_TESTS = {
         TestCase("first is prefix", ((["abc", "abcd", "abcde"],),), "abc"),
         TestCase("last is prefix", ((["abcde", "abcd", "abc"],),), "abc"),
     ],
-
     "remove_duplicates": [
         TestCase("with duplicates", (([1, 1, 2],),), 2),
         TestCase("more duplicates", (([0, 0, 1, 1, 1, 2, 2, 3, 3, 4],),), 5),
@@ -83,9 +117,13 @@ ARRAY_STRING_TESTS = {
         TestCase("negative numbers", (([-3, -1, -1, 0, 0, 1, 2],),), 5),
         TestCase("large range", ((sorted(list(range(100)) + list(range(100))),),), 100),
     ],
-
     "rotate_array": [
-        TestCase("rotate by 3", (([1, 2, 3, 4, 5, 6, 7], 3),), [5, 6, 7, 1, 2, 3, 4], check_modified_arg=0),
+        TestCase(
+            "rotate by 3",
+            (([1, 2, 3, 4, 5, 6, 7], 3),),
+            [5, 6, 7, 1, 2, 3, 4],
+            check_modified_arg=0,
+        ),
         TestCase("rotate by 2", (([-1, -100, 3, 99], 2),), [3, 99, -1, -100], check_modified_arg=0),
         TestCase("rotate by length", (([1, 2, 3], 3),), [1, 2, 3], check_modified_arg=0),
         TestCase("rotate single", (([1], 1),), [1], check_modified_arg=0),
@@ -95,7 +133,6 @@ ARRAY_STRING_TESTS = {
         TestCase("double length", (([1, 2], 4),), [1, 2], check_modified_arg=0),
         TestCase("large k", (([1, 2, 3, 4, 5], 102),), [4, 5, 1, 2, 3], check_modified_arg=0),
     ],
-
     "move_zeroes": [
         TestCase("mixed", (([0, 1, 0, 3, 12],),), [1, 3, 12, 0, 0], check_modified_arg=0),
         TestCase("single zero", (([0],),), [0], check_modified_arg=0),
@@ -108,7 +145,6 @@ ARRAY_STRING_TESTS = {
         TestCase("single non-zero", (([1],),), [1], check_modified_arg=0),
         TestCase("many zeros", (([0, 0, 0, 0, 1],),), [1, 0, 0, 0, 0], check_modified_arg=0),
     ],
-
     "plus_one": [
         TestCase("simple", (([1, 2, 3],),), [1, 2, 4]),
         TestCase("carry", (([9],),), [1, 0]),
@@ -116,22 +152,49 @@ ARRAY_STRING_TESTS = {
         TestCase("no carry", (([1, 2, 9],),), [1, 3, 0]),
         TestCase("single digit", (([0],),), [1]),
         TestCase("middle carry", (([1, 9, 9],),), [2, 0, 0]),
-        TestCase("large number", (([9, 8, 7, 6, 5, 4, 3, 2, 1, 0],),), [9, 8, 7, 6, 5, 4, 3, 2, 1, 1]),
+        TestCase(
+            "large number", (([9, 8, 7, 6, 5, 4, 3, 2, 1, 0],),), [9, 8, 7, 6, 5, 4, 3, 2, 1, 1]
+        ),
         TestCase("partial carry", (([2, 9, 9],),), [3, 0, 0]),
         TestCase("no carry large", (([1, 2, 3, 4, 5, 6, 7, 8],),), [1, 2, 3, 4, 5, 6, 7, 9]),
     ],
-
     "merge_sorted_arrays": [
-        TestCase("simple merge", (([1, 2, 3, 0, 0, 0], 3, [2, 5, 6], 3),), [1, 2, 2, 3, 5, 6], check_modified_arg=0),
+        TestCase(
+            "simple merge",
+            (([1, 2, 3, 0, 0, 0], 3, [2, 5, 6], 3),),
+            [1, 2, 2, 3, 5, 6],
+            check_modified_arg=0,
+        ),
         TestCase("empty second", (([1], 1, [], 0),), [1], check_modified_arg=0),
         TestCase("empty first", (([0], 0, [1], 1),), [1], check_modified_arg=0),
-        TestCase("all from second", (([0, 0, 0], 0, [1, 2, 3], 3),), [1, 2, 3], check_modified_arg=0),
-        TestCase("interleaved", (([1, 3, 5, 0, 0, 0], 3, [2, 4, 6], 3),), [1, 2, 3, 4, 5, 6], check_modified_arg=0),
-        TestCase("second all smaller", (([4, 5, 6, 0, 0, 0], 3, [1, 2, 3], 3),), [1, 2, 3, 4, 5, 6], check_modified_arg=0),
-        TestCase("with duplicates", (([1, 2, 3, 0, 0, 0], 3, [1, 2, 3], 3),), [1, 1, 2, 2, 3, 3], check_modified_arg=0),
-        TestCase("negative numbers", (([-3, -1, 0, 0, 0], 2, [-2, 1, 2], 3),), [-3, -2, -1, 1, 2], check_modified_arg=0),
+        TestCase(
+            "all from second", (([0, 0, 0], 0, [1, 2, 3], 3),), [1, 2, 3], check_modified_arg=0
+        ),
+        TestCase(
+            "interleaved",
+            (([1, 3, 5, 0, 0, 0], 3, [2, 4, 6], 3),),
+            [1, 2, 3, 4, 5, 6],
+            check_modified_arg=0,
+        ),
+        TestCase(
+            "second all smaller",
+            (([4, 5, 6, 0, 0, 0], 3, [1, 2, 3], 3),),
+            [1, 2, 3, 4, 5, 6],
+            check_modified_arg=0,
+        ),
+        TestCase(
+            "with duplicates",
+            (([1, 2, 3, 0, 0, 0], 3, [1, 2, 3], 3),),
+            [1, 1, 2, 2, 3, 3],
+            check_modified_arg=0,
+        ),
+        TestCase(
+            "negative numbers",
+            (([-3, -1, 0, 0, 0], 2, [-2, 1, 2], 3),),
+            [-3, -2, -1, 1, 2],
+            check_modified_arg=0,
+        ),
     ],
-
     "product_except_self": [
         TestCase("simple", (([1, 2, 3, 4],),), [24, 12, 8, 6]),
         TestCase("with zero", (([-1, 1, 0, -3, 3],),), [0, 0, 9, 0, 0]),
@@ -142,7 +205,6 @@ ARRAY_STRING_TESTS = {
         TestCase("single zero", (([1, 2, 0, 4],),), [0, 0, 8, 0]),
         TestCase("large values", (([10, 20, 30],),), [600, 300, 200]),
     ],
-
     "container_with_most_water": [
         TestCase("example 1", (([1, 8, 6, 2, 5, 4, 8, 3, 7],),), 49),
         TestCase("example 2", (([1, 1],),), 1),
@@ -152,8 +214,9 @@ ARRAY_STRING_TESTS = {
         TestCase("same height", (([5, 5, 5, 5],),), 15),
         TestCase("tall ends", (([10, 1, 1, 1, 10],),), 40),
         TestCase("short middle", (([5, 1, 5],),), 10),
+        TestCase("zero heights", (([0, 0],),), 0),
+        TestCase("one zero", (([0, 5],),), 0),
     ],
-
     "trapping_rain_water": [
         TestCase("example 1", (([0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1],),), 6),
         TestCase("example 2", (([4, 2, 0, 3, 2, 5],),), 9),
@@ -166,7 +229,6 @@ ARRAY_STRING_TESTS = {
         TestCase("flat", (([3, 3, 3, 3],),), 0),
         TestCase("w shape", (([3, 0, 2, 0, 3],),), 7),
     ],
-
     "longest_substring_without_repeating": [
         TestCase("abcabcbb", (("abcabcbb",),), 3),
         TestCase("bbbbb", (("bbbbb",),), 1),
@@ -179,7 +241,6 @@ ARRAY_STRING_TESTS = {
         TestCase("special chars", (("a!b@c#d",),), 7),
         TestCase("numbers", (("12312345",),), 5),
     ],
-
     "minimum_window_substring": [
         TestCase("example 1", (("ADOBECODEBANC", "ABC"),), "BANC"),
         TestCase("example 2", (("a", "a"),), "a"),
