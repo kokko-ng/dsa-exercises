@@ -53,12 +53,17 @@ TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
         TestCase("single project", ((1, 1, [1], [0]),), 2),
         TestCase("more projects than k", ((1, 0, [1, 2, 3], [0, 0, 0]),), 3),
         TestCase("high initial capital", ((2, 100, [1, 2, 3], [0, 1, 2]),), 105),
+        TestCase("k is zero", ((0, 5, [1, 2, 3], [0, 0, 0]),), 5),
+        TestCase("empty projects", ((2, 10, [], []),), 10),
+        TestCase("gradual unlock", ((3, 0, [1, 2, 3], [0, 1, 3]),), 6),
     ],
     "next_interval": [
         TestCase("basic", (([[1, 2], [2, 3], [0, 1], [3, 4]],),), [1, 3, 0, -1]),
         TestCase("no next", (([[1, 4], [2, 3], [3, 4]],),), [-1, 2, -1]),
         TestCase("single", (([[1, 2]],),), [-1]),
         TestCase("all same", (([[1, 2], [1, 2], [1, 2]],),), [-1, -1, -1]),
+        TestCase("consecutive", (([[1, 2], [2, 3], [3, 4]],),), [1, 2, -1]),
+        TestCase("self reference", (([[1, 1], [2, 2]],),), [0, 1]),
     ],
     "kth_smallest_in_sorted_matrix": [
         TestCase("basic", (([[1, 5, 9], [10, 11, 13], [12, 13, 15]], 8),), 13),
@@ -67,6 +72,8 @@ TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
         TestCase("single", (([[1]], 1),), 1),
         TestCase("negative values", (([[-5, -4], [-3, -2]], 2),), -4),
         TestCase("duplicates", (([[1, 1], [1, 2]], 3),), 1),
+        TestCase("middle element", (([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 5),), 5),
+        TestCase("k at boundary", (([[1, 10], [2, 11]], 2),), 2),
     ],
     "merge_k_sorted_arrays": [
         TestCase("basic", (([[1, 4, 5], [1, 3, 4], [2, 6]],),), [1, 1, 2, 3, 4, 4, 5, 6]),
@@ -81,6 +88,8 @@ TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
         TestCase("single lists", (([[1, 2, 3], [1, 2, 3], [1, 2, 3]],),), [1, 1]),
         TestCase("two lists", (([[1, 5], [2, 4]],),), [1, 2]),
         TestCase("single element lists", (([[1], [2], [3]],),), [1, 3]),
+        TestCase("negative values", (([[-5, -1, 0], [-3, 2, 4], [-2, 1, 3]],),), [-2, 0]),
+        TestCase("overlapping ranges", (([[1, 5, 8], [4, 12], [7, 8, 10]],),), [4, 7]),
     ],
     "reorganize_string": [
         TestCase("possible", (("aab",),), "aba"),
@@ -89,5 +98,8 @@ TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
         TestCase("two chars", (("aabb",),), "abab"),
         TestCase("three chars", (("aabc",),), "abac"),
         TestCase("all same", (("aaa",),), ""),
+        TestCase("many chars balanced", (("aabbccdd",),), "abcdabcd"),
+        TestCase("two same", (("aa",),), ""),
+        TestCase("long string", (("aaabbbccc",),), "abcabcabc"),
     ],
 }

@@ -35,6 +35,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("descending middle", (([20, 15, 10, 5, 0], 10),), 2),
         TestCase("ascending first", (([1, 5, 10, 15, 20], 1),), 0),
         TestCase("two elements desc", (([5, 1], 5),), 0),
+        TestCase("two elements asc", (([1, 5], 1),), 0),
+        TestCase("negative descending", (([-1, -5, -10], -5),), 1),
     ],
     "ceiling_of_number": [
         TestCase("exact match", (([4, 6, 10], 6),), 1),
@@ -45,6 +47,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("first element", (([1, 2, 3, 4], 0),), 0),
         TestCase("at boundary", (([1, 3, 5, 7, 9], 5),), 2),
         TestCase("single element ceiling", (([5], 3),), 0),
+        TestCase("with duplicates", (([1, 2, 2, 2, 5], 2),), 1),
+        TestCase("negative numbers", (([-10, -5, -1, 0, 5], -3),), 2),
     ],
     "floor_of_number": [
         TestCase("exact match", (([4, 6, 10], 6),), 1),
@@ -55,6 +59,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("at first", (([1, 2, 3, 4], 1),), 0),
         TestCase("at boundary", (([1, 3, 5, 7, 9], 5),), 2),
         TestCase("single element floor", (([5], 7),), 0),
+        TestCase("with duplicates", (([1, 2, 2, 2, 5], 2),), 3),
+        TestCase("negative numbers", (([-10, -5, -1, 0, 5], -3),), 1),
     ],
     "next_letter": [
         TestCase("example 1", ((["c", "f", "j"], "a"),), "c"),
@@ -65,6 +71,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("exact middle", ((["a", "c", "f", "h"], "c"),), "f"),
         TestCase("single letter wrap", ((["a"], "z"),), "a"),
         TestCase("consecutive", ((["a", "b", "c"], "a"),), "b"),
+        TestCase("last in array", ((["a", "b", "c"], "c"),), "a"),
+        TestCase("with duplicates", ((["a", "a", "b", "b", "c"], "a"),), "b"),
     ],
     "number_range": [
         TestCase("found", (([5, 7, 7, 8, 8, 10], 8),), [3, 4]),
@@ -96,6 +104,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("large gap", (([1, 2, 100, 200, 300], 200),), 3),
         TestCase("single element", (([5], 5),), 0),
         TestCase("in first chunk", (([1, 2, 3, 4, 5, 6, 7, 8], 3),), 2),
+        TestCase("target before all", (([10, 20, 30], 5),), -1),
+        TestCase("large array", ((list(range(1, 1001)), 999),), 998),
     ],
     "minimum_difference_element": [
         TestCase("example 1", (([4, 6, 10], 7),), 6),
@@ -106,6 +116,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("less than first", (([5, 10, 15], 2),), 5),
         TestCase("greater than last", (([1, 5, 10], 12),), 10),
         TestCase("equidistant", (([1, 5, 9], 7),), 5),  # Return smaller when equidistant
+        TestCase("single element", (([5], 3),), 5),
+        TestCase("negative numbers", (([-10, -5, 0, 5], -3),), -5),
     ],
     "bitonic_array_maximum": [
         TestCase("example 1", (([1, 3, 8, 12, 4, 2],),), 12),
@@ -124,6 +136,8 @@ BINARY_SEARCH_TESTS = {
         TestCase("not found", (([1, 3, 8, 12, 4, 2], 10),), -1),
         TestCase("at start", (([1, 5, 10, 5, 1], 1),), 0),  # or 4
         TestCase("at end", (([1, 5, 10, 5, 2], 2),), 4),
+        TestCase("only increasing", (([1, 2, 3, 4, 5], 6),), -1),  # searching for non-existent
+        TestCase("only decreasing target", (([5, 4, 3, 2, 1], 3),), 2),
     ],
     "search_rotated_array": [
         TestCase("found left", (([4, 5, 6, 7, 0, 1, 2], 0),), 4),

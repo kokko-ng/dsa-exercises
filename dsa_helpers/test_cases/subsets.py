@@ -67,6 +67,12 @@ SUBSETS_TESTS = {
         TestCase("no dups", (([1, 2],),), [[1, 2], [2, 1]], nested_set_compare),
         TestCase("single", (([5],),), [[5]], nested_set_compare),
         TestCase("three same", (([2, 2, 2],),), [[2, 2, 2]], nested_set_compare),
+        TestCase(
+            "negative with dups",
+            (([-1, -1, 0],),),
+            [[-1, -1, 0], [-1, 0, -1], [0, -1, -1]],
+            nested_set_compare,
+        ),
     ],
     "string_permutations_by_changing_case": [
         TestCase("letters", (("a1b2",),), ["a1b2", "a1B2", "A1b2", "A1B2"], nested_set_compare),
@@ -78,6 +84,9 @@ SUBSETS_TESTS = {
         ),
         TestCase("all numbers", (("123",),), ["123"]),
         TestCase("single letter", (("a",),), ["a", "A"], nested_set_compare),
+        TestCase("mixed case input", (("aB",),), ["ab", "aB", "Ab", "AB"], nested_set_compare),
+        TestCase("empty string", (("",),), [""]),
+        TestCase("single number", (("5",),), ["5"]),
     ],
     "balanced_parentheses": [
         TestCase(
@@ -85,6 +94,27 @@ SUBSETS_TESTS = {
         ),
         TestCase("n=1", ((1,),), ["()"]),
         TestCase("n=2", ((2,),), ["(())", "()()"], nested_set_compare),
+        TestCase(
+            "n=4",
+            ((4,),),
+            [
+                "(((())))",
+                "((()()))",
+                "((())())",
+                "((()))()",
+                "(()(()))",
+                "(()()())",
+                "(()())()",
+                "(())(())",
+                "(())()()",
+                "()((()))",
+                "()(()())",
+                "()(())()",
+                "()()(())",
+                "()()()()",
+            ],
+            nested_set_compare,
+        ),
     ],
     "unique_generalized_abbreviations": [
         TestCase(
@@ -124,6 +154,9 @@ SUBSETS_TESTS = {
         TestCase("single", (("5",),), [5]),
         TestCase("addition", (("1+2+3",),), [6, 6], sorted_compare),
         TestCase("add and subtract", (("2+3-1",),), [0, 4], sorted_compare),
+        TestCase("multiply only", (("2*3*4",),), [24, 24], sorted_compare),
+        TestCase("two operands", (("1+2",),), [3]),
+        TestCase("zero", (("0+0",),), [0]),
     ],
     "structurally_unique_bst": [
         TestCase("n=1", ((1,),), 1, lambda actual, expected: len(actual) == expected),
@@ -137,5 +170,7 @@ SUBSETS_TESTS = {
         TestCase("n=3", ((3,),), 5),
         TestCase("n=4", ((4,),), 14),
         TestCase("n=5", ((5,),), 42),
+        TestCase("n=6", ((6,),), 132),
+        TestCase("n=7", ((7,),), 429),
     ],
 }

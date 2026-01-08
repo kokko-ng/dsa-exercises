@@ -136,6 +136,7 @@ HASH_MAP_TESTS = {
         TestCase("example 2", (([1, 2, 3], 3),), 2),
         TestCase("negative", (([1, -1, 0], 0),), 3),
         TestCase("single match", (([1], 1),), 1),
+        TestCase("single no match", (([1], 2),), 0),
         TestCase("no match", (([1, 2, 3], 7),), 0),
         TestCase("all zeros", (([0, 0, 0], 0),), 6),
         TestCase("negative numbers", (([-1, -1, 1], 0),), 1),
@@ -153,7 +154,13 @@ HASH_MAP_TESTS = {
     "LRUCache": [
         TestCase(
             "example 1",
-            (((2,), ["put", "put", "get", "put", "get", "put", "get", "get", "get"], [(1, 1), (2, 2), (1,), (3, 3), (2,), (4, 4), (1,), (3,), (4,)]),),
+            (
+                (
+                    (2,),
+                    ["put", "put", "get", "put", "get", "put", "get", "get", "get"],
+                    [(1, 1), (2, 2), (1,), (3, 3), (2,), (4, 4), (1,), (3,), (4,)],
+                ),
+            ),
             [None, None, 1, None, -1, None, -1, 3, 4],
             is_class_test=True,
         ),
@@ -165,7 +172,13 @@ HASH_MAP_TESTS = {
         ),
         TestCase(
             "update existing key",
-            (((2,), ["put", "put", "get", "put", "get", "get"], [(1, 1), (2, 2), (1,), (1, 10), (1,), (2,)]),),
+            (
+                (
+                    (2,),
+                    ["put", "put", "get", "put", "get", "get"],
+                    [(1, 1), (2, 2), (1,), (1, 10), (1,), (2,)],
+                ),
+            ),
             [None, None, 1, None, 10, 2],
             is_class_test=True,
         ),
@@ -177,13 +190,25 @@ HASH_MAP_TESTS = {
         ),
         TestCase(
             "eviction order",
-            (((2,), ["put", "put", "get", "get", "put", "get", "get"], [(1, 1), (2, 2), (1,), (2,), (3, 3), (1,), (3,)]),),
+            (
+                (
+                    (2,),
+                    ["put", "put", "get", "get", "put", "get", "get"],
+                    [(1, 1), (2, 2), (1,), (2,), (3, 3), (1,), (3,)],
+                ),
+            ),
             [None, None, 1, 2, None, -1, 3],
             is_class_test=True,
         ),
         TestCase(
             "get updates order",
-            (((2,), ["put", "put", "get", "put", "get", "get"], [(1, 1), (2, 2), (1,), (3, 3), (2,), (1,)]),),
+            (
+                (
+                    (2,),
+                    ["put", "put", "get", "put", "get", "get"],
+                    [(1, 1), (2, 2), (1,), (3, 3), (2,), (1,)],
+                ),
+            ),
             [None, None, 1, None, -1, 1],
             is_class_test=True,
         ),

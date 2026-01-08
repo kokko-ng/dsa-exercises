@@ -118,17 +118,6 @@ MONOTONIC_STACK_TESTS = {
         TestCase("all 1s", (([["1", "1"], ["1", "1"]],),), 4),
         TestCase("all 0s", (([["0", "0"], ["0", "0"]],),), 0),
     ],
-    "sliding_window_maximum": [
-        TestCase("example 1", (([1, 3, -1, -3, 5, 3, 6, 7], 3),), [3, 3, 5, 5, 6, 7]),
-        TestCase("single element", (([1], 1),), [1]),
-        TestCase("k equals array", (([1, 2, 3], 3),), [3]),
-        TestCase("decreasing", (([5, 4, 3, 2, 1], 3),), [5, 4, 3]),
-        TestCase("increasing", (([1, 2, 3, 4, 5], 3),), [3, 4, 5]),
-        TestCase("all same", (([5, 5, 5, 5], 2),), [5, 5, 5]),
-        TestCase("alternating", (([1, 5, 1, 5, 1], 2),), [5, 5, 5, 5]),
-        TestCase("all negative", (([-3, -2, -1, -5, -4], 2),), [-2, -1, -1, -4]),
-        TestCase("k equals 1", (([4, 3, 2, 1], 1),), [4, 3, 2, 1]),
-    ],
     "StockSpanner": [
         TestCase(
             "example 1",

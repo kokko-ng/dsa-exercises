@@ -80,6 +80,8 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("sorted", (([1, 2, 3, 4, 5],),), 33),
         TestCase("descending", (([5, 4, 3, 2, 1],),), 33),
         TestCase("three ropes", (([2, 3, 4],),), 14),  # 2+3=5 (cost 5), 5+4=9 (cost 9), total 14
+        TestCase("empty", (([],),), 0),
+        TestCase("large ropes", (([100, 200, 300],),), 900),
     ],
     "maximum_distinct_elements": [
         TestCase("example 1", (([7, 3, 5, 8, 5, 3, 3], 2),), 3),
@@ -99,6 +101,9 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         ),  # No elements between 2nd and 3rd smallest
         TestCase("with negatives", (([-5, -2, 0, 3, 7], 2, 5),), 1),  # Sum of -2, 0, 3
         TestCase("larger range", (([1, 2, 3, 4, 5, 6, 7, 8], 2, 7),), 18),  # 3+4+5+6
+        TestCase("k1=1 k2=2", (([10, 20, 30], 1, 2),), 0),  # Nothing between 1st and 2nd
+        TestCase("all same", (([5, 5, 5, 5], 1, 4),), 10),  # 5+5 between
+        TestCase("duplicates", (([1, 1, 2, 2, 3, 3], 2, 5),), 4),  # 2+2 between
     ],
     "kth_largest_in_stream": [
         TestCase("example 1", ((3, [4, 5, 8, 2], [3, 5, 10, 9, 4]),), [4, 5, 5, 8, 8]),
@@ -118,5 +123,7 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("single word", ((["hello"], 1),), ["hello"]),
         TestCase("all same freq", ((["a", "b", "c"], 2),), ["a", "b"]),
         TestCase("k equals unique", ((["apple", "banana", "apple"], 2),), ["apple", "banana"]),
+        TestCase("k=1 multiple same freq", ((["a", "b", "c", "a", "b", "c"], 1),), ["a"]),
+        TestCase("all duplicates", ((["word", "word", "word"], 1),), ["word"]),
     ],
 }

@@ -151,6 +151,7 @@ ARRAY_STRING_TESTS = {
         TestCase("multiple carry", (([9, 9, 9],),), [1, 0, 0, 0]),
         TestCase("no carry", (([1, 2, 9],),), [1, 3, 0]),
         TestCase("single digit", (([0],),), [1]),
+        TestCase("single digit no carry", (([1],),), [2]),
         TestCase("middle carry", (([1, 9, 9],),), [2, 0, 0]),
         TestCase(
             "large number", (([9, 8, 7, 6, 5, 4, 3, 2, 1, 0],),), [9, 8, 7, 6, 5, 4, 3, 2, 1, 1]
@@ -251,5 +252,7 @@ ARRAY_STRING_TESTS = {
         TestCase("window at start", (("ABCD", "AB"),), "AB"),
         TestCase("window at end", (("DCBA", "BA"),), "BA"),
         TestCase("case sensitive", (("AaBb", "ab"),), "aBb"),
+        TestCase("empty s", (("", "a"),), ""),
+        TestCase("empty t", (("abc", ""),), ""),
     ],
 }

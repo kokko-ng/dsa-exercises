@@ -1,6 +1,6 @@
 """Test cases for Two Pointers & Sliding Window problems (Category 03)."""
 
-from . import TestCase, sorted_compare, set_compare, nested_set_compare
+from . import TestCase, nested_set_compare
 
 TWO_POINTERS_TESTS = {
     "remove_element": [
@@ -13,7 +13,6 @@ TWO_POINTERS_TESTS = {
         TestCase("single element no match", (([1], 2),), 1),
         TestCase("alternating", (([1, 2, 1, 2, 1], 1),), 2),
     ],
-
     "squares_of_sorted_array": [
         TestCase("mixed signs", (([-4, -1, 0, 3, 10],),), [0, 1, 9, 16, 100]),
         TestCase("all negative", (([-7, -3, -1],),), [1, 9, 49]),
@@ -24,18 +23,28 @@ TWO_POINTERS_TESTS = {
         TestCase("larger array", (([-5, -3, -2, -1],),), [1, 4, 9, 25]),
         TestCase("symmetric", (([-3, -1, 0, 1, 3],),), [0, 1, 1, 9, 9]),
     ],
-
     "three_sum": [
-        TestCase("example 1", (([-1, 0, 1, 2, -1, -4],),), [[-1, -1, 2], [-1, 0, 1]], nested_set_compare),
+        TestCase(
+            "example 1", (([-1, 0, 1, 2, -1, -4],),), [[-1, -1, 2], [-1, 0, 1]], nested_set_compare
+        ),
         TestCase("no solution", (([0, 1, 1],),), [], nested_set_compare),
         TestCase("all zeros", (([0, 0, 0],),), [[0, 0, 0]], nested_set_compare),
         TestCase("two elements", (([1, -1],),), [], nested_set_compare),
         TestCase("duplicates", (([1, 1, -2],),), [[-2, 1, 1]], nested_set_compare),
-        TestCase("multiple solutions", (([-2, 0, 1, 1, 2],),), [[-2, 0, 2], [-2, 1, 1]], nested_set_compare),
-        TestCase("negative heavy", (([-4, -2, -1, 0, 1, 2],),), [[-2, 0, 2], [-1, 0, 1]], nested_set_compare),
+        TestCase(
+            "multiple solutions",
+            (([-2, 0, 1, 1, 2],),),
+            [[-2, 0, 2], [-2, 1, 1]],
+            nested_set_compare,
+        ),
+        TestCase(
+            "negative heavy",
+            (([-4, -2, -1, 0, 1, 2],),),
+            [[-2, 0, 2], [-1, 0, 1]],
+            nested_set_compare,
+        ),
         TestCase("empty", (([],),), [], nested_set_compare),
     ],
-
     "three_sum_closest": [
         TestCase("example 1", (([-1, 2, 1, -4], 1),), 2),
         TestCase("all zeros", (([0, 0, 0], 1),), 0),
@@ -46,7 +55,6 @@ TWO_POINTERS_TESTS = {
         TestCase("mixed", (([1, 2, 4, 8, 16], 15),), 14),
         TestCase("duplicates", (([1, 1, 1, 1], 0),), 3),
     ],
-
     "sort_colors": [
         TestCase("mixed", (([2, 0, 2, 1, 1, 0],),), [0, 0, 1, 1, 2, 2], check_modified_arg=0),
         TestCase("simple", (([2, 0, 1],),), [0, 1, 2], check_modified_arg=0),
@@ -58,7 +66,6 @@ TWO_POINTERS_TESTS = {
         TestCase("two colors", (([1, 0, 1, 0],),), [0, 0, 1, 1], check_modified_arg=0),
         TestCase("single element", (([1],),), [1], check_modified_arg=0),
     ],
-
     "backspace_string_compare": [
         TestCase("equal after backspace", (("ab#c", "ad#c"),), True),
         TestCase("both empty", (("ab##", "c#d#"),), True),
@@ -71,7 +78,6 @@ TWO_POINTERS_TESTS = {
         TestCase("single char diff", (("a", "b"),), False),
         TestCase("complex", (("bxj##tw", "bxo#j##tw"),), True),
     ],
-
     "maximum_average_subarray": [
         TestCase("example 1", (([1, 12, -5, -6, 50, 3], 4),), 12.75),
         TestCase("single element", (([5], 1),), 5.0),
@@ -82,7 +88,6 @@ TWO_POINTERS_TESTS = {
         TestCase("all same", (([5, 5, 5, 5], 2),), 5.0),
         TestCase("large k", (([0, 1, 1, 3, 3], 4),), 2.0),
     ],
-
     "minimum_size_subarray_sum": [
         TestCase("example 1", ((7, [2, 3, 1, 2, 4, 3]),), 2),
         TestCase("single element enough", ((4, [1, 4, 4]),), 1),
@@ -93,7 +98,6 @@ TWO_POINTERS_TESTS = {
         TestCase("exact sum", ((6, [1, 2, 3]),), 3),
         TestCase("larger than all", ((100, [1, 2, 3, 4, 5]),), 0),
     ],
-
     "longest_repeating_character_replacement": [
         TestCase("example 1", (("ABAB", 2),), 4),
         TestCase("example 2", (("AABABBA", 1),), 4),
@@ -104,7 +108,6 @@ TWO_POINTERS_TESTS = {
         TestCase("empty", (("", 2),), 0),
         TestCase("all same", (("BBBB", 2),), 4),
     ],
-
     "permutation_in_string": [
         TestCase("found", (("ab", "eidbaooo"),), True),
         TestCase("not found", (("ab", "eidboaoo"),), False),
@@ -115,7 +118,6 @@ TWO_POINTERS_TESTS = {
         TestCase("single char not found", (("a", "b"),), False),
         TestCase("repeated chars", (("aab", "cbdaaboa"),), True),
     ],
-
     "find_all_anagrams": [
         TestCase("example 1", (("cbaebabacd", "abc"),), [0, 6]),
         TestCase("example 2", (("abab", "ab"),), [0, 1, 2]),
@@ -126,10 +128,11 @@ TWO_POINTERS_TESTS = {
         TestCase("empty s", (("", "a"),), []),
         TestCase("overlapping", (("aaa", "aa"),), [0, 1]),
     ],
-
     "max_consecutive_ones_iii": [
         TestCase("example 1", (([1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0], 2),), 6),
-        TestCase("example 2", (([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3),), 10),
+        TestCase(
+            "example 2", (([0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1], 3),), 10
+        ),
         TestCase("all ones", (([1, 1, 1], 0),), 3),
         TestCase("all zeros", (([0, 0, 0], 3),), 3),
         TestCase("k equals length", (([0, 1, 0], 3),), 3),
@@ -137,7 +140,6 @@ TWO_POINTERS_TESTS = {
         TestCase("no flips needed", (([1, 1, 1, 1], 2),), 4),
         TestCase("all need flip", (([0, 0, 0, 0], 2),), 2),
     ],
-
     "fruit_into_baskets": [
         TestCase("example 1", (([1, 2, 1],),), 3),
         TestCase("example 2", (([0, 1, 2, 2],),), 3),
@@ -148,7 +150,6 @@ TWO_POINTERS_TESTS = {
         TestCase("single element", (([5],),), 1),
         TestCase("alternating three", (([1, 2, 3, 1, 2, 3],),), 2),
     ],
-
     "longest_substring_k_distinct": [
         TestCase("example 1", (("eceba", 2),), 3),
         TestCase("example 2", (("aa", 1),), 2),
@@ -158,5 +159,16 @@ TWO_POINTERS_TESTS = {
         TestCase("empty string", (("", 2),), 0),
         TestCase("single char", (("a", 1),), 1),
         TestCase("k equals distinct", (("abc", 3),), 3),
+    ],
+    "sliding_window_maximum": [
+        TestCase("example 1", (([1, 3, -1, -3, 5, 3, 6, 7], 3),), [3, 3, 5, 5, 6, 7]),
+        TestCase("single element", (([1], 1),), [1]),
+        TestCase("k equals length", (([1, 2, 3], 3),), [3]),
+        TestCase("all same", (([5, 5, 5, 5], 2),), [5, 5, 5]),
+        TestCase("descending", (([9, 8, 7, 6, 5], 3),), [9, 8, 7]),
+        TestCase("ascending", (([1, 2, 3, 4, 5], 3),), [3, 4, 5]),
+        TestCase("k equals 1", (([4, 3, 2, 1], 1),), [4, 3, 2, 1]),
+        TestCase("negative numbers", (([-1, -3, -5, -2], 2),), [-1, -3, -2]),
+        TestCase("two elements", (([2, 1], 2),), [2]),
     ],
 }

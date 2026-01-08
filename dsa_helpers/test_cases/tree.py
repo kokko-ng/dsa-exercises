@@ -27,6 +27,8 @@ TREE_TESTS = {
         TestCase("single node", (([1],),), [1.0]),
         TestCase("two levels", (([3, 9, 20],),), [3.0, 14.5]),
         TestCase("negative values", (([-1, -2, -3],),), [-1.0, -2.5]),
+        TestCase("large values", (([2147483647, -2147483648, 0],),), [2147483647.0, -1073741824.0]),
+        TestCase("three levels unbalanced", (([1, 2, 3, 4, None, None, 5],),), [1.0, 2.5, 4.5]),
     ],
     "minimum_depth": [
         TestCase("balanced", (([3, 9, 20, None, None, 15, 7],),), 2),
@@ -46,6 +48,8 @@ TREE_TESTS = {
         TestCase("next level", (([3, 9, 20, None, None, 15, 7], 20),), 15),
         TestCase("last node", (([3, 9, 20, None, None, 15, 7], 7),), None),
         TestCase("root", (([1, 2, 3], 1),), 2),
+        TestCase("single node", (([5], 5),), None),
+        TestCase("left child successor", (([1, 2, 3, 4, 5], 3),), 4),
     ],
     "connect_level_order_siblings": [
         TestCase(
@@ -55,6 +59,8 @@ TREE_TESTS = {
         ),
         TestCase("single node", (([1],),), [[1, None]]),
         TestCase("empty", (([],),), []),
+        TestCase("two levels", (([1, 2, 3],),), [[1, None], [2, 3, None]]),
+        TestCase("left skewed", (([1, 2, None, 3],),), [[1, None], [2, None], [3, None]]),
     ],
     "path_sum": [
         TestCase("has path", (([5, 4, 8, 11, None, 13, 4, 7, 2, None, None, None, 1], 22),), True),
@@ -63,6 +69,8 @@ TREE_TESTS = {
         TestCase("single node false", (([1], 2),), False),
         TestCase("empty", (([], 0),), False),
         TestCase("negative sum", (([-2, -3], -5),), True),
+        TestCase("zero sum", (([0, 1, -1], 0),), True),
+        TestCase("target zero non-zero tree", (([1, 2, 3], 0),), False),
     ],
     "all_paths_for_sum": [
         TestCase(
@@ -79,6 +87,9 @@ TREE_TESTS = {
         TestCase("simple", (([1, 2, 3],),), 25),
         TestCase("single", (([1],),), 1),
         TestCase("larger", (([4, 9, 0, 5, 1],),), 1026),
+        TestCase("zeros", (([0, 0, 0],),), 0),
+        TestCase("left only", (([1, 2],),), 12),
+        TestCase("right only", (([1, None, 2],),), 12),
     ],
     "path_with_given_sequence": [
         TestCase("exists", (([1, 7, 9, None, None, 2, 9], [1, 9, 9]),), True),
@@ -86,6 +97,9 @@ TREE_TESTS = {
         TestCase("single", (([1], [1]),), True),
         TestCase("empty sequence", (([1], []),), False),
         TestCase("sequence longer than path", (([1, 2], [1, 2, 3]),), False),
+        TestCase("wrong root", (([1, 2, 3], [2, 3]),), False),
+        TestCase("partial match", (([1, 2, 3], [1, 2]),), True),
+        TestCase("single wrong value", (([1], [2]),), False),
     ],
     "count_paths_for_sum": [
         TestCase("multiple paths", (([10, 5, -3, 3, 2, None, 11, 3, -2, None, 1], 8),), 3),
@@ -93,12 +107,16 @@ TREE_TESTS = {
         TestCase("single node", (([1], 1),), 1),
         TestCase("empty tree", (([], 0),), 0),
         TestCase("no matching paths", (([1, 2, 3], 100),), 0),
+        TestCase("zero target", (([0, 0, 0], 0),), 6),
+        TestCase("negative target", (([-1, -2, -3], -3),), 2),
     ],
     "tree_diameter": [
         TestCase("balanced", (([1, 2, 3, 4, 5],),), 3),
         TestCase("skewed", (([1, 2, None, 3, None, 4],),), 3),
         TestCase("single", (([1],),), 0),
         TestCase("empty", (([],),), 0),
+        TestCase("two nodes", (([1, 2],),), 1),
+        TestCase("full tree 3 levels", (([1, 2, 3, 4, 5, 6, 7],),), 4),
     ],
     "path_with_maximum_sum": [
         TestCase("mixed", (([-10, 9, 20, None, None, 15, 7],),), 42),
@@ -106,5 +124,8 @@ TREE_TESTS = {
         TestCase("simple", (([1, 2, 3],),), 6),
         TestCase("single path", (([2, -1],),), 2),
         TestCase("all negative", (([-1, -2, -3],),), -1),
+        TestCase("zero values", (([0, 0, 0],),), 0),
+        TestCase("large positive", (([100, 50, 50],),), 200),
+        TestCase("left only path", (([5, 4, None, 3, None, 2],),), 14),
     ],
 }

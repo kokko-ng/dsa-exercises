@@ -25,6 +25,8 @@ LINKED_LIST_TESTS = {
         TestCase("k=1", (([1, 2, 3], 1),), [1, 2, 3]),
         TestCase("k=len", (([1, 2, 3], 3),), [3, 2, 1]),
         TestCase("single", (([1], 1),), [1]),
+        TestCase("negative values", (([-3, -2, -1, 0, 1, 2], 2),), [-2, -3, 0, -1, 2, 1]),
+        TestCase("k greater than len", (([1, 2], 3),), [1, 2]),
     ],
     "reverse_alternating_k": [
         TestCase("k=2", (([1, 2, 3, 4, 5, 6, 7, 8], 2),), [2, 1, 3, 4, 6, 5, 7, 8]),
@@ -32,6 +34,10 @@ LINKED_LIST_TESTS = {
         TestCase("short list", (([1, 2], 2),), [2, 1]),
         TestCase("k=1", (([1, 2, 3], 1),), [1, 2, 3]),
         TestCase("single node", (([1], 1),), [1]),
+        TestCase("negative values", (([-4, -3, -2, -1], 2),), [-3, -4, -2, -1]),
+        TestCase(
+            "nine elements k=3", (([1, 2, 3, 4, 5, 6, 7, 8, 9], 3),), [3, 2, 1, 4, 5, 6, 9, 8, 7]
+        ),
     ],
     "rotate_list": [
         TestCase("rotate by 2", (([1, 2, 3, 4, 5], 2),), [4, 5, 1, 2, 3]),
@@ -40,6 +46,9 @@ LINKED_LIST_TESTS = {
         TestCase("k=0", (([1, 2, 3], 0),), [1, 2, 3]),
         TestCase("k > len", (([1, 2], 3),), [2, 1]),
         TestCase("empty", (([], 0),), []),
+        TestCase("k equals len", (([1, 2, 3], 3),), [1, 2, 3]),
+        TestCase("large k", (([1, 2, 3, 4], 10),), [3, 4, 1, 2]),
+        TestCase("negative values", (([-3, -2, -1], 1),), [-1, -3, -2]),
     ],
     "swap_pairs": [
         TestCase("even length", (([1, 2, 3, 4],),), [2, 1, 4, 3]),
@@ -47,6 +56,8 @@ LINKED_LIST_TESTS = {
         TestCase("single", (([1],),), [1]),
         TestCase("empty", (([],),), []),
         TestCase("two nodes", (([1, 2],),), [2, 1]),
+        TestCase("six nodes", (([1, 2, 3, 4, 5, 6],),), [2, 1, 4, 3, 6, 5]),
+        TestCase("negative values", (([-2, -1, 0, 1],),), [-1, -2, 1, 0]),
     ],
     "reverse_between": [
         TestCase("middle", (([1, 2, 3, 4, 5], 2, 4),), [1, 4, 3, 2, 5]),
@@ -54,6 +65,8 @@ LINKED_LIST_TESTS = {
         TestCase("to end", (([1, 2, 3, 4], 2, 4),), [1, 4, 3, 2]),
         TestCase("single", (([1], 1, 1),), [1]),
         TestCase("full reverse", (([1, 2, 3, 4, 5], 1, 5),), [5, 4, 3, 2, 1]),
+        TestCase("two nodes reverse both", (([1, 2], 1, 2),), [2, 1]),
+        TestCase("negative values", (([-3, -2, -1, 0], 2, 3),), [-3, -1, -2, 0]),
     ],
     "odd_even_linked_list": [
         TestCase("mixed", (([1, 2, 3, 4, 5],),), [1, 3, 5, 2, 4]),
@@ -61,6 +74,8 @@ LINKED_LIST_TESTS = {
         TestCase("two nodes", (([1, 2],),), [1, 2]),
         TestCase("single", (([1],),), [1]),
         TestCase("empty", (([],),), []),
+        TestCase("three nodes", (([1, 2, 3],),), [1, 3, 2]),
+        TestCase("negative values", (([-2, -1, 0, 1, 2],),), [-2, 0, 2, -1, 1]),
     ],
     "split_linked_list": [
         TestCase("split 5 into 3", (([1, 2, 3, 4, 5], 3),), [[1, 2], [3, 4], [5]]),
@@ -68,6 +83,12 @@ LINKED_LIST_TESTS = {
         TestCase("even split", (([1, 2, 3, 4], 2),), [[1, 2], [3, 4]]),
         TestCase("single", (([1], 1),), [[1]]),
         TestCase("empty list", (([], 3),), [[], [], []]),
+        TestCase("k=1", (([1, 2, 3, 4, 5], 1),), [[1, 2, 3, 4, 5]]),
+        TestCase(
+            "10 into 3",
+            (([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 3),),
+            [[1, 2, 3, 4], [5, 6, 7], [8, 9, 10]],
+        ),
     ],
     "flatten_multilevel_list": [
         TestCase(
