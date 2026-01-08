@@ -126,10 +126,15 @@ class _MultilevelNode:
 
 
 def _create_multilevel_list(data: dict) -> Optional[_MultilevelNode]:
-    """Create a multilevel linked list from test data format."""
+    """Create a multilevel linked list from test data format.
+
+    Supports nested children via 'nested_child_at' and 'nested_child' keys.
+    """
     values = data.get("list", [])
     child_at = data.get("child_at", -1)
     child_values = data.get("child", [])
+    nested_child_at = data.get("nested_child_at", -1)
+    nested_child_values = data.get("nested_child", [])
 
     if not values:
         return None
@@ -147,10 +152,21 @@ def _create_multilevel_list(data: dict) -> Optional[_MultilevelNode]:
     if child_at >= 0 and child_at < len(nodes) and child_values:
         child_head = _MultilevelNode(child_values[0])
         child_current = child_head
+        child_nodes = [child_head]
         for val in child_values[1:]:
             child_current.next = _MultilevelNode(val)
             child_current = child_current.next
+            child_nodes.append(child_current)
         nodes[child_at].child = child_head
+
+        # Attach nested child if specified
+        if nested_child_at >= 0 and nested_child_at < len(child_nodes) and nested_child_values:
+            nested_head = _MultilevelNode(nested_child_values[0])
+            nested_current = nested_head
+            for val in nested_child_values[1:]:
+                nested_current.next = _MultilevelNode(val)
+                nested_current = nested_current.next
+            child_nodes[nested_child_at].child = nested_head
 
     return head
 
@@ -270,6 +286,101 @@ TREE_OUTPUT_FUNCS = {
     "connect_all_siblings",
 }
 
+# Graph functions that need special handling
+GRAPH_INPUT_FUNCS = {
+    "clone_graph",
+}
+
+GRAPH_OUTPUT_FUNCS = {
+    "clone_graph",
+}
+
+
+def _create_graph_from_adjacency_list(adj_list: list[list[int]]) -> Optional[Any]:
+    """Create a graph from adjacency list format.
+
+    The adjacency list format uses 1-indexed nodes.
+    adj_list[i] contains neighbors of node i+1.
+    Returns the first node (node with value 1).
+    """
+    if not adj_list:
+        return None
+
+    # Create all nodes first
+    nodes: dict[int, Any] = {}
+    for i in range(len(adj_list)):
+        # Create a simple node object with val and neighbors attributes
+        # This matches the Node class defined in the notebook
+        node = type("Node", (), {"val": i + 1, "neighbors": []})()
+        nodes[i + 1] = node
+
+    # Connect neighbors
+    for i, neighbors in enumerate(adj_list):
+        nodes[i + 1].neighbors = [nodes[n] for n in neighbors if n in nodes]
+
+    return nodes.get(1)
+
+
+def _graph_to_adjacency_list(node: Any) -> Optional[list[list[int]]]:
+    """Convert a graph back to adjacency list format.
+
+    Uses BFS to traverse the graph and build adjacency list.
+    """
+    if node is None:
+        return None
+
+    # Use BFS to traverse all nodes
+    visited: dict[int, Any] = {}
+    queue = [node]
+    visited[node.val] = node
+
+    while queue:
+        curr = queue.pop(0)
+        for neighbor in curr.neighbors:
+            if neighbor.val not in visited:
+                visited[neighbor.val] = neighbor
+                queue.append(neighbor)
+
+    # Build adjacency list (sorted by node value)
+    max_val = max(visited.keys())
+    adj_list: list[list[int]] = []
+    for i in range(1, max_val + 1):
+        if i in visited:
+            adj_list.append(sorted([n.val for n in visited[i].neighbors]))
+        else:
+            adj_list.append([])
+
+    return adj_list
+
+
+def _preprocess_graph_args(func_name: str, args: tuple) -> tuple:
+    """Convert adjacency list to graph Node objects."""
+    if func_name not in GRAPH_INPUT_FUNCS:
+        return args
+
+    new_args = list(args)
+
+    if func_name == "clone_graph":
+        if args[0] is None:
+            return args
+        if isinstance(args[0], list):
+            new_args[0] = _create_graph_from_adjacency_list(args[0])
+
+    return tuple(new_args)
+
+
+def _postprocess_graph_result(func_name: str, result: Any) -> Any:
+    """Convert graph Node result back to adjacency list format."""
+    if func_name not in GRAPH_OUTPUT_FUNCS:
+        return result
+
+    if func_name == "clone_graph":
+        if result is None:
+            return None
+        return _graph_to_adjacency_list(result)
+
+    return result
+
 
 def _postprocess_tree_result(func_name: str, result: Any) -> Any:
     """Convert TreeNode result back to comparable format."""
@@ -341,9 +452,10 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
     """Run a single test case."""
     test_args = test.args[0]  # Capture the input arguments
 
-    # Preprocess arguments for linked list and tree functions
+    # Preprocess arguments for linked list, tree, and graph functions
     preprocessed_args = _preprocess_linked_list_args(func_name, test_args)
     preprocessed_args = _preprocess_tree_args(func_name, preprocessed_args)
+    preprocessed_args = _preprocess_graph_args(func_name, preprocessed_args)
 
     # Make a copy for functions that modify in-place
     if test.check_modified_arg is not None:
@@ -393,9 +505,10 @@ def _run_test(func: Callable[..., Any], test: TestCase, func_name: str = "") -> 
             # Postprocess linked list results for in-place modifications
             actual = _postprocess_linked_list_result(func_name, actual)
         else:
-            # Postprocess linked list and tree results
+            # Postprocess linked list, tree, and graph results
             actual = _postprocess_linked_list_result(func_name, actual)
             actual = _postprocess_tree_result(func_name, actual)
+            actual = _postprocess_graph_result(func_name, actual)
 
         # Check result
         if test.comparator:

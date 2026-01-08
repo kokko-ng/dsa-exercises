@@ -21,6 +21,7 @@ FAST_SLOW_TESTS: dict[str, list[TestCase]] = {
         TestCase("cycle to self", (({"list": [1], "pos": 0},),), 1),
         TestCase("cycle at middle", (({"list": [1, 2, 3, 4, 5], "pos": 2},),), 3),
         TestCase("long list no cycle", (({"list": [1, 2, 3, 4, 5], "pos": -1},),), None),
+        TestCase("two nodes no cycle", (({"list": [1, 2], "pos": -1},),), None),
     ],
     "happy_number_fast_slow": [
         TestCase("happy 19", ((19,),), True),
@@ -45,6 +46,7 @@ FAST_SLOW_TESTS: dict[str, list[TestCase]] = {
         TestCase("palindrome even", (([1, 2, 2, 1],),), True),
         TestCase("not palindrome", (([1, 2],),), False),
         TestCase("single node", (([1],),), True),
+        TestCase("two nodes palindrome", (([1, 1],),), True),
         TestCase("palindrome odd", (([1, 2, 1],),), True),
         TestCase("not palindrome long", (([1, 2, 3, 4],),), False),
         TestCase("all same", (([1, 1, 1, 1],),), True),

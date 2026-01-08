@@ -74,7 +74,7 @@ TWO_POINTERS_TESTS: dict[str, list[TestCase]] = {
         TestCase("no backspace", (("abc", "abc"),), True),
         TestCase("multiple backspace", (("a###b", "b"),), True),
         TestCase("backspace at start", (("#a#b", "b"),), True),
-        TestCase("empty result", (("####", ""),), True),
+        TestCase("empty result", (("####", "#"),), True),
         TestCase("single chars", (("a", "a"),), True),
         TestCase("single char diff", (("a", "b"),), False),
         TestCase("complex", (("bxj##tw", "bxo#j##tw"),), True),
@@ -119,6 +119,7 @@ TWO_POINTERS_TESTS: dict[str, list[TestCase]] = {
         TestCase("single char found", (("a", "a"),), True),
         TestCase("single char not found", (("a", "b"),), False),
         TestCase("repeated chars", (("aab", "cbdaaboa"),), True),
+        TestCase("at start", (("ab", "abcd"),), True),
     ],
     "find_all_anagrams": [
         TestCase("example 1", (("cbaebabacd", "abc"),), [0, 6]),
@@ -139,8 +140,10 @@ TWO_POINTERS_TESTS: dict[str, list[TestCase]] = {
         TestCase("all zeros", (([0, 0, 0], 3),), 3),
         TestCase("k equals length", (([0, 1, 0], 3),), 3),
         TestCase("single element", (([1], 0),), 1),
+        TestCase("single zero", (([0], 1),), 1),
         TestCase("no flips needed", (([1, 1, 1, 1], 2),), 4),
         TestCase("all need flip", (([0, 0, 0, 0], 2),), 2),
+        TestCase("k zero with zeros", (([1, 0, 1, 0, 1], 0),), 1),
     ],
     "fruit_into_baskets": [
         TestCase("example 1", (([1, 2, 1],),), 3),

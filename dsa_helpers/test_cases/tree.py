@@ -9,18 +9,28 @@ TREE_TESTS: dict[str, list[TestCase]] = {
         TestCase("empty", (([],),), []),
         TestCase("left skewed", (([1, 2, None, 3],),), [[1], [2], [3]]),
         TestCase("right skewed", (([1, None, 2, None, 3],),), [[1], [2], [3]]),
+        TestCase("negative values", (([-10, -5, -3, -2, -1],),), [[-10], [-5, -3], [-2, -1]]),
+        TestCase("duplicates", (([1, 1, 1, 1, 1],),), [[1], [1, 1], [1, 1]]),
     ],
     "reverse_level_order": [
         TestCase("complete tree", (([3, 9, 20, None, None, 15, 7],),), [[15, 7], [9, 20], [3]]),
         TestCase("single node", (([1],),), [[1]]),
         TestCase("empty", (([],),), []),
         TestCase("left skewed", (([1, 2, None, 3],),), [[3], [2], [1]]),
+        TestCase("right skewed", (([1, None, 2, None, 3],),), [[3], [2], [1]]),
+        TestCase("negative values", (([-1, -2, -3],),), [[-2, -3], [-1]]),
     ],
     "zigzag_level_order": [
         TestCase("complete tree", (([3, 9, 20, None, None, 15, 7],),), [[3], [20, 9], [15, 7]]),
         TestCase("single node", (([1],),), [[1]]),
         TestCase("empty", (([],),), []),
         TestCase("two levels", (([1, 2, 3],),), [[1], [3, 2]]),
+        TestCase(
+            "four levels",
+            (([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],),),
+            [[1], [3, 2], [4, 5, 6, 7], [15, 14, 13, 12, 11, 10, 9, 8]],
+        ),
+        TestCase("negative values", (([-1, -2, -3, -4, -5],),), [[-1], [-3, -2], [-4, -5]]),
     ],
     "average_of_levels": [
         TestCase("complete tree", (([3, 9, 20, None, None, 15, 7],),), [3.0, 14.5, 11.0]),
@@ -36,12 +46,16 @@ TREE_TESTS: dict[str, list[TestCase]] = {
         TestCase("single node", (([1],),), 1),
         TestCase("empty", (([],),), 0),
         TestCase("unbalanced", (([1, 2, 3, 4],),), 2),
+        TestCase("right skewed", (([1, 2, None, None, 3],),), 2),
+        TestCase("negative values", (([-1, -2, -3],),), 2),
     ],
     "maximum_depth": [
         TestCase("balanced", (([3, 9, 20, None, None, 15, 7],),), 3),
         TestCase("single node", (([1],),), 1),
         TestCase("empty", (([],),), 0),
         TestCase("left skewed", (([1, 2, None, 3],),), 3),
+        TestCase("right skewed", (([1, None, 2, None, 3, None, 4],),), 4),
+        TestCase("negative values", (([-1, -2, -3],),), 2),
     ],
     "level_order_successor": [
         TestCase("in same level", (([3, 9, 20, None, None, 15, 7], 9),), 20),
@@ -61,6 +75,10 @@ TREE_TESTS: dict[str, list[TestCase]] = {
         TestCase("empty", (([],),), []),
         TestCase("two levels", (([1, 2, 3],),), [[1, None], [2, 3, None]]),
         TestCase("left skewed", (([1, 2, None, 3],),), [[1, None], [2, None], [3, None]]),
+        TestCase("right skewed", (([1, None, 2, None, 3],),), [[1, None], [2, None], [3, None]]),
+        TestCase(
+            "unbalanced", (([1, 2, 3, 4, None, None, 5],),), [[1, None], [2, 3, None], [4, 5, None]]
+        ),
     ],
     "path_sum": [
         TestCase("has path", (([5, 4, 8, 11, None, 13, 4, 7, 2, None, None, None, 1], 22),), True),
@@ -102,6 +120,8 @@ TREE_TESTS: dict[str, list[TestCase]] = {
         TestCase("wrong root", (([1, 2, 3], [2, 3]),), False),
         TestCase("partial match", (([1, 2, 3], [1, 2]),), True),
         TestCase("single wrong value", (([1], [2]),), False),
+        TestCase("empty tree empty sequence", (([], []),), False),
+        TestCase("empty tree non-empty sequence", (([], [1]),), False),
     ],
     "count_paths_for_sum": [
         TestCase("multiple paths", (([10, 5, -3, 3, 2, None, 11, 3, -2, None, 1], 8),), 3),
@@ -120,6 +140,8 @@ TREE_TESTS: dict[str, list[TestCase]] = {
         TestCase("empty", (([],),), 0),
         TestCase("two nodes", (([1, 2],),), 1),
         TestCase("full tree 3 levels", (([1, 2, 3, 4, 5, 6, 7],),), 4),
+        TestCase("negative values", (([-1, -2, -3, -4, -5],),), 3),
+        TestCase("diameter not through root", (([1, 2, None, 3, 4, None, 5, None, 6],),), 4),
     ],
     "path_with_maximum_sum": [
         TestCase("mixed", (([-10, 9, 20, None, None, 15, 7],),), 42),

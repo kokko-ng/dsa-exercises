@@ -1,5 +1,6 @@
 """Test cases for Two Heaps problems (Category 09)."""
 
+from ..comparators import reorganize_string_compare
 from . import TestCase
 
 TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
@@ -116,16 +117,17 @@ TWO_HEAPS_TESTS: dict[str, list[TestCase]] = {
         TestCase("single element lists", (([[1], [2], [3]],),), [1, 3]),
         TestCase("negative values", (([[-5, -1, 0], [-3, 2, 4], [-2, 1, 3]],),), [-2, 0]),
         TestCase("overlapping ranges", (([[1, 5, 8], [4, 12], [7, 8, 10]],),), [4, 7]),
+        TestCase("single list", (([[1, 2, 3]],),), [1, 1]),
     ],
     "reorganize_string": [
-        TestCase("possible", (("aab",),), "aba"),
-        TestCase("impossible", (("aaab",),), ""),
-        TestCase("single", (("a",),), "a"),
-        TestCase("two chars", (("aabb",),), "abab"),
-        TestCase("three chars", (("aabc",),), "abac"),
-        TestCase("all same", (("aaa",),), ""),
-        TestCase("many chars balanced", (("aabbccdd",),), "abcdabcd"),
-        TestCase("two same", (("aa",),), ""),
-        TestCase("long string", (("aaabbbccc",),), "abcabcabc"),
+        TestCase("possible", (("aab",),), "aba", reorganize_string_compare),
+        TestCase("impossible", (("aaab",),), "", reorganize_string_compare),
+        TestCase("single", (("a",),), "a", reorganize_string_compare),
+        TestCase("two chars", (("aabb",),), "abab", reorganize_string_compare),
+        TestCase("three chars", (("aabc",),), "abac", reorganize_string_compare),
+        TestCase("all same", (("aaa",),), "", reorganize_string_compare),
+        TestCase("many chars balanced", (("aabbccdd",),), "abcdabcd", reorganize_string_compare),
+        TestCase("two same", (("aa",),), "", reorganize_string_compare),
+        TestCase("long string", (("aaabbbccc",),), "abcabcabc", reorganize_string_compare),
     ],
 }

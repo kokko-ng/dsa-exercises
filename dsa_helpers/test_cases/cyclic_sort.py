@@ -87,5 +87,6 @@ CYCLIC_SORT_TESTS: dict[str, list[TestCase]] = {
         TestCase("with duplicates", (([1, 1, 1, 1], 3),), [2, 3, 4]),
         TestCase("k equals 1", (([2, 3, 4], 1),), [1]),
         TestCase("with zeros", (([0, 1, 2], 2),), [3, 4]),
+        TestCase("single element", (([1], 2),), [2, 3]),
     ],
 }

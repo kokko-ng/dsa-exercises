@@ -18,6 +18,8 @@ LINKED_LIST_TESTS: dict[str, list[TestCase]] = {
         TestCase("two elements", (([1, 2, 3, 4, 5], 3, 4),), [1, 2, 4, 3, 5]),
         TestCase("single element", (([5], 1, 1),), [5]),
         TestCase("first two", (([1, 2, 3], 1, 2),), [2, 1, 3]),
+        TestCase("left equals right", (([1, 2, 3, 4, 5], 3, 3),), [1, 2, 3, 4, 5]),
+        TestCase("negative values", (([-5, -4, -3, -2, -1], 2, 4),), [-5, -2, -3, -4, -1]),
     ],
     "reverse_k_group": [
         TestCase("k=2", (([1, 2, 3, 4, 5], 2),), [2, 1, 4, 3, 5]),
@@ -27,6 +29,7 @@ LINKED_LIST_TESTS: dict[str, list[TestCase]] = {
         TestCase("single", (([1], 1),), [1]),
         TestCase("negative values", (([-3, -2, -1, 0, 1, 2], 2),), [-2, -3, 0, -1, 2, 1]),
         TestCase("remainder nodes", (([1, 2, 3, 4, 5, 6, 7], 3),), [3, 2, 1, 6, 5, 4, 7]),
+        TestCase("duplicates", (([1, 1, 2, 2, 3, 3], 2),), [1, 1, 2, 2, 3, 3]),
     ],
     "reverse_alternating_k": [
         TestCase("k=2", (([1, 2, 3, 4, 5, 6, 7, 8], 2),), [2, 1, 3, 4, 6, 5, 7, 8]),
@@ -89,6 +92,8 @@ LINKED_LIST_TESTS: dict[str, list[TestCase]] = {
             (([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 3),),
             [[1, 2, 3, 4], [5, 6, 7], [8, 9, 10]],
         ),
+        TestCase("negative values", (([-3, -2, -1, 0], 2),), [[-3, -2], [-1, 0]]),
+        TestCase("single into multiple", (([5], 3),), [[5], [], []]),
     ],
     "flatten_multilevel_list": [
         TestCase(

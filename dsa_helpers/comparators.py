@@ -75,6 +75,30 @@ def palindrome_substring_compare(result: Any, expected: Any) -> bool:
     return result == result[::-1]
 
 
+def reorganize_string_compare(result: Any, expected: Any) -> bool:
+    """Compare reorganized strings.
+
+    For reorganize_string: validates that no two adjacent characters are the same
+    and result contains the same characters as expected (or empty if impossible).
+    """
+    if not isinstance(result, str):
+        return False
+    # If expected is empty string, result must also be empty
+    if expected == "":
+        return result == ""
+    # If result is empty, expected must also be empty
+    if result == "":
+        return expected == ""
+    # Check same length and same characters
+    if sorted(result) != sorted(expected):
+        return False
+    # Check no adjacent duplicates
+    for i in range(1, len(result)):
+        if result[i] == result[i - 1]:
+            return False
+    return True
+
+
 def frequency_sort_compare(result: Any, expected_input: str) -> bool:
     """Compare frequency-sorted strings.
 

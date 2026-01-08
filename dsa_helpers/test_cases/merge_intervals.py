@@ -46,6 +46,7 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("touching", (([[1, 3], [5, 7]], [[3, 5]]),), [[3, 3], [5, 5]]),
         TestCase("partial overlap", (([[1, 5], [10, 15]], [[3, 12]]),), [[3, 5], [10, 12]]),
         TestCase("single point", (([[1, 1]], [[1, 1]]),), [[1, 1]]),
+        TestCase("both empty", (([], []),), []),
     ],
     "meeting_rooms": [
         TestCase("overlapping", (([[0, 30], [5, 10], [15, 20]],),), False),
@@ -76,6 +77,7 @@ MERGE_INTERVALS_TESTS: dict[str, list[TestCase]] = {
         TestCase("single", (([[1, 2]],),), 0),
         TestCase("nested", (([[1, 10], [2, 3], [4, 5]],),), 1),
         TestCase("chain remove", (([[1, 3], [2, 4], [3, 5], [4, 6]],),), 2),
+        TestCase("negative intervals", (([[-3, -1], [-2, 0], [1, 2]],),), 1),
     ],
     "employee_free_time": [
         TestCase("example 1", (([[[1, 2], [5, 6]], [[1, 3]], [[4, 10]]],),), [[3, 4]]),

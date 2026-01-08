@@ -58,6 +58,8 @@ K_WAY_MERGE_TESTS: dict[str, list[TestCase]] = {
         TestCase("single row", (([[1, 2, 3, 4, 5]], 3),), 3),
         TestCase("single column", (([[1], [2], [3], [4]], 2),), 2),
         TestCase("rectangular", (([[1, 2, 3], [4, 5, 6]], 5),), 5),
+        TestCase("negative numbers", (([[-10, -5, 0], [-3, 2, 5], [1, 4, 8]], 4),), -3),
+        TestCase("with duplicates", (([[1, 2, 2], [2, 3, 3], [3, 4, 5]], 5),), 3),
     ],
     "median_of_sorted_arrays": [
         TestCase("basic", (([1, 3], [2]),), 2.0),

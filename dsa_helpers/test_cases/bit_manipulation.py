@@ -19,6 +19,7 @@ BIT_MANIPULATION_TESTS: dict[str, list[TestCase]] = {
         TestCase("negative", (([-2, -2, -2, 3],),), 3),
         TestCase("zero is single", (([1, 1, 1, 0],),), 0),
         TestCase("negative single", (([1, 1, 1, -1],),), -1),
+        TestCase("all negatives", (([-2, -2, -2, -5],),), -5),
     ],
     "single_number_iii": [
         TestCase("basic", (([1, 2, 1, 3, 2, 5],),), [3, 5], sorted_compare),
@@ -26,6 +27,8 @@ BIT_MANIPULATION_TESTS: dict[str, list[TestCase]] = {
         TestCase("negative", (([-1, 0],),), [-1, 0], sorted_compare),
         TestCase("with zero", (([0, 1, 2, 2],),), [0, 1], sorted_compare),
         TestCase("large gap", (([1, 100, 1, 200, 100, 200, 5, 999],),), [5, 999], sorted_compare),
+        TestCase("both negative", (([-3, -5, 1, 1],),), [-5, -3], sorted_compare),
+        TestCase("zero and negative", (([0, -1, 2, 2],),), [-1, 0], sorted_compare),
     ],
     "counting_bits": [
         TestCase("n=2", ((2,),), [0, 1, 1]),
@@ -41,6 +44,7 @@ BIT_MANIPULATION_TESTS: dict[str, list[TestCase]] = {
         TestCase("zero", ((0,),), 0),
         TestCase("power of 2", ((1,),), 2147483648),  # 1 reversed is 10000...0 (MSB set)
         TestCase("all 32 ones", ((4294967295,),), 4294967295),  # All 1s stays all 1s
+        TestCase("alternating bits", ((2863311530,),), 1431655765),  # 0xAAAAAAAA -> 0x55555555
     ],
     "power_of_two": [
         TestCase("is power", ((1,),), True),

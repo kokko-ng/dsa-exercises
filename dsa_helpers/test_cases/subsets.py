@@ -64,6 +64,7 @@ SUBSETS_TESTS: dict[str, list[TestCase]] = {
             [[-1, 0, 1], [-1, 1, 0], [0, -1, 1], [0, 1, -1], [1, -1, 0], [1, 0, -1]],
             nested_set_compare,
         ),
+        TestCase("empty", (([],),), [[]], nested_set_compare),
     ],
     "permutations_with_duplicates": [
         TestCase(
@@ -79,6 +80,7 @@ SUBSETS_TESTS: dict[str, list[TestCase]] = {
             [[-1, -1, 0], [-1, 0, -1], [0, -1, -1]],
             nested_set_compare,
         ),
+        TestCase("empty", (([],),), [[]], nested_set_compare),
     ],
     "string_permutations_by_changing_case": [
         TestCase("letters", (("a1b2",),), ["a1b2", "a1B2", "A1b2", "A1B2"], nested_set_compare),
@@ -153,6 +155,7 @@ SUBSETS_TESTS: dict[str, list[TestCase]] = {
             ["ab", "1b", "a1", "2"],
             nested_set_compare,
         ),
+        TestCase("empty", (("",),), [""]),
     ],
     "evaluate_expression": [
         TestCase("simple", (("2-1-1",),), [0, 2], sorted_compare),

@@ -72,7 +72,28 @@ GRAPH_TESTS: dict[str, list[TestCase]] = {
         ),
     ],
     "clone_graph": [
-        # Requires special handling for graph nodes
+        # Test cases use adjacency list format: [[neighbors of node 1], [neighbors of node 2], ...]
+        # The checker will convert these to Node objects and verify deep copy
+        TestCase(
+            "basic four nodes",
+            (([[2, 4], [1, 3], [2, 4], [1, 3]],),),
+            [[2, 4], [1, 3], [2, 4], [1, 3]],
+        ),
+        TestCase(
+            "single node no neighbors",
+            (
+                (
+                    [
+                        [],
+                    ],
+                ),
+            ),
+            [[]],
+        ),
+        TestCase("two connected nodes", (([[2], [1]],),), [[2], [1]]),
+        TestCase("empty graph", ((None,),), None),
+        TestCase("triangle", (([[2, 3], [1, 3], [1, 2]],),), [[2, 3], [1, 3], [1, 2]]),
+        TestCase("star graph", (([[2, 3, 4], [1], [1], [1]],),), [[2, 3, 4], [1], [1], [1]]),
     ],
     "pacific_atlantic_water": [
         TestCase(
@@ -111,12 +132,12 @@ GRAPH_TESTS: dict[str, list[TestCase]] = {
         TestCase("example 1", (("hit", "cog", ["hot", "dot", "dog", "lot", "log", "cog"]),), 5),
         TestCase("no path", (("hit", "cog", ["hot", "dot", "dog", "lot", "log"]),), 0),
         TestCase("short path", (("hot", "dog", ["hot", "dot", "dog"]),), 3),
-        TestCase("same word", (("hit", "hit", ["hit"]),), 1),
         TestCase(
             "longer path", (("go", "sq", ["si", "go", "se", "cm", "so", "ph", "os", "sq"]),), 3
         ),
         TestCase("single char", (("a", "c", ["a", "b", "c"]),), 2),
         TestCase("direct transform", (("ab", "ac", ["ac"]),), 2),
+        TestCase("begin not in list", (("hit", "hot", ["hot"]),), 2),
     ],
     "network_delay_time": [
         TestCase("example 1", (([[2, 1, 1], [2, 3, 1], [3, 4, 1]], 4, 2),), 2),
@@ -137,7 +158,7 @@ GRAPH_TESTS: dict[str, list[TestCase]] = {
         TestCase("unreachable", ((3, [[0, 1, 100]], 0, 2, 1),), -1),
         TestCase("direct flight", ((2, [[0, 1, 100]], 0, 1, 0),), 100),
         TestCase("k larger than needed", ((3, [[0, 1, 100], [1, 2, 100]], 0, 2, 5),), 200),
-        TestCase("same src and dst", ((2, [[0, 1, 100]], 0, 0, 0),), 0),
+        TestCase("no flights", ((3, [], 0, 2, 1),), -1),
     ],
     "minimum_height_trees": [
         TestCase("example 1", ((4, [[1, 0], [1, 2], [1, 3]]),), [1]),
@@ -177,6 +198,13 @@ GRAPH_TESTS: dict[str, list[TestCase]] = {
         ),
         TestCase("single path", (([[1], [2], []],),), [[0, 1, 2]]),
         TestCase("direct", (([[1], []],),), [[0, 1]]),
+        TestCase("minimal two node", (([[1], []],),), [[0, 1]]),
+        TestCase(
+            "multiple branches",
+            (([[1, 2, 3], [], [], []],),),
+            [[0, 1], [0, 2], [0, 3]],
+            unordered_list_compare,
+        ),
     ],
     "critical_connections": [
         TestCase(

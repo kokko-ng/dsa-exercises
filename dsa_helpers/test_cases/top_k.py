@@ -12,6 +12,10 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("one dominant", (([1, 1, 1, 1, 2, 3, 4], 1),), [1]),
         TestCase("all unique", (([1, 2, 3, 4, 5], 3),), None, None),  # Multiple valid
         TestCase("two groups", (([1, 1, 1, 2, 2, 2, 3], 2),), [1, 2], set_compare),
+        TestCase("all same element", (([5, 5, 5, 5], 1),), [5]),
+        TestCase(
+            "large with few unique", (([1] * 100 + [2] * 50 + [3] * 25, 2),), [1, 2], set_compare
+        ),
     ],
     "kth_largest_element": [
         TestCase("example 1", (([3, 2, 1, 5, 6, 4], 2),), 5),
@@ -67,9 +71,12 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("x in middle", (([1, 2, 3, 4, 5], 3, 3),), [2, 3, 4]),
         TestCase("k equals array", (([1, 2, 3], 3, 2),), [1, 2, 3]),
         TestCase("single element", (([5], 1, 5),), [5]),
+        TestCase("single element x differs", (([5], 1, 10),), [5]),
         TestCase("x is element", (([1, 3, 5, 7, 9], 3, 5),), [3, 5, 7]),
         TestCase("between elements", (([1, 2, 4, 5], 2, 3),), [2, 4]),
         TestCase("with negatives", (([-3, -1, 0, 2, 4], 3, 0),), [-1, 0, 2]),
+        TestCase("with duplicates", (([1, 2, 2, 3, 3, 4], 3, 2),), [2, 2, 3]),
+        TestCase("tie breaker smaller", (([1, 3, 5, 7], 2, 4),), [3, 5]),
     ],
     "connect_ropes": [
         TestCase("example 1", (([1, 3, 11, 5],),), 33),
@@ -114,6 +121,8 @@ TOP_K_TESTS: dict[str, list[TestCase]] = {
         TestCase("k equals size", ((3, [1, 2, 3], [4, 5]),), [2, 3]),
         TestCase("all same", ((2, [5, 5], [5, 5]),), [5, 5]),
         TestCase("with negatives", ((2, [-3, -1, 0], [1, 2]),), [0, 1]),
+        TestCase("initial less than k", ((2, [5], [3, 1, 2]),), [3, 3, 3]),
+        TestCase("add smaller values", ((2, [3, 4, 5], [1, 2]),), [4, 4]),
     ],
     "top_k_frequent_words": [
         TestCase("basic", ((["i", "love", "leetcode", "i", "love", "coding"], 2),), ["i", "love"]),

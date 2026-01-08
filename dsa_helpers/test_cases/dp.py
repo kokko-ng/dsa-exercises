@@ -31,6 +31,7 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("single", (([5],),), 5),
         TestCase("two houses", (([1, 2],),), 2),
         TestCase("three houses", (([1, 2, 3],),), 3),
+        TestCase("all same values", (([5, 5, 5, 5],),), 10),
     ],
     "min_cost_climbing_stairs": [
         TestCase("basic", (([10, 15, 20],),), 15),
@@ -63,6 +64,8 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("single", (([1], 1),), 1),
         TestCase("impossible", (([1], 2),), 0),
         TestCase("zeros", (([0, 0, 1], 1),), 4),
+        TestCase("negative target", (([1, 2, 1], -2),), 2),
+        TestCase("zero target", (([1, 1], 0),), 2),
     ],
     "minimum_subset_sum_difference": [
         TestCase("basic", (([1, 6, 11, 5],),), 1),
@@ -100,6 +103,8 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("basic", (("abc",),), 3),
         TestCase("aaa", (("aaa",),), 6),
         TestCase("single", (("a",),), 1),
+        TestCase("two different chars", (("ab",),), 2),
+        TestCase("two same chars", (("aa",),), 3),
     ],
     "edit_distance": [
         TestCase("basic", (("horse", "ros"),), 3),
@@ -163,11 +168,14 @@ DP_TESTS: dict[str, list[TestCase]] = {
             nested_set_compare,
         ),
         TestCase("no solution", (("cats", ["cat", "dog"]),), []),
+        TestCase("single word", (("cat", ["cat"]),), ["cat"]),
     ],
     "longest_string_chain": [
         TestCase("basic", ((["a", "b", "ba", "bca", "bda", "bdca"],),), 4),
         TestCase("single", ((["abcd"],),), 1),
         TestCase("no chain", ((["a", "bc"],),), 1),
+        TestCase("two word chain", ((["a", "ab"],),), 2),
+        TestCase("branching chain", ((["a", "ab", "ac", "abc"],),), 3),
     ],
     "maximal_square": [
         TestCase(
@@ -193,6 +201,8 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("basic", (([3, 1, 5, 8],),), 167),
         TestCase("single", (([5],),), 5),
         TestCase("two", (([1, 5],),), 10),
+        TestCase("with zeros", (([0, 1, 0],),), 0),
+        TestCase("three ascending", (([1, 2, 3],),), 12),
     ],
     "regular_expression_matching": [
         TestCase("no special", (("aa", "a"),), False),
@@ -202,5 +212,8 @@ DP_TESTS: dict[str, list[TestCase]] = {
         TestCase("empty pattern", (("a", ""),), False),
         TestCase("match with dot", (("ab", "a."),), True),
         TestCase("star matches zero", (("ab", "a*b"),), True),
+        TestCase("multiple stars", (("aaa", "a*a"),), True),
+        TestCase("dot at end", (("abc", "ab."),), True),
+        TestCase("star matches many", (("aaaa", "a*"),), True),
     ],
 }

@@ -11,6 +11,7 @@ MONOTONIC_STACK_TESTS: dict[str, list[TestCase]] = {
         TestCase("single element", (([1], [1, 2]),), [2]),
         TestCase("reversed", (([4, 3, 2, 1], [1, 2, 3, 4]),), [-1, 4, 3, 2]),
         TestCase("same arrays", (([1, 2, 3], [1, 2, 3]),), [2, 3, -1]),
+        TestCase("nums1 equals nums2 single", (([5], [5]),), [-1]),
     ],
     "next_greater_element_ii": [
         TestCase("example 1", (([1, 2, 1],),), [2, -1, 2]),
@@ -21,7 +22,9 @@ MONOTONIC_STACK_TESTS: dict[str, list[TestCase]] = {
         TestCase("decreasing", (([5, 4, 3, 2, 1],),), [-1, 5, 5, 5, 5]),
         TestCase("increasing", (([1, 2, 3, 4, 5],),), [2, 3, 4, 5, -1]),
         TestCase("peak in middle", (([1, 5, 3, 2, 4],),), [5, -1, 4, 4, 5]),
-        TestCase("negative numbers", (([-2, -1, -3],),), [-1, -1, -1]),
+        TestCase("negative numbers", (([-2, -1, -3],),), [-1, -1, -2]),
+        TestCase("mixed positive negative", (([-1, 2, -1],),), [2, -1, 2]),
+        TestCase("large values", (([1000000000, 999999999],),), [-1, 1000000000]),
     ],
     "daily_temperatures": [
         TestCase("example 1", (([73, 74, 75, 71, 69, 72, 76, 73],),), [1, 1, 4, 2, 1, 1, 0, 0]),
@@ -95,6 +98,8 @@ MONOTONIC_STACK_TESTS: dict[str, list[TestCase]] = {
         TestCase("one out of place", (([1, 3, 2, 4, 5],),), 2),
         TestCase("negative numbers", (([-1, -2, -3],),), 3),
         TestCase("negative sorted", (([-3, -2, -1],),), 0),
+        TestCase("duplicates unsorted", (([1, 3, 2, 2, 2],),), 4),
+        TestCase("duplicates at boundary", (([1, 2, 2, 2, 1],),), 5),
     ],
     "maximal_rectangle": [
         TestCase(
